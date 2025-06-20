@@ -57,7 +57,7 @@ bufferline.setup({
 		end,
 
 		-- 排序规则
-		sort_by = "last", -- insert it to the end of the list
+		sort_by = "insert_at_end", -- insert it to the end of the list
 	},
 
 	-- 高亮组设置
@@ -72,6 +72,46 @@ bufferline.setup({
 		},
 	},
 })
+
+-- Buffer line
+-- 1. 使用 <leader> + 数字 => 直接跳转到对应缓冲区
+for i = 1, 9 do
+	vim.keymap.set("n", "<leader>" .. i, function()
+		bufferline.go_to(i, true)
+	end, { desc = "Go to buffer " .. i })
+end
+
+-- 2. 使用 gt/gT 在缓冲区之间切换
+vim.keymap.set({ "v", "n" }, "gt", "<cmd>BufferLineCycleNext<CR>", { desc = "Next buffer" })
+vim.keymap.set({ "v", "n" }, "gT", "<cmd>BufferLineCyclePrev<CR>", { desc = "Previous buffer" })
+
+-- 3. 关闭当前缓冲区并切换到上一个
+vim.keymap.set({ "v", "n" }, "ZZ", function()
+	if vim.bo.modified then
+		util.log_err("No write sine last change.")
+		return
+	end
+	local buf = vim.fn.bufnr()
+	bufferline.cycle(-1)
+	vim.cmd.bdelete(buf)
+end, { desc = "Close current buffer" })
+
+-- 4. 添加更多实用的快捷键
+vim.keymap.set("n", "<leader>bc", "<cmd>BufferLinePickClose<CR>", { desc = "选择关闭缓冲区" })
+vim.keymap.set(
+	"n",
+	"<leader>bo",
+	"<cmd>BufferLineCloseLeft<CR><cmd>BufferLineCloseRight<CR>",
+	{ desc = "关闭其他缓冲区" }
+)
+vim.keymap.set("n", "<leader>br", "<cmd>BufferLineCloseRight<CR>", { desc = "关闭右侧缓冲区" })
+vim.keymap.set("n", "<leader>bl", "<cmd>BufferLineCloseLeft<CR>", { desc = "关闭左侧缓冲区" })
+
+vim.keymap.set("n", "<leader>bs", "<cmd>BufferLineSortByDirectory<CR>", { desc = "按目录排序" })
+vim.keymap.set("n", "<leader>bp", "<cmd>BufferLinePick<CR>", { desc = "选择缓冲区" })
+
+vim.keymap.set("n", "<leader>bmm", "<cmd>BufferLineMovePrev<CR>", { desc = "向左移动缓冲区" })
+vim.keymap.set("n", "<leader>bmn", "<cmd>BufferLineMoveNext<CR>", { desc = "向右移动缓冲区" })
 
 -- 添加自动命令组
 local augroup = vim.api.nvim_create_augroup("BufferlineConfig", { clear = true })

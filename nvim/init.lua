@@ -1,5 +1,5 @@
 require("plugins")
--- require("lsp")
+require("lsp")
 
 -- It must be loaded in last
 require("options")

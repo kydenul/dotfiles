@@ -1,25 +1,21 @@
 -- null_ls Format
+-- Note: This is my personal preference.
 
+-- Mason
 local util = require("util")
 local mason_ok, mason = pcall(require, "mason")
 if not mason_ok then
 	util.log_warn("mason load failed.")
 	return
 end
+mason.setup()
 
-local null_ls_ok, null_ls = pcall(require, "null-ls")
-if not null_ls_ok then
-	util.log_warn("null-ls load failed.")
-	return
-end
-
+-- mason-null-ls
 local mason_null_ls_ok, mason_null_ls = pcall(require, "mason-null-ls")
 if not mason_null_ls_ok then
 	util.log_warn("mason-null-ls load failed.")
 	return
 end
-
-mason.setup()
 
 mason_null_ls.setup({
 	-- A list of sources to install if they're not already installed.
@@ -57,6 +53,7 @@ mason_null_ls.setup({
 		-- Hint: see https://github.com/jose-elias-alvarez/null-ls.nvim/blob/main/doc/BUILTIN_CONFIG.md
 		--       to check what we can configure for each source
 		-- function() end, -- disables automatic setup of all null-ls sources
+
 		black = function(_, _)
 			null_ls.register(null_ls.builtins.formatting.black)
 		end,
@@ -69,23 +66,15 @@ mason_null_ls.setup({
 		clangformat = function(_, _)
 			null_ls.register(null_ls.builtins.formatting.clang_format)
 		end,
-		ocamlformat = function(_, _)
-			null_ls.register(null_ls.builtins.formatting.ocamlformat.with({
-				-- Add more arguments to a source's defaults
-				-- Default: { "--enable-outside-detected-project", "--name", "$FILENAME", "-" }
-				-- Type `ocamlformat --help` in your terminal to check more args
-				extra_args = {
-					"--if-then-else",
-					"vertical",
-					"--break-cases",
-					"fit-or-vertical",
-					"--type-decl",
-					"sparse",
-				},
-			}))
-		end,
 	},
 })
+
+-- Anything not supported by mason.
+local null_ls_ok, null_ls = pcall(require, "null-ls")
+if not null_ls_ok then
+	util.log_warn("null-ls load failed.")
+	return
+end
 
 local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
 null_ls.setup({
@@ -105,8 +94,6 @@ null_ls.setup({
 		null_ls.builtins.formatting.stylua,
 
 		-- Go
-		null_ls.builtins.formatting.gofumpt,
-		null_ls.builtins.formatting.goimports_reviser,
 		null_ls.builtins.diagnostics.golangci_lint,
 	},
 

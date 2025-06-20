@@ -45,6 +45,7 @@ gs.setup({
 
 	-- 状态栏集成
 	status_formatter = nil, -- 使用默认格式化器
+
 	-- 当插件附加到缓冲区时设置快捷键
 	on_attach = function(bufnr)
 		local function map(mode, lhs, rhs, opts)

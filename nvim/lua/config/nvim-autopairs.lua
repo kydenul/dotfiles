@@ -35,19 +35,3 @@ npairs.setup({
 		highlight_grey = "LineNr",
 	},
 })
-
--- Integration with nvim-cmp for function parentheses completion
-local ok_cmp, cmp = pcall(require, "cmp")
-if not ok_cmp then
-	util.log_warn("nvim-cmp not found, skipping autopairs integration")
-	return
-end
-
-local ok_cmp_autopairs, cmp_autopairs = pcall(require, "nvim-autopairs.completion.cmp")
-if not ok_cmp_autopairs then
-	util.log_warn("nvim-autopairs.completion.cmp not found")
-	return
-end
-
--- Insert parentheses after function or method completion
-cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
