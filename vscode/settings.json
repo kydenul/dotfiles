@@ -1,0 +1,372 @@
+{
+    // -----------------------------------------------------------------
+    "editor.fontSize": 17,
+    "editor.inlineSuggest.enabled": true,
+    "editor.smoothScrolling": true,
+    "editor.cursorStyle":"line",
+    "editor.cursorBlinking":"solid",
+    "editor.cursorSmoothCaretAnimation": "on",
+    "editor.fontFamily": "'Hack Nerd Font Mono', 'Fira Code', 'Source Code Pro'",
+    "editor.lineNumbers": "relative",
+    "editor.guides.bracketPairs": "active",
+    "editor.rulers": [120],
+    "editor.wordWrap": "on",
+    "editor.renderWhitespace": "boundary",
+    "editor.scrollbar.verticalScrollbarSize": 16,
+    "editor.minimap.enabled": false,
+    "editor.scrollbar.horizontal": "hidden",
+    "editor.scrollbar.vertical":"auto",
+    "editor.unicodeHighlight.ambiguousCharacters": false,
+
+    "window.customTitleBarVisibility": "windowed",
+    "window.titleBarStyle": "custom",
+    "window.commandCenter": false,
+    "window.title": "${dirty}${activeEditorShort}${separator}${rootName}${separator}${profileName}",
+
+    "workbench.panel.showLabels": false,
+    "workbench.activityBar.location": "hidden",
+    "workbench.colorTheme": "Gruvbox Dark Hard",
+    "workbench.layoutControl.enabled": false,
+    "workbench.iconTheme": "material-icon-theme",
+    "workbench.list.smoothScrolling": true,
+    "workbench.colorCustomizations": {
+        "statusBar.background": "#005f5f",
+        "statusBar.foreground": "#e6e7e8",
+        "terminal.foreground": "#839395",
+        "editorCursor.foreground": "#91d696"
+    },
+
+    "terminal.integrated.enableMultiLinePasteWarning": "auto",
+    "terminal.integrated.defaultProfile.linux": "zsh",
+    "terminal.integrated.defaultProfile.windows": "PowerShell",
+    "terminal.integrated.smoothScrolling": true,
+    "terminal.integrated.inheritEnv": false,
+
+    "chat.commandCenter.enabled": false,
+
+    "diffEditor.ignoreTrimWhitespace": true,
+    "diffEditor.hideUnchangedRegions.enabled": true,
+
+    // -----------------------------------------------------------------
+    // Vim
+    "extensions.experimental.affinity": { "vscodevim.vim": 1 }, // To improve performance
+    "vim.leader": "<space>", // leader - prefix key
+    "vim.easymotion": true,
+    "vim.useSystemClipboard": true,
+    "vim.replaceWithRegister": true,
+    "vim.ignorecase": true,
+    "vim.smartcase": true,
+    "vim.foldfix": true,
+    "vim.hlsearch": true,
+    "vim.highlightedyank.enable": true,
+    "vim.highlightedyank.color": "#a9dc7680",
+    "vim.highlightedyank.duration": 500,
+
+    // Input Method
+    // `brew tap daipeihust/tap && brew install im-select`
+    "vim.autoSwitchInputMethod.enable": true,
+    "vim.autoSwitchInputMethod.defaultIM": "com.apple.keylayout.ABC",
+    "vim.autoSwitchInputMethod.obtainIMCmd": "/opt/homebrew/bin/im-select",
+    "vim.autoSwitchInputMethod.switchIMCmd": "/opt/homebrew/bin/im-select {im}",
+
+    "vim.useCtrlKeys": true, // 是否由vim接管ctrl+any的按键，而不是vscode
+    // 由vscode进行处理，而不是vscode-vim插件
+    "vim.handleKeys": {
+        "<C-s>": true,
+        "<C-z>": false,
+        "<C-x>": true
+    },
+
+    "vim.normalModeKeyBindingsNonRecursive": [
+        // Terminal focus
+        { "before": ["<C-t>"], "commands": [{ "command":"workbench.action.terminal.focus" }]},
+
+        // Undo and Redo
+        { "before": ["u"], "commands": [{ "command":"undo" }]},
+        { "before": ["C-r"], "commands": [{ "command":"redo" }]},
+
+        // Split window
+        { "before": ["leader", "s", "v"], "commands": [{ "command": "workbench.action.splitEditorDown" }]},
+        { "before": ["leader", "s", "h"], "commands": [{ "command": "workbench.action.splitEditorRight" }]},
+
+        // Resize window
+        { "before": ["<C-k>"], "commands": [{ "command": "workbench.action.increaseViewHeight" }]},
+        { "before": ["<C-j>"], "commands": [{ "command": "workbench.action.decreaseViewHeight" }]},
+        { "before": ["<C-h>"], "commands": [{ "command": "workbench.action.increaseViewWidth" }]},
+        { "before": ["<C-l>"], "commands": [{ "command": "workbench.action.decreaseViewWidth" }]},
+
+        { "before": ["leader", "h"], "commands": [{ "command": "workbench.action.focusLeftGroup" }]},
+        { "before": ["leader", "j"], "commands": [{ "command": "workbench.action.focusBelowGroup" }]},
+        { "before": ["leader", "k"], "commands": [{ "command": "workbench.action.focusAboveGroup" }]},
+        { "before": ["leader", "l"], "commands": [{ "command": "workbench.action.focusRightGroup" }]},
+
+        // 语义级 重命名
+        { "before": ["leader", "r", "n"],  "commands": [{"command": "editor.action.rename"}] },
+        // Open Recent
+        { "before": ["leader", "r", "f"],  "commands": [{"command": "workbench.action.openRecent"}] },
+        // 
+        { "before": ["K"],  "commands": [{"command": "editor.action.showHover"}] },
+        { "before": ["g", "d"],  "commands": [{"command": "editor.action.revealDefinition"}] },
+        { "before": ["g", "r"],  "commands": [{"command": "editor.action.goToReferences"}] },
+        { "before": ["g", "i"],  "commands": [{"command": "editor.action.goToImplementation"}] },
+
+        // Line Home / End
+        { "before": ["H"], "after": ["^"] },
+        { "before": ["L"], "after": ["$"] },
+
+        // 侧边栏：显示与隐藏
+        { "before": ["leader", "e"], "commands": [{"command": "workbench.explorer.fileView.focus"}] },
+        { "before": ["leader", "leader", "e"], "commands": ["workbench.action.toggleActivityBarVisibility"] },
+
+        // Zen mode
+        { "before": ["leader", "z"], "commands": [{"command": "workbench.action.toggleZenMode", "when": "!isAuxiliaryWindowFocusedContext" }]},
+        // Quick open
+        { "before": ["leader", "o"], "commands": [{ "command": "workbench.action.quickOpen" }]},
+        //  Global find
+        { "before": ["leader", "f"], "commands": [{ "command": "workbench.action.findInFiles" }]},
+
+        // Trouble
+        { "before": ["[", "d"], "commands": ["editor.action.marker.prevInFiles"]},
+        { "before": ["]", "d"], "commands": ["editor.action.marker.nextInFiles"]},
+
+        // Source Control Git
+        { "before": ["leader", "g"], "commands": ["workbench.scm.focus"] },
+        // Start to debug
+        { "before": ["leader", "d"], "commands": ["workbench.action.debug.start"] },
+        { "before": ["leader", "c", "c"], "commands": [{ "command": "go.debug.cursor" }]},
+
+        // save file
+        { "before": ["leader","w"], "commands": [":w!" ] },
+        // Format file
+        { "before": ["leader", "="], "commands": ["editor.action.formatDocument"]},
+
+        // Quit
+        { "before": ["leader","q"], "commands": [":q" ] },
+        // Terminal
+        { "before": ["leader", "t"], "commands": [":terminal"] }, 
+
+        // Tab Next
+        { "before": ["g", "t"], "commands": ["workbench.action.nextEditorInGroup"] }, 
+        { "before": ["g", "T"], "commands": ["workbench.action.previousEditorInGroup"] }, 
+
+        // No highlight
+        { "before": ["leader", "n", "h"], "commands": [":nohl"] },
+
+        // EasyMotion
+        { "before": ["leader", ","], "after": ["leader", "leader", "s"] },
+
+        // Todo tree
+        { "before": ["leader", "t", "d"],  "commands": [{"command": "todo-tree-view.focus"}]},
+
+        // PlantUML
+        { "before": ["leader", "p", "t"], "commands": [{"command": "plantuml.exportDocument"}]},
+
+        // Generate commit message
+        { "before": ["leader", "c", "m"], "commands": [{ "command": "windsurf.generateCommitMessage" }]},
+
+        // Cline
+        { "before": ["leader", "c", "l"], "commands": [{ "command": "claude-dev.SidebarProvider.focus"}]},
+    ],
+
+    "vim.insertModeKeyBindings": [
+        { "before": ["j", "k"], "after": ["<Esc>"] },
+
+        // cursor move
+        { "before": ["C-n"], "commands": ["cursorDown"] },
+        { "before": ["C-p"], "commands": ["cursorUp"] }
+    ],
+
+    "vim.visualModeKeyBindings": [
+        { "before": [">"], "commands": [ "editor.action.indentLines"] },
+        { "before": ["<"], "commands": [ "editor.action.outdentLines"] },
+
+        // Visual 模式下，`p` 粘贴时而不覆盖当前寄存器
+        { "before": ["p"], "after": [ "p", "g", "v", "y"] },
+
+        { "before": ["H"], "after": ["^"] },
+        { "before": ["L"], "after": ["$"] }
+    ],
+
+    // -----------------------------------------------------------------
+    // Git
+    "git.autofetch": true,
+    "git.openRepositoryInParentFolders": "never",
+    "gitlens.codeLens.enabled": false,
+    "gitlens.statusBar.enabled": false,
+    "gitlens.hovers.enabled": false,
+    "gitlens.graph.layout": "editor",
+    "gitlens.ai.model": "gemini:gemini-2.0-flash",
+    "gitlens.views.commitDetails.files.layout": "tree",
+    "gitlens.views.scm.grouped.views": {
+        "commits": true,
+        "branches": true,
+        "remotes": true,
+        "stashes": true,
+        "tags": true,
+        "worktrees": true,
+        "contributors": true,
+        "repositories": false,
+        "searchAndCompare": true,
+        "launchpad": false
+    },
+
+    // -----------------------------------------------------------------
+    // todo-tree settings
+    "todo-tree.regex.regex": "((%|#|\"\"\"|'''|//|<!--|^\\s*\\*)\\s*($TAGS)|^\\s*- \\[( |x|X)\\])",
+    "todo-tree.regex.regexCaseSensitive": true,
+    "todo-tree.tree.showCountsInTree": true,
+    "todo-tree.general.tags": [ "TODO", "FIXME", "NOTE", "TAG", "BUG", "XXX" ],
+    "todo-tree.highlights.defaultHighlight": {"gutterIcon": true, "rulerLane": "right",
+        "foreground": "#ffffff", "background": "#2e5e18", "iconColour": "#38ad01"},
+    "todo-tree.highlights.customHighlight": {
+        "FIXME": { "background": "#FF0000", "iconColour": "#FF0000" },
+        "BUG": {  "background": "#008000", "iconColour": "#008000" },
+        "TAG": { "icon": "tag", "background": "#0b7c69", "iconColour": "#0b7c69" },
+        "NOTE": { "icon": "note", "background": "#7675cf", "iconColour": "#7675cf" },
+        "XXX": { "icon": "beaker", "background": "#FFA500", "iconColour": "#FFA500" }
+    },
+
+    // -----------------------------------------------------------------
+    // Markdownlint
+    // 关闭 preview 滚动的时候, Markdown 文件跟着滚动
+    "markdown.preview.scrollEditorWithPreview": false,
+    "markdownlint.config": {
+        "MD010": false,
+        "MD024": false,
+        "MD033": false
+    },
+
+    // -----------------------------------------------------------------
+    // Golang
+    "gopls": {  
+        "ui.semanticTokens": true,
+        "formatting.gofumpt": true,
+    },
+    "go.formatTool": "gofumpt",
+    "go.toolsManagement.autoUpdate": true,
+    "go.inlayHints.parameterNames": false,
+    "go.lintTool": "golangci-lint",
+    "go.lintFlags": [ "--fast" ],
+    
+    // -----------------------------------------------------------------
+    // Clangd
+    "clangd.onConfigChanged": "restart",
+    "clangd.path": "/usr/bin/clangd",
+    "clangd.arguments": [
+        "--compile-commands-dir=${workspaceFolder}/build",
+        "--header-insertion=never"
+    ],
+    "[c]": {
+        "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd"
+    },
+    "[cpp]": {
+        "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd"
+    },
+
+    // -----------------------------------------------------------------
+    // CMake
+    "cmake.configureOnOpen": true,
+    "cmake.generator": "Ninja",
+    "cmake.parallelJobs": 0,
+
+    // -----------------------------------------------------------------
+    // LaTex
+    "latex-workshop.latex.outDir": "%DIR%",
+    "latex-workshop.latex.tools": [
+        {
+            "name": "xelatex",
+            "command": "xelatex",
+            "args": [
+                "-synctex=1",
+                "-interaction=nonstopmode",
+                "-file-line-error",
+                "--output-directory=%OUTDIR%",
+                "%DOCFILE%"
+            ]
+        },
+        {
+            "name": "pdflatex",
+            "command": "pdflatex",
+            "args": [
+                "-synctex=1",
+                "-interaction=nonstopmode",
+                "-file-line-error",
+                "--output-directory=%OUTDIR%",
+                "%DOCFILE%"
+            ]
+        },
+        {
+            "name": "bibtex",
+            "command": "bibtex",
+            "args": ["%OUTDIR%/%DOCFILE%"],
+            "env": {"TEXMFOUTPUT": "%OUTDIR%"}
+        },
+        {
+            "name": "biber",
+            "command": "biber",
+            "args": ["%OUTDIR%/%DOCFILE%"],
+            "env": {"TEXMFOUTPUT": "%OUTDIR%"}
+        }
+    ],
+    "latex-workshop.latex.recipes": [
+        { "name": "xelatex", "tools": ["xelatex"] },
+        { "name": "pdflatex", "tools": ["pdflatex"] },
+        { "name": "xe->bibtex->xe*2", "tools": ["xelatex", "bibtex", "xelatex", "xelatex"] },
+        { "name": "xe->biber->xe*2", "tools": ["xelatex", "biber", "xelatex", "xelatex"] },
+        { "name": "pdf->bib->pdf*2", "tools": ["pdflatex", "bibtex", "pdflatex", "pdflatex"] }
+    ],
+    "latex-workshop.view.pdf.viewer": "tab",
+    "latex-workshop.view.pdf.internal.synctex.keybinding": "double-click",
+    "latex-workshop.latex.clean.fileTypes": [
+        "*.aux",
+        "*.bbl",
+        "*.blg",
+        "*.idx",
+        "*.ind",
+        "*.lof",
+        "*.lot",
+        "*.out",
+        "*.toc",
+        "*.acn",
+        "*.acr",
+        "*.alg",
+        "*.glg",
+        "*.glo",
+        "*.gls",
+        "*.ist",
+        "*.fls",
+        "*.log",
+        "*.fdb_latexmk",
+        "*.gz"
+    ],
+    "latex-workshop.latex.autoClean.run": "onFailed",
+    "latex-workshop.latex.autoBuild.run": "onSave",
+    "latex-workshop.latex.recipe.default": "lastUsed",
+    "latex-workshop.showContextMenu": true,
+    "latex-workshop.message.error.show": false,
+    "latex-workshop.message.warning.show": false,
+
+    // -----------------------------------------------------------------
+    // plantuml
+    "plantuml.exportOutDir": ".",
+    "plantuml.exportFormat": "svg",
+    "plantuml.exportSubFolder": false,
+
+    // -----------------------------------------------------------------
+    // remote SSH
+    "remote.autoForwardPortsSource": "hybrid",
+    "remote.SSH.remotePlatform": {
+        "*.devcloud.woa.com": "linux",
+        "DevCloud": "linux",
+        "kydenlu-any1.devcloud.woa.com": "linux"
+    },
+
+    // -----------------------------------------------------------------
+    // AI
+    "github.copilot.nextEditSuggestions.enabled": true,
+    "github.copilot.enable": {
+        "*": true,
+        "plaintext": false,
+        "markdown": true,
+    },
+}
