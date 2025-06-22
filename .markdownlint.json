@@ -1,0 +1,8 @@
+{
+  "comment": "MD013: 设置行长为120，但不对代码块和表格应用此规则",
+  "MD013": {
+    "line_length": 120,
+    "code_blocks": false,
+    "tables": false
+  }
+}

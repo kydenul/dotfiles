@@ -28,6 +28,8 @@ $ ln -s ~/.dotfiles/windsurf/keybindings.json /Users/<YourUserName>/Library/Appl
 $ ln -s ~/.dotfiles/windsurf/settings.json /Users/<YourUserName>/Library/Application\ Support/Windsurf/User/settings.json
 
 $ ln -s ~/.dotfiles/.zshrc ~/.zshrc
+$ ln -s ~/.dotfiles/.tmux.conf ~/.tmux.conf
+$ ln -s ~/.dotfiles/.markdownlint.json ~/.markdownlint.json
 ```
 
 ---
