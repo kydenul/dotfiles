@@ -99,4 +99,3 @@ tree.setup({
 		cmd = nil, -- Use system default program to open files
 	},
 })
-

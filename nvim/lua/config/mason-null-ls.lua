@@ -53,19 +53,6 @@ mason_null_ls.setup({
 		-- Hint: see https://github.com/jose-elias-alvarez/null-ls.nvim/blob/main/doc/BUILTIN_CONFIG.md
 		--       to check what we can configure for each source
 		-- function() end, -- disables automatic setup of all null-ls sources
-
-		black = function(_, _)
-			null_ls.register(null_ls.builtins.formatting.black)
-		end,
-		stylua = function(_, _)
-			null_ls.register(null_ls.builtins.formatting.stylua)
-		end,
-		rubyformat = function(_, _)
-			null_ls.register(null_ls.builtins.formatting.rubyfmt)
-		end,
-		clangformat = function(_, _)
-			null_ls.register(null_ls.builtins.formatting.clang_format)
-		end,
 	},
 })
 

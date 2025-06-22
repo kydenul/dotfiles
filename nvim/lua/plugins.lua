@@ -33,6 +33,8 @@ vim.opt.rtp:prepend(lazypath)
 --           Lazy-load on key mapping
 --     opts: The table will be passed to the require(...).setup(opts)
 require("lazy").setup({
+	{ "echasnovski/mini.icons", version = "*" },
+
 	-- Colorscheme
 	{
 		"ellisonleao/gruvbox.nvim",
@@ -248,7 +250,15 @@ require("lazy").setup({
 	},
 
 	-- LSP manager
-	"williamboman/mason.nvim",
+	{
+		-- Mason: Neovim 的包管理器，用来安装 LSP, DAP, Linters 等
+		"williamboman/mason.nvim",
+		opts = {
+			ui = {
+				border = "rounded",
+			},
+		},
+	},
 	"williamboman/mason-lspconfig.nvim",
 	"neovim/nvim-lspconfig",
 
@@ -293,82 +303,12 @@ require("lazy").setup({
 
 		-- use a release tag to download pre-built binaries
 		version = "*",
-		-- AND/OR build from source, requires nightly: https://rust-lang.github.io/rustup/concepts/channels.html#working-with-nightly-rust
-		-- build = 'cargo build --release',
-		-- If you use nix, you can build from source using latest nightly rust with:
-		-- build = 'nix run .#build-plugin',
 
-		--- @module 'blink.cmp'
-		--- @type blink.cmp.Config
-		opts = {
-			-- 'default' (recommended) for mappings similar to built-in completions (C-y to accept)
-			-- 'super-tab' for mappings similar to vscode (tab to accept)
-			-- 'enter' for enter to accept
-			-- 'none' for no mappings
-			--
-			-- All presets have the following mappings:
-			-- C-space: Open menu or open docs if already open
-			-- C-n/C-p or Up/Down: Select next/previous item
-			-- C-e: Hide menu
-			-- C-k: Toggle signature help (if signature.enabled = true)
-			--
-			-- See :h blink-cmp-config-keymap for defining your own keymap
-			keymap = {
-				-- Each keymap may be a list of commands and/or functions
-				preset = "enter",
-				-- Select completions
-				["<Up>"] = { "select_prev", "fallback" },
-				["<Down>"] = { "select_next", "fallback" },
-				["<Tab>"] = { "select_next", "fallback" },
-				["<S-Tab>"] = { "select_prev", "fallback" },
-				-- Scroll documentation
-				["<C-b>"] = { "scroll_documentation_up", "fallback" },
-				["<C-f>"] = { "scroll_documentation_down", "fallback" },
-				-- Show/hide signature
-				["<C-k>"] = { "show_signature", "hide_signature", "fallback" },
-			},
+		-- opts_extend = { "sources.default" },
 
-			appearance = {
-				-- 'mono' (default) for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
-				-- Adjusts spacing to ensure icons are aligned
-				nerd_font_variant = "mono",
-			},
-
-			sources = {
-				-- `lsp`, `buffer`, `snippets`, `path` and `omni` are built-in
-				-- so you don't need to define them in `sources.providers`
-				default = { "lsp", "path", "snippets", "buffer" },
-
-				-- Sources are configured via the sources.providers table
-			},
-
-			-- (Default) Rust fuzzy matcher for typo resistance and significantly better performance
-			-- You may use a lua implementation instead by using `implementation = "lua"` or fallback to the lua implementation,
-			-- when the Rust fuzzy matcher is not available, by using `implementation = "prefer_rust"`
-			--
-			-- See the fuzzy documentation for more information
-			fuzzy = { implementation = "prefer_rust_with_warning" },
-			completion = {
-				-- The keyword should only matchh against the text before
-				keyword = { range = "prefix" },
-				menu = {
-					-- Use treesitter to highlight the label text for the given list of sources
-					draw = {
-						treesitter = { "lsp" },
-					},
-				},
-				-- Show completions after tying a trigger character, defined by the source
-				trigger = { show_on_trigger_character = true },
-				documentation = {
-					-- Show documentation automatically
-					auto_show = true,
-				},
-			},
-
-			-- Signature help when tying
-			signature = { enabled = true },
-		},
-		opts_extend = { "sources.default" },
+		config = function()
+			require("config.blink")
+		end,
 	},
 
 	-- Code snippet engine
@@ -450,6 +390,128 @@ require("lazy").setup({
 			vim.keymap.set("i", "<C-x>", function()
 				return vim.fn["codeium#Clear"]()
 			end, { expr = true, silent = true })
+		end,
+	},
+
+	-- DAP
+	{
+		-- =============================================================================
+		-- 此插件将 mason 和 nvim-dap 连接起来，实现调试器自动配置
+		-- 必须在 nvim-dap 之前加载
+		-- =============================================================================
+		"jay-babu/mason-nvim-dap.nvim",
+		dependencies = { "williamboman/mason.nvim", "mfussenegger/nvim-dap" },
+		-- handler 会自动为 mason 中安装的调试器设置好 adapter
+		opts = {
+			-- 在启动时确保这些调试器已安装
+			ensure_installed = { "python", "go", "codelldb" },
+
+			-- handler 为空即可，它会自动处理
+			handlers = {},
+		},
+	},
+	{
+		-- 核心调试器插件
+		"mfussenegger/nvim-dap",
+		dependencies = {
+			-- DAP UI，提供变量、堆栈、断点等窗口
+			{
+				"rcarriga/nvim-dap-ui",
+				dependencies = { "nvim-neotest/nvim-nio" },
+
+				config = function()
+					-- 在调试会话开始和结束时自动打开/关闭 DAP UI
+					local dap, dapui = require("dap"), require("dapui")
+					dapui.setup()
+
+					-- 自动开关 DAP UI
+					dap.listeners.after.event_initialized["dapui_config"] = function()
+						dapui.open()
+					end
+					dap.listeners.before.event_terminated["dapui_config"] = function()
+						dapui.close()
+					end
+					dap.listeners.before.event_exited["dapui_config"] = function()
+						dapui.close()
+					end
+				end,
+			},
+			-- 在代码旁显示调试信息
+			{ "theHamsta/nvim-dap-virtual-text" },
+		},
+		config = function()
+			local dap = require("dap")
+
+			-- === 启动配置 (Launch Configurations) ===
+			-- mason-nvim-dap 已经处理了 adapters，我们只需要定义如何启动程序
+
+			-- Python
+			dap.configurations.python = {
+				{
+					type = "python", -- mason-nvim-dap 会自动映射到 debugpy
+					request = "launch",
+					name = "Launch file",
+					program = "${file}", -- 调试当前文件
+					pythonPath = function()
+						return vim.fn.input("Path to python executable: ", "python", "file")
+					end,
+				},
+			}
+
+			-- Go
+			dap.configurations.go = {
+				{
+					type = "delve", -- mason-nvim-dap 会自动映射到 delve
+					request = "launch",
+					name = "Launch file",
+					program = "${fileDirname}", -- 调试当前文件所在的目录
+				},
+			}
+
+			-- C, C++, Rust
+			dap.configurations.cpp = {
+				{
+					type = "codelldb", -- mason-nvim-dap 会自动映射到 codelldb
+					request = "launch",
+					name = "Launch file",
+					program = function()
+						-- 编译后，手动输入可执行文件路径
+						return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
+					end,
+					cwd = "${workspaceFolder}",
+					stopOnEntry = false,
+				},
+			}
+			-- C++ 和 Rust 可以共用一套配置
+			dap.configurations.c = dap.configurations.cpp
+			dap.configurations.rust = dap.configurations.cpp
+
+			-- ===================================================================
+			-- ‼️ NEW: 定义自定义的 DAP 图标 ‼️
+			-- ===================================================================
+			local sign = vim.fn.sign_define
+			sign("DapBreakpoint", { text = "", texthl = "DapBreakpoint", linehl = "", numhl = "" })
+			sign("DapBreakpointCondition", { text = "󰃤", texthl = "DapBreakpoint", linehl = "", numhl = "" })
+			sign("DapLogPoint", { text = "󰌑", texthl = "DapLogPoint", linehl = "", numhl = "" })
+			sign("DapRejectedBreakpoint", { text = "󰚦", texthl = "DapRejectedBreakpoint", linehl = "", numhl = "" })
+			sign("DapStopped", { text = "", texthl = "DapStopped", linehl = "DapStoppedLine", numhl = "" })
+
+			-- ===================================================================
+			-- ‼️ NEW: Keymappings ‼️
+			-- ===================================================================
+			vim.keymap.set({ "n", "v" }, "<F5>", dap.continue, { desc = "DAP: Continue" })
+			vim.keymap.set({ "n", "v" }, "<F9>", dap.toggle_breakpoint, { desc = "DAP: Toggle Breakpoint" })
+
+			vim.keymap.set("n", "<F10>", dap.step_over, { desc = "DAP: Step Over" })
+			vim.keymap.set("n", "<F11>", dap.step_into, { desc = "DAP: Step Into" })
+			vim.keymap.set("n", "<F12>", dap.step_out, { desc = "DAP: Step Out" })
+
+			vim.keymap.set("n", "<leader>dt", dap.terminate, { desc = "DAP: Terminate" })
+			vim.keymap.set("n", "<leader>dr", dap.repl.open, { desc = "DAP: Open REPL" })
+			vim.keymap.set("n", "<leader>dl", dap.run_last, { desc = "DAP: Run Last" })
+			vim.keymap.set("n", "<Leader>dp", function()
+				dap.set_breakpoint(nil, nil, vim.fn.input("Log point message: "))
+			end)
 		end,
 	},
 })

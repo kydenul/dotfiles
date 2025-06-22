@@ -1,13 +1,22 @@
-local keymap = vim.keymap
-local opts = {
-	noremap = true, -- non-recursive
-	silent = true, -- do not show message
-}
-
-vim.g.mapleader = " " -- Map leader key
-
+-- Clipboard
+vim.opt.clipboard = "unnamedplus"
+if vim.fn.exists("$SSH_TTY") == 1 then
+	util.log_info("SSH_TTY detected")
+	vim.g.clipboard = {
+		name = "osc52",
+		copy = {
+			["+"] = require("vim.ui.clipboard.osc52").copy("+"),
+			["*"] = require("vim.ui.clipboard.osc52").copy("*"),
+		},
+		paste = {
+			["+"] = require("vim.ui.clipboard.osc52").paste("+"),
+			["*"] = require("vim.ui.clipboard.osc52").paste("*"),
+		},
+	}
+end
 vim.opt.completeopt = { "menu", "menuone", "noselect" }
 vim.opt.mouse = "a" -- allow the mouse to be used in Nvim
+vim.opt.scrolloff = 8
 
 -- Tab
 vim.opt.tabstop = 4 -- number of visual spaces per TAB
@@ -21,7 +30,7 @@ vim.opt.relativenumber = true -- add numbers to each line on the left side
 vim.opt.cursorline = true -- highlight cursor line underneath the cursor horizontally
 -- vim.opt.guicursor = ""
 vim.wo.colorcolumn = "100"
-vim.opt.scrolloff = 8
+
 vim.opt.splitbelow = true -- open new vertical split bottom
 vim.opt.splitright = true -- open new horizontal splits right
 vim.opt.termguicolors = true -- enabl 24-bit RGB color in the TUI
@@ -52,89 +61,6 @@ vim.o.timeoutlen = 500
 
 -- 补全增强
 vim.o.wildmenu = true
-
--- Clipboard
-vim.opt.clipboard = "unnamedplus"
-if vim.fn.exists("$SSH_TTY") == 1 then
-	util.log_info("SSH_TTY detected")
-	vim.g.clipboard = {
-		name = "osc52",
-		copy = {
-			["+"] = require("vim.ui.clipboard.osc52").copy("+"),
-			["*"] = require("vim.ui.clipboard.osc52").copy("*"),
-		},
-		paste = {
-			["+"] = require("vim.ui.clipboard.osc52").paste("+"),
-			["*"] = require("vim.ui.clipboard.osc52").paste("*"),
-		},
-	}
-end
-
-----------------------------------
--- Insert mode --
-----------------------------------
-keymap.set("i", "jk", "<ESC>")
-
-----------------------------------
--- Normal mode --
-----------------------------------
--- New windows
-keymap.set("n", "<leader>sv", "<C-w>v") -- 水平新增窗口
-keymap.set("n", "<leader>sh", "<C-w>s") -- 垂直新增窗口
-
--- Resize with arrows
--- delta: 2 lines
-keymap.set("n", "<C-j>", ":resize -3<CR>", opts)
-keymap.set("n", "<C-k>", ":resize +3<CR>", opts)
-keymap.set("n", "<C-h>", ":vertical resize -3<CR>", opts)
-keymap.set("n", "<C-l>", ":vertical resize +3<CR>", opts)
-
--- leader + hjkl 在窗口之间跳转
-keymap.set("n", "<leader>h", "<C-w>h", opts) -- 向左跳转
-keymap.set("n", "<leader>j", "<C-w>j", opts) -- 向下跳转
-keymap.set("n", "<leader>k", "<C-w>k", opts) -- 向上跳转
-keymap.set("n", "<leader>l", "<C-w>l", opts) -- 向右跳转
-
--- 文件
-keymap.set("n", "<leader>w", ":w!<CR>", { desc = "Save" }) -- Save file
-
--- 取消高亮
-keymap.set("n", "<leader>nh", ":nohl<CR>")
-
--- 光标快速移动
-keymap.set({ "n", "v" }, "H", "^", { desc = "Move to start of line" }) -- 移动光标至行首
-keymap.set({ "n", "v" }, "L", "$", { desc = "Move to end of line" }) -- 移动光标至行尾
-
-----------------------------------
--- Visual mode --
-----------------------------------
--- Hint: start visual mode with the same area as the previous area and the same mode
-keymap.set("v", "<", "<gv", opts)
-keymap.set("v", ">", ">gv", opts)
-
--- 单行或多行移动
-keymap.set("v", "J", ":m '>+1<CR>gv=gv")
-keymap.set("v", "K", ":m '<-2<CR>gv=gv")
-keymap.set({ "n" }, "J", "5j")
-
--- Visual mode, 粘贴不要复制
-keymap.set("v", "p", '"_dP', opts)
-
--- IncRename
-vim.keymap.set("n", "<leader>rn", function()
-	return ":IncRename " .. vim.fn.expand("<cword>")
-end, { expr = true })
-
--- Toggle nvim-tree
-vim.keymap.set(
-	{ "n", "t" },
-	"<leader>e",
-	"<Cmd>NvimTreeFindFileToggle<CR>",
-	{ noremap = true, silent = true, nowait = true }
-)
-
--- Neogit
-vim.keymap.set("n", "<leader>g", "<Cmd>Neogit<CR>", { noremap = true, silent = true, desc = "Neogit" })
 
 -------------------------------------
 -------------------------------------
