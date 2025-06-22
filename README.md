@@ -18,7 +18,7 @@ $ im-select
 com.apple.keylayout.ABC
 
 # Install
-$ git clone https://github.com/kydance/dotfiles.git ~/.dotfiles
+$ git clone https://github.com/kydenul/dotfiles.git ~/.dotfiles
 
 # Mac
 $ ln -s ~/.dotfiles/vscode/keybindings.json /Users/<YourUserName>/Library/Application\ Support/Code/User/keybindings.json
@@ -62,7 +62,7 @@ LuaJIT 2.1.1725453128
 Run "nvim -V1 -v" for more info
 
 # Install the config on your computer
-$ git clone https://github.com/kydance/dotfiles.git ~/.dotfiles
+$ git clone https://github.com/kydenul/dotfiles.git ~/.dotfiles
 $ ln -s ~/.dotfiles/nvim/ ~/.config/nvim
 
 $ Verify
