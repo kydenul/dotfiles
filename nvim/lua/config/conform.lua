@@ -54,7 +54,7 @@ conform.setup({
     lua = { "stylua" },
 
     -- Go
-    go = { "goimports-reviser", "gofumpt" },
+    go = { "golangci-lint", "gofumpt", "goimports-reviser" },
 
     -- JSON
     json = { "jq" },
