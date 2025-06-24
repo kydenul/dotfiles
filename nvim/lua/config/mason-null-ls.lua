@@ -66,7 +66,7 @@ end
 local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
 null_ls.setup({
 	debug = false,
-	log_level = "warn",
+	log_level = "debug",
 	update_in_insert = false,
 	sources = {
 		-- Python

@@ -1,9 +1,18 @@
 local luasnip_ok, luasnip = pcall(require, "luasnip")
-local cmp_ok, cmp = pcall(require, "cmp")
-local lspkind_ok, lspkind = pcall(require, "lspkind")
+if not luasnip_ok then
+	vim.notify("luasnip failed to load", vim.log.levels.ERROR)
+	return
+end
 
-if not luasnip_ok or not cmp_ok or not lspkind_ok then
-	vim.notify("nvim-cmp or its dependencies failed to load", vim.log.levels.ERROR)
+local cmp_ok, cmp = pcall(require, "cmp")
+if not cmp_ok then
+	vim.notify("cmp failed to load", vim.log.levels.ERROR)
+	return
+end
+
+local lspkind_ok, lspkind = pcall(require, "lspkind")
+if not lspkind_ok then
+	vim.notify("lspkind failed to load", vim.log.levels.ERROR)
 	return
 end
 
@@ -50,6 +59,7 @@ cmp.setup({
 			luasnip.lsp_expand(args.body) -- For `luasnip` users.
 		end,
 	},
+
 	-- Add window configuration for better appearance
 	window = {
 		completion = cmp.config.window.bordered({
@@ -61,17 +71,22 @@ cmp.setup({
 			winhighlight = "Normal:Normal,FloatBorder:FloatBorder,CursorLine:Visual,Search:None",
 		}),
 	},
+
 	mapping = cmp.mapping.preset.insert({
 		-- Use <C-b/f> to scroll the docs
 		["<C-b>"] = cmp.mapping.scroll_docs(-4),
 		["<C-f>"] = cmp.mapping.scroll_docs(4),
+
 		-- Use <C-k/j> to switch in items
 		["<C-k>"] = cmp.mapping.select_prev_item(),
 		["<C-j>"] = cmp.mapping.select_next_item(),
+
 		-- Use <C-Space> to trigger completion
 		["<C-Space>"] = cmp.mapping.complete(),
+
 		-- Use <C-e> to abort completion
 		["<C-e>"] = cmp.mapping.abort(),
+
 		-- Use <CR>(Enter) to confirm selection
 		-- Accept the currently selected item.
 		-- Set `select` to `false` to only confirm explicitly selected items.
@@ -93,6 +108,7 @@ cmp.setup({
 				fallback()
 			end
 		end, { "i", "s" }), -- i - insert mode; s - select mode
+
 		["<S-Tab>"] = cmp.mapping(function(fallback)
 			if cmp.visible() then
 				cmp.select_prev_item()
@@ -108,7 +124,7 @@ cmp.setup({
 	formatting = {
 		-- Customize the appearance of the completion menu
 		format = lspkind.cmp_format({
-			-- Show only symbol annotations "text_symbol"
+			-- Show only symbol annotations "text_symbol" "symbol_text"
 			mode = "symbol_text",
 			-- Prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
 			maxwidth = 50,
@@ -140,7 +156,7 @@ cmp.setup({
 	-- Set source precedence with proper priority
 	sources = cmp.config.sources({
 		{ name = "nvim_lsp", priority = 1000 }, -- For nvim-lsp
-		{ name = "luasnip", priority = 750 }, -- For luasnip user
+		{ name = "luasnip", priority = 750, option = { use_show_condition = false } }, -- For luasnip user
 		{ name = "buffer", priority = 500 }, -- For buffer word completion
 		{ name = "path", priority = 250 }, -- For path completion
 	}),
@@ -156,9 +172,7 @@ cmp.setup({
 cmp.setup.filetype("gitcommit", {
 	sources = cmp.config.sources({
 		{ name = "cmp_git" }, -- You can specify the `cmp_git` source if you were installed it.
-	}, {
-		{ name = "buffer" },
-	}),
+	}, { { name = "buffer" } }),
 })
 
 -- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).

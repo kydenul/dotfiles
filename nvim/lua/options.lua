@@ -68,11 +68,11 @@ vim.o.wildmenu = true
 -- silent! colorscheme gruvbox
 -------------------------------------
 -------------------------------------
-vim.cmd([[
-    augroup colorscheme_mock
-    autocmd!
-    autocmd ColorScheme * hi Normal guibg=none | hi def link LspInlayHint Comment
-    augroup END
-]])
+-- vim.cmd([[
+--     augroup colorscheme_mock
+--     autocmd!
+--     autocmd ColorScheme * hi Normal guibg=none | hi def link LspInlayHint Comment
+--     augroup END
+-- ]])
 
-vim.cmd([[ silent! colorscheme gruvbox ]])
+vim.cmd([[ silent! colorscheme tokyonight ]])
