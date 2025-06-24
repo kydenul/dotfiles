@@ -1,6 +1,6 @@
 local opts = {
-	noremap = true, -- non-recursive
-	silent = true, -- do not show message
+  noremap = true, -- non-recursive
+  silent = true, -- do not show message
 }
 
 vim.g.mapleader = " " -- Map leader key
@@ -57,15 +57,15 @@ vim.keymap.set("v", "p", '"_dP', opts)
 
 -- IncRename
 vim.keymap.set("n", "<leader>rn", function()
-	return ":IncRename " .. vim.fn.expand("<cword>")
+  return ":IncRename " .. vim.fn.expand("<cword>")
 end, { expr = true })
 
 -- Toggle nvim-tree
 vim.keymap.set(
-	{ "n", "t" },
-	"<leader>e",
-	"<Cmd>NvimTreeFindFileToggle<CR>",
-	{ noremap = true, silent = true, nowait = true }
+  { "n", "t" },
+  "<leader>e",
+  "<Cmd>NvimTreeFindFileToggle<CR>",
+  { noremap = true, silent = true, nowait = true }
 )
 
 -- Neogit

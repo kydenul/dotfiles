@@ -12,43 +12,43 @@ local _ = require("telescope.actions.state")
 
 local line_no
 local function post()
-	if line_no then
-		vim.cmd.normal(line_no .. "G")
-		line_no = nil
-	end
+  if line_no then
+    vim.cmd.normal(line_no .. "G")
+    line_no = nil
+  end
 end
 
 local function sorter(opts)
-	opts = opts or {}
-	local fzy = opts.fzy_mod or require("telescope.algos.fzy")
-	local OFFSET = -fzy.get_score_floor()
-	return sorters.Sorter:new({
-		discard = true,
-		scoring_function = function(_, prompt, line)
-			local i = prompt:find(":", 1, true)
-			if i then
-				line_no = tonumber(prompt:sub(i + 1))
-				prompt = prompt:sub(1, i - 1)
-			else
-				line_no = nil
-			end
-			if not fzy.has_match(prompt, line) then
-				return -1
-			end
-			local fzy_score = fzy.score(prompt, line)
-			if fzy_score == fzy.get_score_min() then
-				return 1
-			end
-			return 1 / (fzy_score + OFFSET)
-		end,
-		highlighter = function(_, prompt, display)
-			local i = prompt:find(":", 1, true)
-			if i then
-				prompt = prompt:sub(1, i - 1)
-			end
-			return fzy.positions(prompt, display)
-		end,
-	})
+  opts = opts or {}
+  local fzy = opts.fzy_mod or require("telescope.algos.fzy")
+  local OFFSET = -fzy.get_score_floor()
+  return sorters.Sorter:new({
+    discard = true,
+    scoring_function = function(_, prompt, line)
+      local i = prompt:find(":", 1, true)
+      if i then
+        line_no = tonumber(prompt:sub(i + 1))
+        prompt = prompt:sub(1, i - 1)
+      else
+        line_no = nil
+      end
+      if not fzy.has_match(prompt, line) then
+        return -1
+      end
+      local fzy_score = fzy.score(prompt, line)
+      if fzy_score == fzy.get_score_min() then
+        return 1
+      end
+      return 1 / (fzy_score + OFFSET)
+    end,
+    highlighter = function(_, prompt, display)
+      local i = prompt:find(":", 1, true)
+      if i then
+        prompt = prompt:sub(1, i - 1)
+      end
+      return fzy.positions(prompt, display)
+    end,
+  })
 end
 
 -- Apply post function to actions
@@ -58,141 +58,141 @@ actions.select_vertical._static_post.select_vertical = post
 actions.select_tab._static_post.select_tab = post
 
 telescope.setup({
-	defaults = {
-		mappings = {
-			i = {
-				["<C-v>"] = false,
-				["<C-q>"] = actions.send_to_qflist + actions.open_qflist,
-				["<C-h>"] = "which_key",
-			},
-			n = {
-				["q"] = actions.close,
-			},
-		},
-		file_sorter = sorter,
+  defaults = {
+    mappings = {
+      i = {
+        ["<C-v>"] = false,
+        ["<C-q>"] = actions.send_to_qflist + actions.open_qflist,
+        ["<C-h>"] = "which_key",
+      },
+      n = {
+        ["q"] = actions.close,
+      },
+    },
+    file_sorter = sorter,
 
-		-- Layout
-		layout_strategy = "horizontal",
-		-- layout_strategy = "vertical",
-		layout_config = {
-			vertical = {
-				preview_cutoff = 30,
-				width = 0.9,
-				height = 0.9,
-				prompt_position = "bottom",
-			},
+    -- Layout
+    layout_strategy = "horizontal",
+    -- layout_strategy = "vertical",
+    layout_config = {
+      vertical = {
+        preview_cutoff = 30,
+        width = 0.9,
+        height = 0.9,
+        prompt_position = "bottom",
+      },
 
-			horizontal = {
-				preview_cutoff = 30,
-				width = 0.9,
-				height = 0.9,
-				prompt_position = "bottom",
-			},
-		},
-		preview = {
-			filesize_limit = 1,
-			treesitter = true,
-		},
+      horizontal = {
+        preview_cutoff = 30,
+        width = 0.9,
+        height = 0.9,
+        prompt_position = "bottom",
+      },
+    },
+    preview = {
+      filesize_limit = 1,
+      treesitter = true,
+    },
 
-		path_display = { "truncate" },
-		winblend = 0,
-		set_env = { ["COLORTERM"] = "truecolor" },
-		vimgrep_arguments = {
-			"rg",
-			"--color=never",
-			"--no-heading",
-			"--with-filename",
-			"--line-number",
-			"--column",
-			"--smart-case",
-			"--hidden",
-		},
-	},
+    path_display = { "truncate" },
+    winblend = 0,
+    set_env = { ["COLORTERM"] = "truecolor" },
+    vimgrep_arguments = {
+      "rg",
+      "--color=never",
+      "--no-heading",
+      "--with-filename",
+      "--line-number",
+      "--column",
+      "--smart-case",
+      "--hidden",
+    },
+  },
 
-	pickers = {
-		find_files = {
-			hidden = true,
-			find_command = { "fd", "--type", "f", "--strip-cwd-prefix" },
-		},
-		buffers = {
-			show_all_buffers = true,
-			sort_lastused = true,
-			mappings = {
-				i = {
-					["<c-d>"] = actions.delete_buffer,
-				},
-				n = {
-					["dd"] = actions.delete_buffer,
-				},
-			},
-		},
-	},
+  pickers = {
+    find_files = {
+      hidden = true,
+      find_command = { "fd", "--type", "f", "--strip-cwd-prefix" },
+    },
+    buffers = {
+      show_all_buffers = true,
+      sort_lastused = true,
+      mappings = {
+        i = {
+          ["<c-d>"] = actions.delete_buffer,
+        },
+        n = {
+          ["dd"] = actions.delete_buffer,
+        },
+      },
+    },
+  },
 })
 
 -- Helper functions for setting options
 local function set_opts(opts)
-	opts = opts or {}
-	opts.bufnr = opts.bufnr or vim.api.nvim_get_current_buf()
-	opts.winnr = opts.winnr or vim.api.nvim_get_current_win()
-	return opts
+  opts = opts or {}
+  opts.bufnr = opts.bufnr or vim.api.nvim_get_current_buf()
+  opts.winnr = opts.winnr or vim.api.nvim_get_current_win()
+  return opts
 end
 
 -- Tags functions with improved error handling
 local function awk_tags(opts)
-	opts = set_opts(opts)
+  opts = set_opts(opts)
 
-	local tagfiles = opts.ctags_file and { opts.ctags_file } or vim.fn.tagfiles()
-	for i, ctags_file in ipairs(tagfiles) do
-		tagfiles[i] = vim.fn.expand(ctags_file, true)
-	end
+  local tagfiles = opts.ctags_file and { opts.ctags_file } or vim.fn.tagfiles()
+  for i, ctags_file in ipairs(tagfiles) do
+    tagfiles[i] = vim.fn.expand(ctags_file, true)
+  end
 
-	if vim.tbl_isempty(tagfiles) then
-		util.log_err("No tags file found.")
-		return
-	end
+  if vim.tbl_isempty(tagfiles) then
+    util.log_err("No tags file found.")
+    return
+  end
 
-	opts.entry_maker = opts.entry_maker or make_entry.gen_from_ctags(opts)
+  opts.entry_maker = opts.entry_maker or make_entry.gen_from_ctags(opts)
 
-	-- Use pcall to handle potential errors with awk command
-	local status, result = pcall(function()
-		return finders.new_oneshot_job(vim.iter({ "awk", opts.awk, tagfiles }):flatten():totable(), opts)
-	end)
+  -- Use pcall to handle potential errors with awk command
+  local status, result = pcall(function()
+    return finders.new_oneshot_job(vim.iter({ "awk", opts.awk, tagfiles }):flatten():totable(), opts)
+  end)
 
-	if not status then
-		util.log_err("Error creating tags finder: " .. tostring(result))
-		return
-	end
+  if not status then
+    util.log_err("Error creating tags finder: " .. tostring(result))
+    return
+  end
 
-	opts.finder = result
-	return builtin.tags(opts)
+  opts.finder = result
+  return builtin.tags(opts)
 end
 
 local function current_buffer_tags(opts)
-	opts = set_opts(opts)
-	opts.prompt_title = "Current Buffer Tags"
-	opts.only_current_file = true
-	opts.only_sort_tags = true
-	opts.path_display = "hidden"
+  opts = set_opts(opts)
+  opts.prompt_title = "Current Buffer Tags"
+  opts.only_current_file = true
+  opts.only_sort_tags = true
+  opts.path_display = "hidden"
 
-	local cwd = vim.fn.expand(opts.cwd or vim.loop.cwd())
-	local current_file = Path:new(vim.api.nvim_buf_get_name(opts.bufnr)):normalize(cwd)
-	opts.awk = string.format("$2 == %q{print $0}", current_file)
+  local cwd = vim.fn.expand(opts.cwd or vim.loop.cwd())
+  local current_file = Path:new(vim.api.nvim_buf_get_name(opts.bufnr)):normalize(cwd)
+  opts.awk = string.format("$2 == %q{print $0}", current_file)
 
-	return awk_tags(opts)
+  return awk_tags(opts)
 end
 
 local function grep_tags(opts)
-	opts = set_opts(opts)
-	opts.prompt_title = "Grep Tags (" .. opts.tag .. ")"
-	opts.awk = string.format("$1 == %q{print $0}", opts.tag)
-	return awk_tags(opts)
+  opts = set_opts(opts)
+  opts.prompt_title = "Grep Tags (" .. opts.tag .. ")"
+  opts.awk = string.format("$1 == %q{print $0}", opts.tag)
+  return awk_tags(opts)
 end
 
 -- Enhanced keymaps with descriptions
 vim.keymap.set("n", "<leader>ff", builtin.find_files, { desc = "Find files" })
 vim.keymap.set("n", "<leader>fb", builtin.buffers, { desc = "Find buffers" })
 vim.keymap.set("n", "<leader>fg", function()
-	builtin.live_grep(util.live_grep_opts({}))
+  builtin.live_grep(util.live_grep_opts({}))
 end, { desc = "Live grep" })
 vim.keymap.set("n", "<leader>ft", builtin.help_tags, { desc = "Find help tags" })
 vim.keymap.set("n", "<leader>/", builtin.current_buffer_fuzzy_find, { desc = "Fuzzy find in buffer" })
@@ -204,86 +204,86 @@ vim.keymap.set("n", "<leader>fr", builtin.resume, { desc = "Resume last picker" 
 local git_log = { "git", "log", "--pretty=format:%h %s (%ci) <%an>\n" }
 
 vim.api.nvim_create_user_command("Glg", function(opts)
-	local commit = opts.args ~= "" and opts.args or nil
-	local command = vim.iter({ git_log, commit }):flatten():totable()
+  local commit = opts.args ~= "" and opts.args or nil
+  local command = vim.iter({ git_log, commit }):flatten():totable()
 
-	-- Check if git is available
-	local git_available = vim.fn.executable("git") == 1
-	if not git_available then
-		util.log_err("Git command not found")
-		return
-	end
+  -- Check if git is available
+  local git_available = vim.fn.executable("git") == 1
+  if not git_available then
+    util.log_err("Git command not found")
+    return
+  end
 
-	builtin.git_commits({
-		initial_mode = "normal",
-		git_command = command,
-		previewer = false,
-	})
+  builtin.git_commits({
+    initial_mode = "normal",
+    git_command = command,
+    previewer = false,
+  })
 end, { nargs = "?" })
 
 vim.api.nvim_create_user_command("Glgb", function(opts)
-	local commit = opts.args ~= "" and opts.args or nil
-	local command = vim.iter({ git_log, commit }):flatten():totable()
+  local commit = opts.args ~= "" and opts.args or nil
+  local command = vim.iter({ git_log, commit }):flatten():totable()
 
-	-- Check if in a git repository
-	local in_git_repo = vim.fn.system("git rev-parse --is-inside-work-tree"):match("true")
-	if not in_git_repo then
-		util.log_err("Not in a git repository")
-		return
-	end
+  -- Check if in a git repository
+  local in_git_repo = vim.fn.system("git rev-parse --is-inside-work-tree"):match("true")
+  if not in_git_repo then
+    util.log_err("Not in a git repository")
+    return
+  end
 
-	builtin.git_bcommits({
-		initial_mode = "normal",
-		git_command = command,
-		previewer = false,
-	})
+  builtin.git_bcommits({
+    initial_mode = "normal",
+    git_command = command,
+    previewer = false,
+  })
 end, { nargs = "?" })
 
 vim.api.nvim_create_user_command("Gst", function()
-	builtin.git_status({
-		initial_mode = "normal",
-		git_icons = {
-			added = "+",
-			changed = "~",
-			copied = ">",
-			deleted = "-",
-			renamed = "»",
-			unmerged = "=",
-			untracked = "?",
-		},
-	})
+  builtin.git_status({
+    initial_mode = "normal",
+    git_icons = {
+      added = "+",
+      changed = "~",
+      copied = ">",
+      deleted = "-",
+      renamed = "»",
+      unmerged = "=",
+      untracked = "?",
+    },
+  })
 end, {})
 
 -- Diagnostics command with improved options
 vim.api.nvim_create_user_command("Diag", function()
-	builtin.diagnostics({
-		initial_mode = "normal",
-		bufnr = 0, -- Current buffer only
-		severity_limit = "WARNING",
-	})
+  builtin.diagnostics({
+    initial_mode = "normal",
+    bufnr = 0, -- Current buffer only
+    severity_limit = "WARNING",
+  })
 end, {})
 
 -- Tags command with improved error handling
 vim.api.nvim_create_user_command("Tags", function(opts)
-	if opts.args and opts.args ~= "" then
-		awk_tags({
-			fname_width = 0.4,
-			prompt_title = string.format("Tags ~ %q", opts.args),
-			awk = string.format("$1 ~ %q{print $0}", opts.args),
-		})
-	else
-		builtin.tags({
-			fname_width = 0.4,
-			show_line = true,
-		})
-	end
+  if opts.args and opts.args ~= "" then
+    awk_tags({
+      fname_width = 0.4,
+      prompt_title = string.format("Tags ~ %q", opts.args),
+      awk = string.format("$1 ~ %q{print $0}", opts.args),
+    })
+  else
+    builtin.tags({
+      fname_width = 0.4,
+      show_line = true,
+    })
+  end
 end, { nargs = "?" })
 
 -- Additional useful commands
 vim.api.nvim_create_user_command("Oldfiles", function()
-	builtin.oldfiles({ initial_mode = "normal" })
+  builtin.oldfiles({ initial_mode = "normal" })
 end, {})
 
 vim.api.nvim_create_user_command("Marks", function()
-	builtin.marks({ initial_mode = "normal" })
+  builtin.marks({ initial_mode = "normal" })
 end, {})
