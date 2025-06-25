@@ -15,6 +15,7 @@ treesitter.setup({
     "comment", -- for tags like TODO:, FIXME(user)
     "cpp",
     "css",
+    "bash",
     "diff", -- git diff
     "dockerfile",
     "git_rebase",
