@@ -46,7 +46,15 @@ local on_attach = function(client, bufnr)
   local bufopts = { noremap = true, silent = true, buffer = bufnr }
   vim.keymap.set("n", "gD", vim.lsp.buf.declaration, bufopts)
   vim.keymap.set("n", "gd", vim.lsp.buf.definition, bufopts)
-  vim.keymap.set("n", "K", vim.lsp.buf.hover, bufopts)
+  -- K: show diagnostics if available, otherwise show hover information
+  vim.keymap.set("n", "K", function()
+    local line_diagnostics = vim.diagnostic.get(0, { lnum = vim.fn.line(".") - 1 })
+    if next(line_diagnostics) then
+      vim.diagnostic.open_float()
+    else
+      vim.lsp.buf.hover()
+    end
+  end, bufopts)
   vim.keymap.set("n", "<C-k>", vim.lsp.buf.signature_help, bufopts)
   vim.keymap.set("n", "gi", vim.lsp.buf.implementation, bufopts)
   vim.keymap.set("n", "gr", vim.lsp.buf.references, bufopts)
