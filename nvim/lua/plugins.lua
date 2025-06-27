@@ -203,17 +203,7 @@ require("lazy").setup({
     "petertriho/nvim-scrollbar",
     event = { "BufReadPost", "BufNewFile", "BufWritePre" },
     config = function()
-      require("scrollbar").setup({
-        handlers = {
-          cursor = true,
-          diagnostic = true,
-          gitsigns = true, -- Requires gitsigns
-          handle = true,
-          search = false, -- Requires hlslens
-          ale = false, -- Requires ALE
-        },
-        set_highlights = true,
-      })
+      require("config.scrollbar")
     end,
   },
 
@@ -274,6 +264,8 @@ require("lazy").setup({
     cmd = { "Glg", "Gst", "Diag", "Tags" },
     dependencies = {
       "nvim-lua/plenary.nvim",
+      -- ripgrep is a system-level dependency and needs to be installed separately.
+      -- It's listed here for documentation purposes as Telescope can utilize it.
       "BurntSushi/ripgrep",
     },
     config = function()
