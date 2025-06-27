@@ -235,7 +235,7 @@ require("lazy").setup({
     -- load later and are not important for the initial UI
     event = "VeryLazy",
     config = function()
-      require("config.nvim-surround")
+      require("config.surround")
     end,
   },
 
@@ -325,7 +325,7 @@ require("lazy").setup({
     event = { "BufWritePre" },
     cmd = { "ConformInfo" },
     config = function()
-      require("config.conform")
+      require("config.nvim-conform")
     end,
   },
   {

@@ -1,6 +1,14 @@
 -- Note: The order matters: require("mason") -> require("mason-lspconfig") -> require("lspconfig")
 
-require("mason").setup({
+local util = require("util")
+
+local mason_ok, mason = pcall(require, "mason")
+if not mason_ok then
+  util.log_warn("mason load failed")
+  return
+end
+
+mason.setup({
   ui = {
     icons = {
       package_installed = "✓",
@@ -10,7 +18,13 @@ require("mason").setup({
   },
 })
 
-require("mason-lspconfig").setup({
+local mason_lspconfig_ok, mason_lspconfig = pcall(require, "mason")
+if not mason_lspconfig_ok then
+  util.log_warn("mason lspconfig load failed")
+  return
+end
+
+mason_lspconfig.setup({
   -- A list of servers to automatically install if they're not already installed.
   ensure_installed = {
     "pylsp", -- Python
@@ -28,8 +42,17 @@ require("mason-lspconfig").setup({
 -- How to use setup({}): https://github.com/neovim/nvim-lspconfig/wiki/Understanding-setup-%7B%7D
 --     - the settings table is sent to the LSP.
 --     - on_attach: a lua callback function to run after LSP attaches to a given buffer.
-local lspconfig = require("lspconfig")
-local lsputil = require("lspconfig.util")
+local lspconfig_ok, lspconfig = pcall(require, "lspconfig")
+if not lspconfig_ok then
+  util.log_warn("lspconfig load failed")
+  return
+end
+
+-- Remove Global Default Key mapping
+vim.keymap.del("n", "grn")
+vim.keymap.del("n", "gra")
+vim.keymap.del("n", "grr")
+vim.keymap.del("n", "gri")
 
 -- Use an on_attach function to only map the following keys
 -- after the language server attaches to the current buffer.
@@ -37,15 +60,20 @@ local on_attach = function(client, bufnr)
   -- Enable completion triggered by <c-x><c-o>
   vim.bo[bufnr].omnifunc = "v:lua.vim.lsp.omnifunc"
 
-  if client.name == "rust_analyzer" then
-    -- WARNING: This feature requires Neovim 0.10 or later.
-    vim.lsp.inlay_hint.enable()
+  -- See `:help vim.lsp.*` for documentation on any of the below functions
+  local bufopts = function(desc)
+    return { noremap = true, silent = true, buffer = bufnr, desc = desc }
   end
 
-  -- See `:help vim.lsp.*` for documentation on any of the below functions
-  local bufopts = { noremap = true, silent = true, buffer = bufnr }
-  vim.keymap.set("n", "gD", vim.lsp.buf.declaration, bufopts)
-  vim.keymap.set("n", "gd", vim.lsp.buf.definition, bufopts)
+  vim.keymap.set("n", "<leader>ih", function()
+    vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+  end, bufopts("Toggle Inlay Hints"))
+
+  vim.keymap.set("n", "gD", vim.lsp.buf.declaration, bufopts("Go to Declaration"))
+  vim.keymap.set("n", "gd", vim.lsp.buf.definition, bufopts("Go to Definition"))
+  vim.keymap.set("n", "gr", vim.lsp.buf.references, bufopts("Go to References"))
+  vim.keymap.set("n", "gi", vim.lsp.buf.implementation, bufopts("Go to Implementation"))
+
   -- K: show diagnostics if available, otherwise show hover information
   vim.keymap.set("n", "K", function()
     local line_diagnostics = vim.diagnostic.get(0, { lnum = vim.fn.line(".") - 1 })
@@ -54,25 +82,25 @@ local on_attach = function(client, bufnr)
     else
       vim.lsp.buf.hover()
     end
-  end, bufopts)
-  vim.keymap.set("n", "<C-k>", vim.lsp.buf.signature_help, bufopts)
-  vim.keymap.set("n", "gi", vim.lsp.buf.implementation, bufopts)
-  vim.keymap.set("n", "gr", vim.lsp.buf.references, bufopts)
+  end, bufopts("Hover"))
+  vim.keymap.set("n", "<C-k>", vim.lsp.buf.signature_help, bufopts("Signature Help"))
 
   -- Highlighting when the cursor is on a symbol
   vim.api.nvim_create_autocmd(
     { "CursorHold", "CursorHoldI" },
-    { callback = vim.lsp.buf.document_highlight, buffer = bufnr }
+    { callback = vim.lsp.buf.document_highlight, buffer = bufnr, desc = "Document Highlight" }
   )
   vim.api.nvim_create_autocmd(
     { "CursorMoved", "CursorMovedI" },
-    { callback = vim.lsp.buf.clear_references, buffer = bufnr }
+    { callback = vim.lsp.buf.clear_references, buffer = bufnr, desc = "Clear References" }
   )
+
   -- Configure signature help to show without focusing
   vim.api.nvim_create_autocmd({ "TextChangedI", "TextChangedP" }, {
     callback = function()
       -- Show signature help without focusing the floating window
       local params = vim.lsp.util.make_position_params(0, "utf-8")
+
       vim.lsp.buf_request(bufnr, "textDocument/signatureHelp", params, function(err, result, ctx, config)
         if result and result.signatures and #result.signatures > 0 then
           -- Use vim.lsp.handlers directly instead of deprecated vim.lsp.with
@@ -91,34 +119,24 @@ local on_attach = function(client, bufnr)
     buffer = bufnr,
   })
 
-  -- vim.keymap.set("n", "<space>wa", vim.lsp.buf.add_workspace_folder, bufopts)
-  -- vim.keymap.set("n", "<space>wr", vim.lsp.buf.remove_workspace_folder, bufopts)
-  -- vim.keymap.set("n", "<space>wl", function()
-  -- 	print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-  -- end, bufopts)
-  vim.keymap.set("n", "<space>D", vim.lsp.buf.type_definition, bufopts)
+  -- vim.keymap.set("n", "<space>D", vim.lsp.buf.type_definition, bufopts)
   -- vim.keymap.set("n", "<space>rn", vim.lsp.buf.rename, bufopts)
-  vim.keymap.set("n", "<space>ca", vim.lsp.buf.code_action, bufopts)
+  vim.keymap.set("n", "<space>ca", vim.lsp.buf.code_action, bufopts("Code Action"))
 
   -- Format
   vim.api.nvim_buf_create_user_command(bufnr, "Fmt", function(opts)
     local range
     if opts.range == 2 then
-      range = { ["start"] = { opts.line1, 0 }, ["end"] = { opts.line2, 0 } }
+      -- The range is inclusive, so we need to go to the end of the line.
+      -- -1 means the end of the line.
+      range = { ["start"] = { opts.line1, 0 }, ["end"] = { opts.line2, -1 } }
     end
-    vim.lsp.buf.format({
-      async = true,
-      range = range,
-      -- Predicate used to filter clients. Receives a client as
-      -- argument and must return a boolean. Clients matching the
-      -- predicate are included.
-      filter = function(_client)
-        -- NOTE: If an LSP contains a formatter, we don't need to use null-ls at all.
-        return _client.name == "null-ls" or _client.name == "hls"
-      end,
-    })
+
+    vim.lsp.buf.format({ async = true, range = range })
   end, { range = true })
-  vim.keymap.set("n", "<space>=", ":Fmt<CR>", bufopts)
+
+  -- The keymap remains the same
+  vim.keymap.set("n", "<space>=", ":Fmt<CR>", { noremap = true, silent = true, buffer = bufnr, desc = "Format code" })
 end
 
 -- How to add an LSP for a specific programming language?
@@ -136,25 +154,14 @@ lspconfig.gopls.setup({
     "gowork",
     "gotmpl",
   },
-  root_dir = lsputil.root_pattern("go.work", "go.mod", ".git"),
+  root_dir = require("lspconfig.util").root_pattern("go.work", "go.mod", ".git"),
 })
 lspconfig.lua_ls.setup({
   on_attach = on_attach,
   settings = {
     Lua = {
-      runtime = {
-        -- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim).
-        version = "LuaJIT",
-      },
-      diagnostics = {
-        -- Get the language server to recognize the `vim` global.
-        globals = { "vim" },
-      },
-      workspace = {
-        -- Make the server aware of Neovim runtime files.
-        library = vim.api.nvim_get_runtime_file("", true),
-      },
-      -- Do not send telemetry data containing a randomized but unique identifier.
+      runtime = { version = "LuaJIT" },
+      diagnostics = { globals = { "vim" } },
       telemetry = { enable = false },
     },
   },
@@ -175,9 +182,6 @@ lspconfig.clangd.setup({
 -- See `:help vim.diagnostic.*` for documentation on any of the below functions.
 local opts = { noremap = true, silent = true }
 -- Updated to use the non-deprecated diagnostic functions
-vim.keymap.set("n", "<leader>k", function()
-  vim.diagnostic.open_float()
-end, opts)
 vim.keymap.set("n", "[d", function()
   vim.diagnostic.goto_prev()
 end, opts)

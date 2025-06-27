@@ -67,10 +67,9 @@ treesitter.setup({
     -- disable highlighting for the `tex` filetype, you need to include `latex` in this list as this is
     -- the name of the parser)
     -- If you want to disable the module for some languages you can pass a list to the `disable` option.
-    disable = {},
     -- Or use a function for more flexibility, e.g. to disable slow tree-sitter highlight for large files
     disable = function(lang, buf)
-      local max_filesize = 1000 * 1024 -- 1000 KB
+      local max_filesize = 20000 * 1024 -- 20000 KB
       local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
       if ok and stats and stats.size > max_filesize then
         return true
