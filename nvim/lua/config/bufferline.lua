@@ -86,7 +86,7 @@ vim.keymap.set({ "v", "n" }, "gt", "<cmd>BufferLineCycleNext<CR>", { desc = "Nex
 vim.keymap.set({ "v", "n" }, "gT", "<cmd>BufferLineCyclePrev<CR>", { desc = "Previous buffer" })
 
 -- 3. 关闭当前缓冲区并切换到上一个
-vim.keymap.set({ "v", "n" }, "ZZ", function()
+local buffer_close = function()
   if vim.bo.modified then
     util.log_err("No write sine last change.")
     return
@@ -94,7 +94,9 @@ vim.keymap.set({ "v", "n" }, "ZZ", function()
   local buf = vim.fn.bufnr()
   bufferline.cycle(-1)
   vim.cmd.bdelete(buf)
-end, { desc = "Close current buffer" })
+end
+vim.keymap.set({ "v", "n" }, "ZZ", buffer_close, { desc = "Close current buffer" })
+vim.keymap.set({ "v", "n" }, "<leader>q", buffer_close, { desc = "Close current buffer" })
 
 -- 4. 添加更多实用的快捷键
 vim.keymap.set("n", "<leader>bc", "<cmd>BufferLinePickClose<CR>", { desc = "选择关闭缓冲区" })

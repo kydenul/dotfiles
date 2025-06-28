@@ -66,7 +66,8 @@ require("lazy").setup({
         "rcarriga/nvim-notify",
         opts = {
           background_colour = "#000000",
-          timeout = 2400,
+          timeout = 2000,
+          render = "compact",
         },
       },
     },
@@ -198,14 +199,14 @@ require("lazy").setup({
     end,
   },
 
-  -- Scrollbar
-  {
-    "petertriho/nvim-scrollbar",
-    event = { "BufReadPost", "BufNewFile", "BufWritePre" },
-    config = function()
-      require("config.scrollbar")
-    end,
-  },
+  -- -- Scrollbar
+  -- {
+  --   "petertriho/nvim-scrollbar",
+  --   event = { "BufReadPost", "BufNewFile", "BufWritePre" },
+  --   config = function()
+  --     require("config.scrollbar")
+  --   end,
+  -- },
 
   -- Buffer line
   {
