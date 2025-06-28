@@ -46,23 +46,19 @@ lualine.setup({
         -- 2: Absolute path
         -- 3: Absolute path, with tilde as the home directory
         -- 4: Filename and parent dir, with tilde as the home directory
-        path = 3,
-        symbols = {
-          modified = "●",
-          readonly = "",
-          unnamed = "[No Name]",
-        },
+        path = 1,
+        file_status = true,
       },
     },
 
     lualine_x = {
       "encoding",
-      "fileformat",
+      -- "fileformat",
       "filetype",
       {
         "filesize",
         cond = function()
-          return vim.fn.getfsize(vim.fn.expand("%:p")) > 0
+          return vim.fn.getfsize(vim.fn.expand("%:p")) > 0 -- Not empty file
         end,
       },
     },

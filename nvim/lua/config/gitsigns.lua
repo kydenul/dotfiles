@@ -18,33 +18,43 @@ vim.api.nvim_set_hl(0, "GitSignsUntracked", { fg = "#9C27B0" })
 
 gs.setup({
   signs = {
-    add = { text = "┃" }, -- 添加行
-    change = { text = "┃" }, -- 修改行
-    delete = { text = "_" }, -- 删除行
-    topdelete = { text = "‾" }, -- 删除行（顶部）
-    changedelete = { text = "~" }, -- 修改并删除
-    untracked = { text = "┆" }, -- 未跟踪文件
+    add = { text = "│" },
+    change = { text = "│" },
+    delete = { text = "_" },
+    topdelete = { text = "‾" },
+    changedelete = { text = "~" },
+    untracked = { text = "┆" },
   },
 
   -- Current line blame
   current_line_blame = true,
   current_line_blame_opts = {
     virt_text = true,
-    virt_text_pos = "eol",
-    delay = 300,
+    virt_text_pos = "eol", --'eol' | 'overlay' | 'right_align'
+    delay = 1000,
     ignore_whitespace = true,
   },
   current_line_blame_formatter = "<author>, <author_time:%Y-%m-%d> - <summary>",
 
+  -- Watch Git directory
   watch_gitdir = {
-    interval = 600, -- 检查 Git 目录变化的间隔（毫秒）
-    follow_files = true, -- 跟踪文件重命名
+    interval = 1000, -- Update interval
+    follow_files = true, -- Follow file renames
   },
   attach_to_untracked = true, -- 附加到未跟踪文件
   update_debounce = 100, -- 更新防抖时间（毫秒）
 
   -- 状态栏集成
-  status_formatter = nil, -- 使用默认格式化器
+  status_formatter = nil,
+  max_file_length = 80000, -- Disable if the file is longer than this (in lines)
+  preview_config = {
+    -- Options passed to nvim_open_win
+    border = "single",
+    style = "minimal",
+    relative = "cursor",
+    row = 0,
+    col = 1,
+  },
 
   -- 当插件附加到缓冲区时设置快捷键
   on_attach = function(bufnr)
@@ -77,6 +87,7 @@ gs.setup({
 
     map("n", "ghp", gs.preview_hunk, { desc = "Preview hunk" })
     map("n", "ghi", gs.preview_hunk_inline, { desc = "Preview hunk inline" })
+    map("n", "ghr", gs.reset_hunk, { desc = "Reset hunk" })
     map("n", "ghb", function()
       gs.blame_line({ full = true })
     end, { desc = "Blame line" })
@@ -84,6 +95,5 @@ gs.setup({
     map("n", "ghD", function()
       gs.diffthis("~")
     end, { desc = "Diff this ~" })
-    map("n", "ghr", gs.reset_hunk, { desc = "Reset hunk" })
   end,
 })
