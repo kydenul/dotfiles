@@ -53,6 +53,13 @@ require("lazy").setup({
     priority = 1000,
     opts = {},
   },
+
+  {
+    "sainnhe/gruvbox-material",
+    lazy = true,
+    priority = 1000,
+  },
+
   {
     "folke/noice.nvim",
     event = "VeryLazy",

@@ -64,11 +64,11 @@ bufferline.setup({
   highlights = {
     buffer_selected = {
       bold = true,
-      italic = false,
+      italic = true,
     },
     tab_selected = {
       bold = true,
-      italic = false,
+      italic = true,
     },
   },
 })

@@ -64,17 +64,25 @@ vim.o.timeoutlen = 500
 -- 补全增强
 vim.o.wildmenu = true
 
--------------------------------------
--------------------------------------
--- NOTE ColorScheme -> trigger
--- silent! colorscheme gruvbox
--------------------------------------
--------------------------------------
-vim.cmd([[
-    augroup colorscheme_mock
-    autocmd!
-    autocmd ColorScheme * hi Normal guibg=none | hi def link LspInlayHint Comment
-    augroup END
-]])
+-- -------------------------------------
+-- -------------------------------------
+-- -- NOTE ColorScheme -> trigger
+-- TODO
+-- FIXME
+-- -- silent! colorscheme gruvbox gruvbox-material
+-- -------------------------------------
+-- -------------------------------------
+-- vim.cmd([[
+--     augroup colorscheme_mock
+--     autocmd!
+--     autocmd ColorScheme * hi Normal guibg=none | hi def link LspInlayHint Comment
+--     augroup END
+-- ]])
 
-vim.cmd([[ silent! colorscheme gruvbox ]])
+vim.g.gruvbox_material_foreground = "material" -- "original" "mix" "material"
+vim.g.gruvbox_material_background = "hard" -- 'hard'`, `'medium'`, `'soft'
+vim.g.gruvbox_material_float_style = "dim"
+vim.g.gruvbox_material_cursor = "auto"
+vim.g.gruvbox_material_enable_italic = true
+
+vim.cmd([[ silent! colorscheme gruvbox-material ]])
