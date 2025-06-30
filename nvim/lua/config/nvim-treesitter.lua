@@ -1,6 +1,19 @@
 -- Treesitter
 
 local util = require("util")
+
+local context_ok, context = pcall(require, "treesitter-context")
+if not context_ok then
+  util.log_warn("nvim-treesitter-context init failed!")
+  return
+end
+
+context.setup({
+  enable = true,
+  max_lines = 0, -- 0 表示不限制上下文窗口的高度
+  separator = "─",
+})
+
 local is_ok, treesitter = pcall(require, "nvim-treesitter.configs")
 if not is_ok then
   util.log_warn("nvim-treesitter init failed!")
