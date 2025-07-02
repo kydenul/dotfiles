@@ -18,7 +18,7 @@ if vim.fn.exists("$SSH_TTY") == 1 then
 end
 vim.opt.completeopt = { "menu", "menuone", "noselect" }
 vim.opt.mouse = "a" -- allow the mouse to be used in Nvim
-vim.opt.scrolloff = 8
+vim.opt.scrolloff = 5
 
 -- Tab
 vim.opt.tabstop = 4 -- number of visual spaces per TAB
@@ -27,11 +27,10 @@ vim.opt.shiftwidth = 4 -- insert 4 spaces on a tab
 vim.opt.expandtab = true -- tabs are spaces, mainly because of python
 
 -- UI config
-vim.opt.number = true -- show absolute number
-vim.opt.relativenumber = true -- add numbers to each line on the left side
+vim.opt.number = true -- add numbers to each line on the left side
+vim.opt.relativenumber = true -- show absolute number
 vim.opt.cursorline = true -- highlight cursor line underneath the cursor horizontally
--- vim.opt.guicursor = ""
-vim.wo.colorcolumn = "100"
+vim.wo.colorcolumn = "100" -- 垂直的高亮列的，通常用于提示代码的行宽限制
 
 vim.opt.splitbelow = true -- open new vertical split bottom
 vim.opt.splitright = true -- open new horizontal splits right
@@ -67,8 +66,6 @@ vim.o.wildmenu = true
 -- -------------------------------------
 -- -------------------------------------
 -- -- NOTE ColorScheme -> trigger
--- TODO
--- FIXME
 -- -- silent! colorscheme gruvbox gruvbox-material
 -- -------------------------------------
 -- -------------------------------------
@@ -81,8 +78,11 @@ vim.o.wildmenu = true
 
 vim.g.gruvbox_material_foreground = "material" -- "original" "mix" "material"
 vim.g.gruvbox_material_background = "hard" -- 'hard'`, `'medium'`, `'soft'
-vim.g.gruvbox_material_float_style = "dim"
-vim.g.gruvbox_material_cursor = "auto"
+vim.g.gruvbox_material_float_style = "dim" -- 'bright', "dim"
 vim.g.gruvbox_material_enable_italic = true
 
 vim.cmd([[ silent! colorscheme gruvbox-material ]])
+
+-- Cursor
+vim.api.nvim_set_hl(0, "Cursor", { fg = "#2e3440", bg = "#88c0d0" })
+vim.opt.guicursor = { "n-v-c:block-Cursor", "i-ci-ve:ver20-Cursor", "r-cr:hor15-Cursor" }
