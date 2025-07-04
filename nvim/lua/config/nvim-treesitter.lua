@@ -51,11 +51,11 @@ treesitter.setup({
     "query", -- Added for treesitter query language
     "regex", -- Added for regex highlighting
     "rust",
+    "sql",
+    "php",
     "toml",
     "tsx", -- Added for TypeScript JSX
     "typescript",
-    "sql",
-    "php",
     "vim",
     "vimdoc", -- Added for Vim help documentation
     "yaml",
