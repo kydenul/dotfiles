@@ -353,6 +353,7 @@ require("lazy").setup({
       "hrsh7th/cmp-buffer", -- buffer auto-completion
       "hrsh7th/cmp-path", -- path auto-completion
       "hrsh7th/cmp-cmdline", -- cmdline auto-completion
+      "hrsh7th/cmp-nvim-lsp-signature-help",
 
       -- Code snippet engine
       "saadparwaiz1/cmp_luasnip",

@@ -156,6 +156,7 @@ cmp.setup({
   -- Set source precedence with proper priority
   sources = cmp.config.sources({
     { name = "nvim_lsp", priority = 1000 }, -- For nvim-lsp
+    { name = "nvim_lsp_signature_help" }, -- For nvim-lsp-signature
     { name = "luasnip", priority = 750, option = { use_show_condition = false } }, -- For luasnip user
     { name = "buffer", priority = 500 }, -- For buffer word completion
     { name = "path", priority = 250 }, -- For path completion
