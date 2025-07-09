@@ -63,26 +63,25 @@ vim.o.timeoutlen = 500
 -- 补全增强
 vim.o.wildmenu = true
 
--- -------------------------------------
--- -------------------------------------
--- -- NOTE ColorScheme -> trigger
--- -- silent! colorscheme gruvbox gruvbox-material
--- -------------------------------------
--- -------------------------------------
--- vim.cmd([[
---     augroup colorscheme_mock
---     autocmd!
---     autocmd ColorScheme * hi Normal guibg=none | hi def link LspInlayHint Comment
---     augroup END
--- ]])
+-------------------------------------
+-------------------------------------
+-- NOTE ColorScheme -> trigger
+-- silent! colorscheme gruvbox gruvbox-material
+-------------------------------------
+-------------------------------------
+vim.cmd([[
+    augroup colorscheme_mock
+    autocmd!
+    autocmd ColorScheme * hi Normal guibg=none | hi def link LspInlayHint Comment
+    augroup END
+]])
 
 vim.g.gruvbox_material_foreground = "material" -- "original" "mix" "material"
 vim.g.gruvbox_material_background = "hard" -- 'hard'`, `'medium'`, `'soft'
 vim.g.gruvbox_material_float_style = "dim" -- 'bright', "dim"
 vim.g.gruvbox_material_enable_italic = true
-
 vim.cmd([[ silent! colorscheme gruvbox-material ]])
 
 -- Cursor
-vim.api.nvim_set_hl(0, "Cursor", { fg = "#2e3440", bg = "#88c0d0" })
-vim.opt.guicursor = { "n-v-c:block-Cursor", "i-ci-ve:ver20-Cursor", "r-cr:hor15-Cursor" }
+vim.api.nvim_set_hl(0, "Cursor", { fg = "#91D696", bg = "#91D696" })
+vim.opt.guicursor = { "n-v-c:block-Cursor", "i-ci-ve:ver25-Cursor", "r-cr:hor15-Cursor" }
