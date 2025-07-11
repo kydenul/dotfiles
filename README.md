@@ -13,6 +13,11 @@
 $ brew tap daipeihust/tap # yay install im-select
 $ brew install im-select
 
+# MacOS
+$ brew intsll find
+# Linux - Ubuntu
+apt install fd-find
+
 # Verify
 $ im-select
 com.apple.keylayout.ABC
