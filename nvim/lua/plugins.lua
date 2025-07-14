@@ -351,25 +351,45 @@ require("lazy").setup({
         end,
       },
 
-      -- Codeium
+      -- Copilot
+      "zbirenbaum/copilot-cmp", -- copilot 与 nvim-cmp 之间的桥梁
       {
-        "Exafunction/windsurf.vim",
+        "zbirenbaum/copilot.lua",
+        cmd = "Copilot",
+        event = "InsertEnter",
         config = function()
-          vim.g.codeium_no_map_tab = 1
-          vim.keymap.set("i", "<C-g>", function()
-            return vim.fn["codeium#Accept"]()
-          end, { expr = true, silent = true })
-          vim.keymap.set("i", "<C-;>", function()
-            return vim.fn["codeium#CycleCompletions"](1)
-          end, { expr = true, silent = true })
-          vim.keymap.set("i", "<C-,>", function()
-            return vim.fn["codeium#CycleCompletions"](-1)
-          end, { expr = true, silent = true })
-          vim.keymap.set("i", "<C-x>", function()
-            return vim.fn["codeium#Clear"]()
-          end, { expr = true, silent = true })
+          require("copilot").setup({
+            -- 禁用 Copilot 的默认面板和建议
+            -- 因为我们将使用 nvim-cmp 来展示建议
+            panel = {
+              enabled = false,
+            },
+            suggestion = {
+              enabled = false,
+            },
+          })
         end,
       },
+
+      -- -- Codeium
+      -- {
+      --   "Exafunction/windsurf.vim",
+      --   config = function()
+      --     vim.g.codeium_no_map_tab = 1
+      --     vim.keymap.set("i", "<C-g>", function()
+      --       return vim.fn["codeium#Accept"]()
+      --     end, { expr = true, silent = true })
+      --     vim.keymap.set("i", "<C-;>", function()
+      --       return vim.fn["codeium#CycleCompletions"](1)
+      --     end, { expr = true, silent = true })
+      --     vim.keymap.set("i", "<C-,>", function()
+      --       return vim.fn["codeium#CycleCompletions"](-1)
+      --     end, { expr = true, silent = true })
+      --     vim.keymap.set("i", "<C-x>", function()
+      --       return vim.fn["codeium#Clear"]()
+      --     end, { expr = true, silent = true })
+      --   end,
+      -- },
     },
     config = function()
       require("config.nvim-cmp")
