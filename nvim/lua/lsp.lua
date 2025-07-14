@@ -71,7 +71,7 @@ local on_attach = function(client, bufnr)
 
   vim.keymap.set("n", "gD", vim.lsp.buf.declaration, bufopts("Go to Declaration"))
   vim.keymap.set("n", "gd", vim.lsp.buf.definition, bufopts("Go to Definition"))
-  vim.keymap.set("n", "gr", vim.lsp.buf.references, bufopts("Go to References"))
+  vim.keymap.set("n", "gr", "<cmd>Telescope lsp_references<CR>", bufopts("Go to References"))
   vim.keymap.set("n", "gi", vim.lsp.buf.implementation, bufopts("Go to Implementation"))
 
   -- K: show diagnostics if available, otherwise show hover information
