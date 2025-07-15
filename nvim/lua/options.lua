@@ -87,6 +87,6 @@ vim.api.nvim_set_hl(0, "Cursor", { fg = "#91D696", bg = "#91D696" })
 vim.opt.guicursor = { "n-v-c:block-Cursor", "i-ci-ve:ver25-Cursor", "r-cr:hor15-Cursor" }
 
 -- Highlight symbol under cursor
-vim.api.nvim_set_hl(0, "LspReferenceText", { fg = "#EBDFAC", bg = "#504945" })
+vim.api.nvim_set_hl(0, "LspReferenceText", { bg = "#504945", bold = true })
 vim.api.nvim_set_hl(0, "LspReferenceRead", { link = "LspReferenceText" })
 vim.api.nvim_set_hl(0, "LspReferenceWrite", { link = "LspReferenceText" })
