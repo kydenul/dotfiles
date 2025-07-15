@@ -76,17 +76,17 @@ telescope.setup({
     -- layout_strategy = "vertical",
     layout_config = {
       vertical = {
-        preview_cutoff = 30,
-        width = 0.9,
-        height = 0.9,
-        prompt_position = "bottom",
+        preview_cutoff = 10,
+        width = 0.96,
+        height = 0.96,
+        prompt_position = "top", -- "bottom"
       },
 
       horizontal = {
-        preview_cutoff = 30,
-        width = 0.9,
-        height = 0.9,
-        prompt_position = "bottom",
+        preview_cutoff = 10,
+        width = 0.96,
+        height = 0.96,
+        prompt_position = "top", -- "bottom"
       },
     },
     preview = {
