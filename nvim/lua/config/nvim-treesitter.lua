@@ -172,16 +172,10 @@ treesitter.setup({
 --   zR: open all foldings
 
 -- Set up folding based on treesitter
--- This is a workaround for https://github.com/nvim-treesitter/nvim-treesitter/issues/1337
-vim.api.nvim_create_autocmd({ "BufEnter", "BufAdd", "BufNew", "BufNewFile", "BufWinEnter" }, {
-  group = vim.api.nvim_create_augroup("TS_FOLD_WORKAROUND", {}),
-  callback = function()
-    vim.opt.foldmethod = "expr"
-    vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
-    vim.opt.foldenable = false
-    vim.opt.foldlevel = 99
-  end,
-})
+vim.opt.foldmethod = "expr"
+vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
+vim.opt.foldenable = false
+vim.opt.foldlevel = 99
 
 -- Add commands to help with treesitter
 vim.api.nvim_create_user_command("TSInstallInfo", function()

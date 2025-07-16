@@ -41,20 +41,6 @@ require("lazy").setup({
   -- ==============================================================
   -- ==============================================================
   {
-    "ellisonleao/gruvbox.nvim",
-    priority = 1000,
-    config = function()
-      require("gruvbox").setup({})
-    end,
-  },
-  {
-    "folke/tokyonight.nvim",
-    lazy = false,
-    priority = 1000,
-    opts = {},
-  },
-
-  {
     "sainnhe/gruvbox-material",
     lazy = true,
     priority = 1000,
@@ -156,19 +142,9 @@ require("lazy").setup({
         ",",
         mode = { "n", "x", "o" },
         function()
-          require("flash").jump({
-            search = { forward = true, wrap = false, multi_window = false },
-          })
+          require("flash").jump()
         end,
         desc = "Flash",
-      },
-      {
-        "<leader>,",
-        mode = { "n", "x", "o" },
-        function()
-          require("flash").treesitter()
-        end,
-        desc = "Flash Treesitter",
       },
     },
   },
@@ -206,15 +182,6 @@ require("lazy").setup({
       require("config.neogit")
     end,
   },
-
-  -- -- Scrollbar
-  -- {
-  --   "petertriho/nvim-scrollbar",
-  --   event = { "BufReadPost", "BufNewFile", "BufWritePre" },
-  --   config = function()
-  --     require("config.scrollbar")
-  --   end,
-  -- },
 
   -- Buffer line
   {

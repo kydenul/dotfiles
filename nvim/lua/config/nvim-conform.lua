@@ -101,11 +101,6 @@ conform.setup({
     timeout_ms = 1000,
     lsp_fallback = true,
   },
-
-  -- 格式化后的回调
-  format_after_save = {
-    lsp_fallback = true,
-  },
 })
 
 -- 手动格式化快捷键

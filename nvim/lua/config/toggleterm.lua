@@ -63,9 +63,10 @@ toggleterm.setup({
 -- Define terminal key mappings
 function _G.set_terminal_keymaps()
   local opts = { buffer = 0 }
-  -- Exit terminal mode
+  -- Exit terminal insert mode
   vim.keymap.set("t", "<esc>", [[<C-\><C-n>]], opts)
   vim.keymap.set("t", "jk", [[<C-\><C-n>]], opts)
+
   -- Navigate between windows from terminal mode
   vim.keymap.set("t", "<C-h>", [[<Cmd>wincmd h<CR>]], opts)
   vim.keymap.set("t", "<C-j>", [[<Cmd>wincmd j<CR>]], opts)
@@ -98,24 +99,6 @@ vim.keymap.set(
   "<leader>tg",
   "<cmd>lua _LAZYGIT_TOGGLE()<CR>",
   { noremap = true, silent = true, desc = "Toggle Lazygit" }
-)
-
--- htop
-local htop = Terminal:new({
-  cmd = "htop",
-  direction = "float",
-  float_opts = { border = "single" },
-  hidden = true,
-})
-
-function _HTOP_TOGGLE()
-  htop:toggle()
-end
-vim.keymap.set(
-  "n",
-  "<leader>th",
-  "<cmd>lua _HTOP_TOGGLE()<CR>",
-  { noremap = true, silent = true, desc = "Toggle Htop" }
 )
 
 -- Python REPL

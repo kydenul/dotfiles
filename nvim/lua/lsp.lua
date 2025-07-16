@@ -16,15 +16,7 @@ mason.setup({
       package_uninstalled = "✗",
     },
   },
-})
 
-local mason_lspconfig_ok, mason_lspconfig = pcall(require, "mason")
-if not mason_lspconfig_ok then
-  util.log_warn("mason lspconfig load failed")
-  return
-end
-
-mason_lspconfig.setup({
   -- A list of servers to automatically install if they're not already installed.
   ensure_installed = {
     "pylsp", -- Python
@@ -94,30 +86,6 @@ local on_attach = function(client, bufnr)
     { "CursorMoved", "CursorMovedI" },
     { callback = vim.lsp.buf.clear_references, buffer = bufnr, desc = "Clear References" }
   )
-
-  -- -- Configure signature help to show without focusing
-  -- vim.api.nvim_create_autocmd({ "TextChangedI", "TextChangedP" }, {
-  --   callback = function()
-  --     -- Show signature help without focusing the floating window
-  --     local params = vim.lsp.util.make_position_params(0, "utf-8")
-
-  --     vim.lsp.buf_request(bufnr, "textDocument/signatureHelp", params, function(err, result, ctx, config)
-  --       if result and result.signatures and #result.signatures > 0 then
-  --         -- Use vim.lsp.handlers directly instead of deprecated vim.lsp.with
-  --         local old_handler = vim.lsp.handlers["textDocument/signatureHelp"]
-  --         vim.lsp.handlers["textDocument/signatureHelp"] = function(_, result, ctx, config)
-  --           config = config or {}
-  --           config.focus = false -- This prevents focus from moving to the signature window
-  --           config.border = "rounded"
-  --           return old_handler(_, result, ctx, config)
-  --         end
-  --         -- Call the handler directly with the results
-  --         vim.lsp.handlers["textDocument/signatureHelp"](err, result, ctx, {})
-  --       end
-  --     end)
-  --   end,
-  --   buffer = bufnr,
-  -- })
 
   -- vim.keymap.set("n", "<space>D", vim.lsp.buf.type_definition, bufopts)
   -- vim.keymap.set("n", "<space>rn", vim.lsp.buf.rename, bufopts)
@@ -194,9 +162,9 @@ end, opts)
 
 -- Disable virtual text for diagnostics, as gitsigns will handle it.
 vim.diagnostic.config({
-  virtual_text = true,
-  signs = true,
-  underline = true,
-  update_in_insert = false,
-  severity_sort = true,
+  virtual_text = { severity = { min = vim.diagnostic.severity.HINT, max = vim.diagnostic.severity.ERROR } },
+  right_align = false,
+  underline = false,
+  signs = false,
+  virtual_lines = false,
 })

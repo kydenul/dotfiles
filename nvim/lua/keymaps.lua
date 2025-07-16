@@ -50,7 +50,6 @@ vim.keymap.set("v", ">", ">gv", opts)
 -- 单行或多行移动
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
-vim.keymap.set({ "n" }, "J", "5j")
 
 -- Visual mode, 粘贴不要复制
 vim.keymap.set("v", "p", '"_dP', opts)
