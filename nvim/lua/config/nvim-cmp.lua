@@ -136,7 +136,7 @@ cmp.setup({
       -- Show only symbol annotations "text_symbol" "symbol_text"
       mode = "symbol_text",
       -- Prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
-      maxwidth = 50,
+      maxwidth = 80,
       -- When the popup menu exceeds maxwidth, the truncated part would show ellipsis_char instead (must define maxwidth first)
       ellipsis_char = "...",
 
@@ -147,6 +147,7 @@ cmp.setup({
           -- This concatenates the icons with the name of the item kind
           vim_item.kind = string.format("%s %s", kind_icons[vim_item.kind], vim_item.kind)
           vim_item.menu = ({
+            copilot = "[Copilot]",
             nvim_lsp = "[Lsp]",
             luasnip = "[LuaSnip]",
             nvim_lua = "[Lua]",
