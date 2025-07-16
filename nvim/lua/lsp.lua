@@ -191,3 +191,12 @@ end, opts)
 vim.keymap.set("n", "<space>q", function()
   vim.diagnostic.setloclist()
 end, opts)
+
+-- Disable virtual text for diagnostics, as gitsigns will handle it.
+vim.diagnostic.config({
+  virtual_text = true,
+  signs = true,
+  underline = true,
+  update_in_insert = false,
+  severity_sort = true,
+})

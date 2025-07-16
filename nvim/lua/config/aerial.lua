@@ -80,7 +80,7 @@ aerial.setup({
   lazy_load = true, -- 懒加载符号
   -- Automatically open aerial when entering supported buffers.
   -- This can be a function (see :help aerial-open-automatic)
-  open_automatic = true,
+  open_automatic = false,
   close_automatic_events = { "unsupported" }, -- 当切换到不支持的缓冲区时自动关闭
 
   -- 高亮设置
@@ -89,9 +89,6 @@ aerial.setup({
   highlight_on_hover = true, -- 悬停时高亮符号
   highlight_on_jump = 300, -- 跳转后高亮持续时间（毫秒）
 })
-
--- You probably also want to set a keymap to toggle aerial
-vim.keymap.set("n", "<F12>", "<cmd>AerialToggle!<CR>", { desc = "Toggle Aerial" })
 
 -- Telescope 集成
 local found_telescope, telescope = pcall(require, "telescope")
@@ -111,20 +108,7 @@ end
 -- 添加命令别名以便于使用
 vim.cmd([[command! AerialNavOpen lua require('aerial').nav_open()]])
 
--- -- 添加自动命令以在特定文件类型中自动打开 Aerial（不跳转光标）
--- local augroup = vim.api.nvim_create_augroup("AerialAutoOpen", { clear = true })
--- vim.api.nvim_create_autocmd("FileType", {
--- 	group = augroup,
--- 	pattern = { "python", "go", "lua", "rust", "typescript", "javascript" },
--- 	callback = function()
--- 		-- 延迟加载以确保文件已完全加载
--- 		vim.defer_fn(function()
--- 			if vim.bo.buftype == "" and vim.fn.winnr("$") == 1 then
--- 				local current_win = vim.api.nvim_get_current_win() -- save current window ID
--- 				vim.cmd("AerialOpen") -- open Aerial window
--- 				vim.api.nvim_set_current_win(current_win) -- ensure cursor returns to original window
--- 			end
--- 		end, 300)
--- 	end,
--- 	desc = "在特定文件类型中自动打开 Aerial (不跳转光标)",
--- })
+-- You probably also want to set a keymap to toggle aerial
+vim.keymap.set("n", "<F12>", "<cmd>AerialToggle!<CR>", { desc = "Toggle Aerial" })
+vim.keymap.set("n", "<leader>at", "<cmd>AerialToggle!<CR>", { desc = "Toggle Aerial" })
+

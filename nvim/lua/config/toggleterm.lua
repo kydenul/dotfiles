@@ -8,152 +8,130 @@ if not ok then
 end
 
 toggleterm.setup({
-  -- Terminal configuration
-  shell = vim.o.shell, -- change the default shell
-  open_mapping = [[<C-t>]], -- How to open a new terminal
-  insert_mappings = true, -- whether the open mapping applies in insert mode
-  terminal_mappings = true, -- whether the open mapping applies in terminal mode
-  start_in_insert = true, -- start terminal in insert mode
-  persist_size = true, -- remember terminal size
-  persist_mode = true, -- remember terminal mode (normal/insert)
-  auto_scroll = true, -- automatically scroll to bottom on terminal output
+  open_mapping = [[<C-/>]], -- How to open a new terminal
+  start_in_insert = true, -- Start terminal in insert mode
+  persist_size = true, -- Remember terminal size
+  close_on_exit = true, -- Close the terminal window when the process exits
+  auto_scroll = true, -- Automatically scroll to bottom on terminal output
+  direction = "float", -- 'vertical' | 'horizontal' | 'tab' | 'float'
+  hide_numbers = true, -- Hide the number column in toggleterm buffers
+  shade_terminals = true, -- Shade the terminal window
 
-  -- Size and appearance
+  -- This function is used to calculate the size of non-floating terminals.
   size = function(term)
     if term.direction == "horizontal" then
-      return 15
+      -- If horizontal, set height to 20% of the screen
+      return math.floor(vim.o.lines * 0.2)
     elseif term.direction == "vertical" then
+      -- If vertical, set width to 40% of the screen
       return vim.o.columns * 0.4
-    else
-      return 20
     end
   end,
-  hide_numbers = true, -- hide the number column in toggleterm buffers
-  direction = "float", -- 'vertical' | 'horizontal' | 'tab' | 'float'
-  close_on_exit = true, -- close the terminal window when the process exits
-  shade_filetypes = {},
-  shade_terminals = true,
-  autochdir = false, -- when neovim changes directory, terminal follows
 
   -- Float window options
   float_opts = {
-    -- The border key is *almost* the same as 'nvim_open_win'
-    -- see :h nvim_open_win for details on borders
-    border = "single",
-    width = math.floor(vim.o.columns * 0.9),
-    height = math.floor(vim.o.lines * 0.8),
+    -- Border style
+    border = "single", -- 'single', 'double', 'rounded', 'shadow', 'none'
+    -- Transparency
     winblend = 0,
+    -- Title position
     title_pos = "center",
-  },
-
-  -- Responsive layout
-  responsiveness = {
-    horizontal_breakpoint = 135, -- columns at which terminals stack vertically
+    -- Dimensions and position to center the floating window
+    width = function()
+      return math.floor(vim.o.columns * 0.8)
+    end,
+    height = function()
+      return math.floor(vim.o.lines * 0.8)
+    end,
+    row = function()
+      return math.floor((vim.o.lines - (vim.o.lines * 0.8)) / 2)
+    end,
+    col = function()
+      return math.floor((vim.o.columns - (vim.o.columns * 0.8)) / 2)
+    end,
   },
 
   -- Callbacks
-  on_open = function()
-    -- Disable line numbers in terminal
-    vim.opt_local.number = false
-    vim.opt_local.relativenumber = false
+  on_open = function(term)
+    -- Disable line numbers in the terminal buffer
+    vim.cmd("setlocal nonumber norelativenumber")
+    -- Enter insert mode automatically
+    vim.cmd("startinsert!")
   end,
 })
 
 -- Define terminal key mappings
--- t: terminal mode
 function _G.set_terminal_keymaps()
-  local opts = { noremap = true, buffer = 0 }
-
-  -- Normal mode mappings for closing the terminal
-  vim.keymap.set("n", "<Esc>", [[<Cmd>quit<CR>]], opts)
-  vim.keymap.set("n", "q", [[<Cmd>quit<CR>]], opts)
-
-  -- Terminal mode mappings for exiting terminal mode
+  local opts = { buffer = 0 }
+  -- Exit terminal mode
   vim.keymap.set("t", "<esc>", [[<C-\><C-n>]], opts)
   vim.keymap.set("t", "jk", [[<C-\><C-n>]], opts)
-
-  -- Terminal mode mappings for window navigation
-  -- These are useful for non-float terminals (horizontal/vertical splits)
+  -- Navigate between windows from terminal mode
   vim.keymap.set("t", "<C-h>", [[<Cmd>wincmd h<CR>]], opts)
   vim.keymap.set("t", "<C-j>", [[<Cmd>wincmd j<CR>]], opts)
   vim.keymap.set("t", "<C-k>", [[<Cmd>wincmd k<CR>]], opts)
   vim.keymap.set("t", "<C-l>", [[<Cmd>wincmd l<CR>]], opts)
 end
 
--- Apply terminal keymaps when terminal opens
--- If you only want these mappings for toggleterm use term://*toggleterm#* instead
-vim.cmd("autocmd! TermOpen term://* lua set_terminal_keymaps()")
+-- Apply terminal keymaps only when a toggleterm terminal opens
+vim.cmd("autocmd! TermOpen term://*toggleterm#* lua set_terminal_keymaps()")
 
--- Create custom terminal instances
--- Toggleterm exposes the `Terminal` class to create custom terminals
+-- ===================================================================
+-- Custom Terminals
+-- ===================================================================
 local Terminal = require("toggleterm.terminal").Terminal
 
--- Create lazygit terminal
+-- Lazygit
 local lazygit = Terminal:new({
   cmd = "lazygit",
-  hidden = true,
+  dir = vim.fn.getcwd(),
   direction = "float",
-  float_opts = {
-    border = "double",
-  },
-  on_open = function(term)
-    vim.cmd("startinsert!")
-    vim.api.nvim_buf_set_keymap(term.bufnr, "n", "q", "<cmd>close<CR>", { noremap = true, silent = true })
-  end,
+  float_opts = { border = "double" },
+  hidden = true, -- Hide from buffer list
 })
 
 function _LAZYGIT_TOGGLE()
   lazygit:toggle()
 end
-
--- Create htop terminal
-local htop = Terminal:new({
-  cmd = "htop",
-  hidden = true,
-  direction = "float",
-  float_opts = {
-    border = "single",
-  },
-})
-
-function _HTOP_TOGGLE()
-  htop:toggle()
-end
-
--- Create a terminal for running tests
-local test_runner = Terminal:new({
-  cmd = "", -- Will be set when called
-  hidden = true,
-  direction = "horizontal",
-
-  size = function()
-    return math.floor(vim.o.lines * 0.3)
-  end,
-
-  on_open = function(term)
-    vim.cmd("startinsert!")
-  end,
-
-  on_exit = function()
-    vim.cmd("echo 'Test run completed!'")
-  end,
-})
-
-function _RUN_TEST(cmd)
-  test_runner:set_cmd(cmd)
-  test_runner:toggle()
-end
-
--- Create keymappings for custom terminals
-vim.api.nvim_set_keymap(
+vim.keymap.set(
   "n",
   "<leader>tg",
   "<cmd>lua _LAZYGIT_TOGGLE()<CR>",
   { noremap = true, silent = true, desc = "Toggle Lazygit" }
 )
-vim.api.nvim_set_keymap(
+
+-- htop
+local htop = Terminal:new({
+  cmd = "htop",
+  direction = "float",
+  float_opts = { border = "single" },
+  hidden = true,
+})
+
+function _HTOP_TOGGLE()
+  htop:toggle()
+end
+vim.keymap.set(
   "n",
   "<leader>th",
   "<cmd>lua _HTOP_TOGGLE()<CR>",
   { noremap = true, silent = true, desc = "Toggle Htop" }
+)
+
+-- Python REPL
+local python_repl = Terminal:new({
+  cmd = "python",
+  direction = "float",
+  float_opts = { border = "rounded" },
+  hidden = true,
+})
+
+function _PYTHON_REPL_TOGGLE()
+  python_repl:toggle()
+end
+vim.keymap.set(
+  "n",
+  "<leader>tp",
+  "<cmd>lua _PYTHON_REPL_TOGGLE()<CR>",
+  { noremap = true, silent = true, desc = "Toggle Python REPL" }
 )
