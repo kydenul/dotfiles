@@ -65,6 +65,7 @@ local on_attach = function(client, bufnr)
   vim.keymap.set("n", "gd", vim.lsp.buf.definition, bufopts("Go to Definition"))
   vim.keymap.set("n", "gr", "<cmd>Telescope lsp_references<CR>", bufopts("Go to References"))
   vim.keymap.set("n", "gi", vim.lsp.buf.implementation, bufopts("Go to Implementation"))
+  vim.keymap.set("n", "gh", vim.lsp.buf.hover, bufopts("Hover"))
 
   -- K: show diagnostics if available, otherwise show hover information
   vim.keymap.set("n", "K", function()
@@ -162,9 +163,20 @@ end, opts)
 
 -- Disable virtual text for diagnostics, as gitsigns will handle it.
 vim.diagnostic.config({
-  virtual_text = { severity = { min = vim.diagnostic.severity.HINT, max = vim.diagnostic.severity.ERROR } },
-  right_align = false,
-  underline = false,
-  signs = false,
-  virtual_lines = false,
+  virtual_text = {
+    severity = { min = vim.diagnostic.severity.HINT },
+    spacing = 2,
+    prefix = "■",
+  },
+
+  signs = true,
+  underline = true,
+  update_in_insert = false,
+  severity_sort = true,
+
+  float = {
+    border = "single",
+    source = "always",
+    focusable = false,
+  },
 })
