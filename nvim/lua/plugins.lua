@@ -132,6 +132,14 @@ require("lazy").setup({
     end,
   },
 
+  -- Session management
+  {
+    "rmagatti/auto-session",
+    config = function()
+      require("config.auto-session")
+    end,
+  },
+
   -- Folding
   {
     "kevinhwang91/nvim-ufo",

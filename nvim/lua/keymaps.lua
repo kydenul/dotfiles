@@ -69,3 +69,9 @@ vim.keymap.set(
 
 -- Neogit
 vim.keymap.set("n", "<leader>g", "<Cmd>Neogit<CR>", { noremap = true, silent = true, desc = "Neogit" })
+
+-- Session management
+vim.keymap.set("n", "<leader>ss", "<Cmd>SessionSave<CR>", { noremap = true, silent = true, desc = "Save session" })
+vim.keymap.set("n", "<leader>sr", "<Cmd>SessionRestore<CR>", { noremap = true, silent = true, desc = "Restore session" })
+vim.keymap.set("n", "<leader>sd", "<Cmd>SessionDelete<CR>", { noremap = true, silent = true, desc = "Delete session" })
+vim.keymap.set("n", "<leader>sf", "<Cmd>Telescope session-lens search_session<CR>", { noremap = true, silent = true, desc = "Find sessions" })

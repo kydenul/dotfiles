@@ -43,4 +43,3 @@ neogit.setup({
     hunk = { "", "" },
   },
 })
-
