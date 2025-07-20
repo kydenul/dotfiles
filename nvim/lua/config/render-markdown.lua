@@ -1,4 +1,4 @@
--- Aerial: code outline and symbol navigation plugin
+-- render-markdown.nvim
 
 local util = require("util")
 

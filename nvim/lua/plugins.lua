@@ -132,6 +132,15 @@ require("lazy").setup({
     end,
   },
 
+  -- Folding
+  {
+    "kevinhwang91/nvim-ufo",
+    dependencies = { "kevinhwang91/promise-async" },
+    config = function()
+      require("config.nvim-ufo")
+    end,
+  },
+
   -- Smart motion
   {
     "folke/flash.nvim",
@@ -253,7 +262,6 @@ require("lazy").setup({
   {
     "nvim-treesitter/nvim-treesitter",
     dependencies = {
-      "p00f/nvim-ts-rainbow",
       "nvim-treesitter/nvim-treesitter-textobjects",
       "nvim-treesitter/nvim-treesitter-context",
 

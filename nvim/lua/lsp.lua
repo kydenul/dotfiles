@@ -1,4 +1,4 @@
--- Note: The order matters: require("mason") -> require("mason-lspconfig") -> require("lspconfig")
+-- NOTE: The order matters: require("mason") -> require("mason-lspconfig") -> require("lspconfig")
 
 local util = require("util")
 
@@ -112,7 +112,7 @@ end
 -- 1. Use `:Mason` to install the corresponding LSP.
 -- 2. Add the configuration below. The syntax is `lspconfig.<name>.setup(...)`
 -- Hint (find <name> here) : https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
-lspconfig.bashls.setup({})
+lspconfig.bashls.setup({ on_attach = on_attach })
 lspconfig.pylsp.setup({ on_attach = on_attach })
 lspconfig.gopls.setup({
   on_attach = on_attach,
@@ -143,9 +143,7 @@ lspconfig.lua_ls.setup({
 --     Place your compiler flags in the compile_flags.txt file, located in the root directory
 --     of your project. Each line in the file should contain a single compiler flag.
 -- src: https://clangd.llvm.org/installation#compile_commandsjson
-lspconfig.clangd.setup({
-  on_attach = on_attach,
-})
+lspconfig.clangd.setup({ on_attach = on_attach })
 
 -- Customized on_attach function.
 -- See `:help vim.diagnostic.*` for documentation on any of the below functions.

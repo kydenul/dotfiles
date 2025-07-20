@@ -162,21 +162,6 @@ treesitter.setup({
   },
 })
 
--- Folding hints:
---   A uppercase letter followed `z` means recursive
---   zo: open one fold under the cursor
---   zc: close one fold under the cursor
---   za: toggle the folding
---   zv: open just enough folds to make the line in which the cursor is located not folded
---   zM: close all foldings
---   zR: open all foldings
-
--- Set up folding based on treesitter
-vim.opt.foldmethod = "expr"
-vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
-vim.opt.foldenable = false
-vim.opt.foldlevel = 99
-
 -- Add commands to help with treesitter
 vim.api.nvim_create_user_command("TSInstallInfo", function()
   vim.cmd("TSInstallInfo")
