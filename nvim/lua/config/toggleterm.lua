@@ -8,12 +8,12 @@ if not ok then
 end
 
 toggleterm.setup({
-  open_mapping = [[<C-/>]], -- How to open a new terminal
+  open_mapping = [[<C-\>]], -- How to open a new terminal
   start_in_insert = true, -- Start terminal in insert mode
   persist_size = true, -- Remember terminal size
   close_on_exit = true, -- Close the terminal window when the process exits
   auto_scroll = true, -- Automatically scroll to bottom on terminal output
-  direction = "float", -- 'vertical' | 'horizontal' | 'tab' | 'float'
+  direction = "vertical", -- 'vertical' | 'horizontal' | 'tab' | 'float'
   hide_numbers = true, -- Hide the number column in toggleterm buffers
   shade_terminals = true, -- Shade the terminal window
 
@@ -63,15 +63,8 @@ toggleterm.setup({
 -- Define terminal key mappings
 function _G.set_terminal_keymaps()
   local opts = { buffer = 0 }
-  -- Exit terminal insert mode
   vim.keymap.set("t", "<esc>", [[<C-\><C-n>]], opts)
   vim.keymap.set("t", "jk", [[<C-\><C-n>]], opts)
-
-  -- Navigate between windows from terminal mode
-  vim.keymap.set("t", "<C-h>", [[<Cmd>wincmd h<CR>]], opts)
-  vim.keymap.set("t", "<C-j>", [[<Cmd>wincmd j<CR>]], opts)
-  vim.keymap.set("t", "<C-k>", [[<Cmd>wincmd k<CR>]], opts)
-  vim.keymap.set("t", "<C-l>", [[<Cmd>wincmd l<CR>]], opts)
 end
 
 -- Apply terminal keymaps only when a toggleterm terminal opens
@@ -81,25 +74,6 @@ vim.cmd("autocmd! TermOpen term://*toggleterm#* lua set_terminal_keymaps()")
 -- Custom Terminals
 -- ===================================================================
 local Terminal = require("toggleterm.terminal").Terminal
-
--- Lazygit
-local lazygit = Terminal:new({
-  cmd = "lazygit",
-  dir = vim.fn.getcwd(),
-  direction = "float",
-  float_opts = { border = "double" },
-  hidden = true, -- Hide from buffer list
-})
-
-function _LAZYGIT_TOGGLE()
-  lazygit:toggle()
-end
-vim.keymap.set(
-  "n",
-  "<leader>tg",
-  "<cmd>lua _LAZYGIT_TOGGLE()<CR>",
-  { noremap = true, silent = true, desc = "Toggle Lazygit" }
-)
 
 -- Python REPL
 local python_repl = Terminal:new({
