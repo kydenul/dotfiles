@@ -181,13 +181,6 @@ local function current_buffer_tags(opts)
   return awk_tags(opts)
 end
 
-local function grep_tags(opts)
-  opts = set_opts(opts)
-  opts.prompt_title = "Grep Tags (" .. opts.tag .. ")"
-  opts.awk = string.format("$1 == %q{print $0}", opts.tag)
-  return awk_tags(opts)
-end
-
 -- Enhanced keymaps with descriptions
 vim.keymap.set("n", "<leader>ff", builtin.find_files, { desc = "Find files" })
 vim.keymap.set("n", "<leader>fb", builtin.buffers, { desc = "Find buffers" })
@@ -199,6 +192,14 @@ vim.keymap.set("n", "<leader>/", builtin.current_buffer_fuzzy_find, { desc = "Fu
 vim.keymap.set("n", "<leader>fo", current_buffer_tags, { desc = "Find buffer tags" })
 vim.keymap.set("n", "<leader>fd", builtin.diagnostics, { desc = "Find diagnostics" })
 vim.keymap.set("n", "<leader>fr", builtin.resume, { desc = "Resume last picker" })
+
+-- Additional useful telescope mappings
+vim.keymap.set("n", "<leader>fc", builtin.commands, { desc = "Find commands" })
+vim.keymap.set("n", "<leader>fk", builtin.keymaps, { desc = "Find keymaps" })
+vim.keymap.set("n", "<leader>fs", builtin.grep_string, { desc = "Find string under cursor" })
+vim.keymap.set("n", "<leader>fh", builtin.command_history, { desc = "Find command history" })
+vim.keymap.set("n", "<leader>fm", builtin.marks, { desc = "Find marks" })
+vim.keymap.set("n", "<leader>fj", builtin.jumplist, { desc = "Find jumplist" })
 
 -- Git commands with improved error handling
 local git_log = { "git", "log", "--pretty=format:%h %s (%ci) <%an>\n" }

@@ -56,9 +56,14 @@ vim.o.backup = false
 vim.o.writebackup = false
 vim.o.swapfile = false
 
--- Smaller updatetime
-vim.o.updatetime = 240
-vim.o.timeoutlen = 500
+-- Smaller updatetime for better responsiveness
+vim.o.updatetime = 250
+vim.o.timeoutlen = 300
+
+-- Better performance
+vim.o.lazyredraw = false -- Don't redraw during macros (can cause issues with some plugins)
+vim.o.ttyfast = true -- Faster terminal connection
+vim.o.regexpengine = 0 -- Use automatic regexp engine selection
 
 -- 补全增强
 vim.o.wildmenu = true

@@ -278,7 +278,8 @@ require("lazy").setup({
       "andymass/vim-matchup",
       "mfussenegger/nvim-treehopper",
     },
-    event = "BufReadPost",
+    event = { "BufReadPost", "BufNewFile" },
+    cmd = { "TSInstall", "TSBufEnable", "TSBufDisable", "TSModuleInfo" },
     build = ":TSUpdate",
     config = function()
       require("config.nvim-treesitter")
@@ -328,8 +329,27 @@ require("lazy").setup({
         event = "InsertEnter",
         dependencies = { "rafamadriz/friendly-snippets" },
         config = function()
+          -- Load friendly snippets
           require("luasnip.loaders.from_vscode").lazy_load({
             include = { "c", "cpp", "go", "python", "sh", "json", "lua", "gitcommit", "sql", "markdown" },
+          })
+
+          -- Load custom snippets
+          require("config.snippets")
+
+          -- Configure LuaSnip
+          local luasnip = require("luasnip")
+          luasnip.config.setup({
+            history = true,
+            updateevents = "TextChanged,TextChangedI",
+            enable_autosnippets = true,
+            ext_opts = {
+              [require("luasnip.util.types").choiceNode] = {
+                active = {
+                  virt_text = { { "●", "Orange" } },
+                },
+              },
+            },
           })
         end,
       },

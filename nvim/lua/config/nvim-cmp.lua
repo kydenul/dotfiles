@@ -177,8 +177,12 @@ cmp.setup({
 
   -- Add performance settings
   performance = {
-    max_view_entries = 20, -- Limit the number of items shown at once
+    debounce = 60, -- Delay before triggering completion
+    throttle = 30, -- Delay between completion requests
     fetching_timeout = 500, -- Timeout for fetching completions
+    confirm_resolve_timeout = 80, -- Timeout for resolving completion items
+    async_budget = 1, -- Maximum time per async operation
+    max_view_entries = 200, -- Maximum number of completion items
   },
 })
 

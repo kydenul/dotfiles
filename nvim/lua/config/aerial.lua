@@ -111,4 +111,3 @@ vim.cmd([[command! AerialNavOpen lua require('aerial').nav_open()]])
 -- You probably also want to set a keymap to toggle aerial
 vim.keymap.set("n", "<F12>", "<cmd>AerialToggle!<CR>", { desc = "Toggle Aerial" })
 vim.keymap.set("n", "<leader>at", "<cmd>AerialToggle!<CR>", { desc = "Toggle Aerial" })
-

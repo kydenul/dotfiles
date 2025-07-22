@@ -15,9 +15,12 @@ mason.setup({
       package_pending = "➜",
       package_uninstalled = "✗",
     },
+    border = "rounded",
   },
+  max_concurrent_installers = 4,
 
-  -- A list of servers to automatically install if they're not already installed.
+  automatic_installation = true,
+  -- Use mason-lspconfig for better integration
   ensure_installed = {
     "pylsp", -- Python
     "gopls", -- Go
