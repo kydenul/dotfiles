@@ -14,9 +14,9 @@ $ brew tap daipeihust/tap # yay install im-select
 $ brew install im-select
 
 # MacOS
-$ brew intsll find
+$ brew install fd
 # Linux - Ubuntu
-apt install fd-find
+sudo apt install fd-find
 
 # Verify
 $ im-select
@@ -70,94 +70,132 @@ Run "nvim -V1 -v" for more info
 $ git clone https://github.com/kydenul/dotfiles.git ~/.dotfiles
 $ ln -s ~/.dotfiles/nvim/ ~/.config/nvim
 
-$ Verify
+# Verify installation
 $ ls -l ~/.config | grep 'nvim'
 lrwxr-xr-x@ 1 kyden  staff    27B 23 Sep 22:55 nvim -> /Users/kyden/.dotfiles/nvim
 ```
 
-### Use OSC 52
+### Getting Started
 
-Operating System Controls(OSC), 是一种约定俗成的用于终端程序中的逃逸序列表达，
-终端会根据 OSC codes 所定义的行文处理方式处理它所包围的文本。
+1. **First Launch**: When you first open Neovim, lazy.nvim will automatically bootstrap itself and install all plugins. This may take a few minutes.
 
-而正巧的是就有一种定义决定了「如何从终端中复制内容到系统剪贴板中」，那就是 OSC 52 escape sequence。
+2. **Plugin Management**: Use these commands to manage plugins:
+   - `:Lazy` - Open plugin manager interface
+   - `:Lazy sync` - Install/update/remove plugins
+   - `:Lazy clean` - Remove unused plugins
+   - `:Lazy health` - Check plugin health
 
-OSC 52 一次最长接受 100000 个字节，其中前 7 个字节为 `\033]52;c;`，
-中间 99992 个字节为待复制文本，最后一个字节为 `\a`。
+3. **LSP Setup**: Language servers are managed by Mason:
+   - `:Mason` - Open Mason interface to install/manage LSP servers
+   - `:LspInfo` - Show LSP status for current buffer
+   - `:checkhealth` - Check Neovim health (including LSP)
 
-待复制文本需要编码为 base64 表达，因此实际可用的复制长度为 74994 个字节。
-一般 74994 个字节可以超过普通的纯文本范围了，完全能够满足日常的复制粘贴的需求。
+4. **Initial Configuration**:
+   - The configuration will automatically install language servers for common languages
+   - Copilot requires authentication: `:Copilot auth` (if you have access)
+   - Check `:checkhealth lazy` to ensure everything is working correctly
 
-#### Steps
+### OSC 52 Clipboard Integration
 
-1. 创建 `yank` 文件，然后赋予执行权限并加入 PATH 中(这里可以使用软连接的方式 `ln -s ~/.dotfiles/yank /usr/local/bin/yank`)：
+**What is OSC 52?**
+Operating System Controls (OSC) are escape sequences used in terminal programs. OSC 52 specifically defines "how to copy content from terminal to system clipboard".
 
-    ```bash
-    #!/bin/sh
+**Technical Details:**
 
-    # copy via OSC 52
-    buf=$( cat "$@" )
-    len=$( printf %s "$buf" | wc -c ) max=74994
-    test $len -gt $max && echo "$0: input is $(( len - max )) bytes too long" >&2
-    printf "\033]52;c;$( printf %s "$buf" | head -c $max | base64 | tr -d '\r\n' )\a"
-    ```
+- Maximum length: 100,000 bytes per operation
+- Format: `\033]52;c;[base64-encoded-text]\a`
+- Practical limit: ~74,994 bytes (after base64 encoding)
+- Sufficient for most daily copy-paste operations
 
-2. Neovim setting
+#### Neovim setting
 
-    ```lua
-    vim.g.clipboard = {
-        name = "OSC 52",
-        copy = {
-            ["+"] = require("vim.ui.clipboard.osc52").copy("+"),
-            ["*"] = require("vim.ui.clipboard.osc52").copy("*"),
-        },
-        paste = {
-            ["+"] = require("vim.ui.clipboard.osc52").paste("+"),
-            ["*"] = require("vim.ui.clipboard.osc52").paste("*"),
-        },
-    }
-    vim.opt.clipboard = "unnamedplus" -- use system clipboard
-    ```
+```lua
+vim.g.clipboard = {
+    name = "OSC 52",
+    copy = {
+        ["+"] = require("vim.ui.clipboard.osc52").copy("+"),
+        ["*"] = require("vim.ui.clipboard.osc52").copy("*"),
+    },
+    paste = {
+        ["+"] = require("vim.ui.clipboard.osc52").paste("+"),
+        ["*"] = require("vim.ui.clipboard.osc52").paste("*"),
+    },
+}
+vim.opt.clipboard = "unnamedplus" -- use system clipboard
+```
 
-3. TMux setting
+### Plugin Manager - Lazy.nvim
 
-    ```conf
-    set -g allow-passthrough on
-    ```
+This configuration uses [lazy.nvim](https://github.com/folke/lazy.nvim), a modern plugin manager that offers:
+
+**Key Features:**
+
+- **Fast startup**: Plugins are lazy-loaded by default
+- **Automatic bootstrapping**: Installs itself on first run
+- **Lockfile support**: `lazy-lock.json` ensures reproducible plugin versions
+- **Rich UI**: Beautiful interface for plugin management
+- **Health checks**: Built-in diagnostics for plugin issues
+- **Profiling**: Startup time analysis
+
+**Commands:**
+
+- `:Lazy` - Open the plugin manager interface
+- `:Lazy sync` - Install missing plugins and update existing ones
+- `:Lazy clean` - Remove plugins that are no longer needed  
+- `:Lazy update` - Update plugins to latest versions
+- `:Lazy profile` - Show startup time breakdown
 
 ### Plugins
 
 #### Colorscheme
 
-- zephyr: 清新的配色方案
-- tokyonight: 一种受欢迎的配色方案，灵感来自 Tokyo 的夜景
-- gruvbox: Gruvbox 主题，深色和浅色模式都支持
+- **gruvbox-material**: Modern gruvbox theme with better contrast and colors
 
-`:colorscheme <theme>` 可切换主题
+`:colorscheme gruvbox-material` to switch theme
 
-#### Which key
+#### Which Key
 
-提供一个帮助菜单，显示可用的快捷键，帮助用户记住和使用快捷键
+Displays a popup with available keybindings when you start typing a key sequence, helping you remember and discover shortcuts
 
 #### Buffer Line
 
-提供一个漂亮的缓冲区标签行，允许用户在多个缓冲区之间轻松切换。
+Provides a beautiful buffer tab line that allows easy switching between multiple buffers with:
 
-- `gt`: 下一个 Buffer
-- `gT`: 上一个 buffer
-- `ZZ`: 关闭当前**已保存**的 Buffer
+- Visual buffer indicators
+- Close buttons for each buffer
+- Buffer reordering support
 
-#### Yank
+Keymaps:
 
-增强复制粘贴功能，支持更复杂的粘贴操作
+- `gt`: Next buffer
+- `gT`: Previous buffer  
+- `ZZ`: Close current saved buffer
 
-#### Status Line
+#### Yank (Yanky)
 
-强大的状态栏，支持自定义显示信息
+Enhances copy/paste functionality with:
 
-#### Vim Tmux Navigator
+- Yank history management
+- Smart paste operations
+- Integration with system clipboard
 
-允许在 Neovim 和 Tmux 之间无缝导航，使用 Ctrl + hjkl 快捷键
+#### Status Line (Lualine)
+
+Powerful and customizable statusline showing:
+
+- Current mode
+- Git branch and changes
+- File information and encoding
+- LSP status and diagnostics
+- Current location in file
+
+#### Session Management
+
+**auto-session**: Automatic session management that:
+
+- Saves and restores your workspace automatically
+- Remembers open files, window layouts, and more
+- Works across Neovim restarts
 
 #### File Explorer
 
@@ -170,47 +208,80 @@ OSC 52 一次最长接受 100000 个字节，其中前 7 个字节为 `\033]52;c
 
 显示代码的大纲视图，方便快速导航
 
-#### Hop
+#### Flash (Smart Jump)
 
-智能跳转，快速移动到文件中的特定位置
+Intelligent jumping to move quickly to specific positions in files
 
-- `,<char>`: 跳转到 `<char>` 字母处
+- `,`: Flash jump to any position (replaces traditional f/t motions)
 
 #### Surround
 
-快速添加、删除或更改文本周围的括号或引号
+**nvim-surround**: Quick add, delete, or change text surroundings (brackets, quotes, etc.)
 
-- `cs<src><dst>`: change `<src>` to `<dst>`
+Keymaps:
 
-#### Indent Blank Line
+- `gz<motion><replacement>`: Add surroundings
+- `gzd<char>`: Delete surrounding <char>
+- `gzc<old><new>`: Change surrounding from <old> to <new>
 
-在代码中显示缩进的空行
+#### Code Enhancement
 
-#### Inc Rename
+**indent-blankline.nvim**: Shows indentation guides and scope highlighting
 
-提供 LSP 支持的重命名功能
+**nvim-ufo**: Advanced folding with:
 
-- `<leader>r`
+- LSP-based folding
+- Treesitter integration
+- Preview folded content
 
-#### Git
+**flash.nvim**: Enhanced navigation and text objects
 
-`gitsigns` 在文件中显示 Git 修改的签名和状态.
+#### Enhanced UI
 
-`neogit`, 一个 Git 客户端，可以通过 Neovim 进行更复杂的 Git 操作.
+**noice.nvim**: Completely replaces the default Neovim UI for:
 
-- `Neogit`: 打开 Git 客户端
+- Command line interface
+- Messages and notifications  
+- Search interface
+- LSP progress indicators
+
+**trouble.nvim**: Better diagnostics and quickfix list with:
+
+- Pretty diagnostic display
+- Workspace-wide error navigation
+- Integration with LSP and Telescope
+
+#### Git Integration
+
+**gitsigns.nvim**: Shows Git changes in the sign column and provides Git operations
+
+**neogit**: Full-featured Git client interface for Neovim
+
+**vim-fugitive**: Comprehensive Git wrapper
+
+Keymaps:
+
+- `<leader>g`: Open Neogit interface
+- Git signs appear in the sign column showing additions, deletions, and changes
 
 #### Comments and TODO
 
-方便的代码注释
+**vim-commentary**: Easy code commenting
+**todo-comments.nvim**: Highlight and search for TODO, FIXME, NOTE, etc.
 
-- `gc`:
+Keymaps:
 
-#### ToggleTerm
+- `gc`: Toggle line comment (normal/visual mode)
+- `gcc`: Toggle current line comment
+- `gcu`: Uncomment current and adjacent commented lines
 
-可以在 Neovim 中使用的终端集成
+#### Terminal Integration
 
-- `<C-t>`: 打开一个 toogleterm
+**toggleterm.nvim**: Integrated terminal management within Neovim
+
+Keymaps:
+
+- `<C-t>`: Toggle terminal window
 
 #### Telescope
 
@@ -228,7 +299,9 @@ OSC 52 一次最长接受 100000 个字节，其中前 7 个字节为 `\033]52;c
 
 #### Markdown
 
-- MarkdownPreview: `<leader>mdp`，实时预览功能
+- **render-markdown.nvim**: Live markdown rendering in Neovim buffer
+- **vim-markdown**: Enhanced markdown syntax and folding
+- **PlantUML**: Syntax highlighting and preview for PlantUML diagrams
 
 #### Autopairs
 
@@ -242,66 +315,136 @@ OSC 52 一次最长接受 100000 个字节，其中前 7 个字节为 `\033]52;c
 
 #### Auto Complete Engine
 
-`LuaSnip`，提供 Snippet 功能的插件，配合自动补全使用
+**nvim-cmp**: Powerful autocompletion framework with multiple sources:
 
-`nvim-cmp`，强大的自动补全框架，支持多种来源的补全
+- LSP completions
+- Buffer completions  
+- Path completions
+- Command line completions
+- **GitHub Copilot**: AI-powered code suggestions
+
+**LuaSnip**: Advanced snippet engine with:
+
+- VSCode-style snippets support
+- Custom snippet definitions
+- Dynamic snippet expansion
 
 #### LSP Manager
 
-`mason`: 一个 Neovim 插件管理器，专注于提供一个简单、一致的接口来管理外部工具和语言服务器；
+**mason**: Package manager for LSP servers, formatters, linters, and debug adapters
 
-`nvim-lspconfig`: 函数跳转、定义查看等
+**nvim-lspconfig**: Language Server Protocol configurations with:
 
-`lsp_signature`: 提供 LSP 函数签名的提示
+- Go-to definition, references, implementation
+- Hover documentation
+- Code actions and refactoring
+- Diagnostic information
 
-#### Formater
+**inc-rename.nvim**: LSP-powered incremental rename with live preview
 
-`mason-null-ls`: 处理 LSP 相关的格式化和检查；
+#### Formatter & Debugging
 
-- `<space>=`: 格式化
+**conform.nvim**: Modern async formatter with support for multiple formatters per filetype
 
----
+**nvim-dap**: Full debugging support with:
 
-## VIM 操作
-
-### 段落移动
-
-在程序开发时，通常一段功能相关的代码会写在一起，即之间没有空行，这时可以用段落移动命令来快速移动光标。
-
-> `{`   # 移动到上一段的开头
->
-> `}`   # 移动到下一段的开头
-
-### 括号切换
-
-> `%`: 括号匹配以及切换
-
-### 单词快速匹配
-
-> `#`: 匹配光标所在单词，向前查找（快速查看这个单词在其他什么位置使用过）
-
-### 文件操作
-
-> `:e`：edit，会打开内置的文件浏览器，浏览当下目录的文件
->
-> `:n filename`：new，新建文件
->
-> `:w filename`：write，保存文件
-
-### 分屏
-
-> `:sp[filename]`：split，水平分屏
->
-> `:vsp[filename]`：vertical split，垂直分屏
+- Debug Adapter Protocol integration
+- Visual debugging UI with variables, stack traces, and breakpoints
+- Support for Python, Go, C/C++, and more
+- Auto-installed debug adapters via Mason
 
 ---
 
-## Preblem and Solution
+## Key Mappings
 
-1. 无法预览Markdown，使用 `:message` 查看报错如下：`Error: Cannot find module 'tslib'`.
+### Leader Key
 
-    只需手动执行 `:call mkdp#util#install()` 下载预编译 bundle 即可
+Leader key is set to `<Space>`
 
-2. Linux 共用系统剪切板的问题
+### Custom Keymaps
 
-    `sudo pacman -S xsel`
+#### Window Management
+
+- `<leader>sv`: Split window vertically
+- `<leader>sh`: Split window horizontally  
+- `<leader>h/j/k/l`: Navigate between windows
+- `<C-h/j/k/l>`: Resize windows
+
+#### File Operations
+
+- `<leader>w`: Save file
+- `<leader>q`: Quit current window
+- `<leader>Q`: Quit all windows
+- `<leader>e`: Toggle file explorer
+
+#### Navigation & Editing
+
+- `jk`: Exit insert mode (alternative to ESC)
+- `H`: Move to start of line (replaces ^)
+- `L`: Move to end of line (replaces $)
+- `<leader>nh`: Clear search highlights
+
+#### Visual Mode
+
+- `J/K`: Move selected lines up/down
+- `</>`; Indent/dedent while keeping selection
+- `p`: Paste without copying the replaced text
+
+#### Plugin-Specific
+
+- `<leader>rn`: LSP rename (inc-rename)
+- `<leader>g`: Open Git interface (Neogit)
+- `,`: Flash jump to position
+- `<C-t>`: Toggle terminal
+
+---
+
+## VIM Operations
+
+### Paragraph Movement
+
+In development, related code is usually written together without empty lines. Use paragraph movement commands to quickly move the cursor.
+
+> `{` - Move to beginning of previous paragraph
+>
+> `}` - Move to beginning of next paragraph
+
+### Bracket Matching
+
+> `%`: Match and jump between brackets
+
+### Word Matching
+
+> `#`: Search for word under cursor backward
+> `*`: Search for word under cursor forward
+
+### File Operations
+
+> `:e` - Edit, opens built-in file browser for current directory
+>
+> `:n filename` - New, create new file
+>
+> `:w filename` - Write, save file to specified name
+
+### Window Splitting
+
+> `:sp[filename]` - Horizontal split
+>
+> `:vsp[filename]` - Vertical split
+
+---
+
+## Problem and Solution
+
+1. Cannot preview Markdown files, use `:messages` to check errors such as: `Error: Cannot find module 'tslib'`.
+
+    Simply execute `:call mkdp#util#install()` manually to download the precompiled bundle
+
+2. Linux system clipboard sharing issue
+
+    ```bash
+    # For Arch Linux
+    sudo pacman -S xsel
+    # For Ubuntu/Debian
+    sudo apt install xsel
+    ```
