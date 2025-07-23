@@ -30,7 +30,7 @@ vim.opt.expandtab = true -- tabs are spaces, mainly because of python
 vim.opt.number = true -- add numbers to each line on the left side
 vim.opt.relativenumber = true -- show absolute number
 vim.opt.cursorline = true -- highlight cursor line underneath the cursor horizontally
-vim.wo.colorcolumn = "100" -- 垂直的高亮列的，通常用于提示代码的行宽限制
+vim.wo.colorcolumn = "120" -- 垂直的高亮列的，通常用于提示代码的行宽限制
 
 vim.opt.splitbelow = true -- open new vertical split bottom
 vim.opt.splitright = true -- open new horizontal splits right
