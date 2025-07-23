@@ -48,13 +48,13 @@ tree.setup({
   -- Behavior
   hijack_cursor = true,
   sync_root_with_cwd = true,
-  respect_buf_cwd = true, -- Change cwd when opening a file
+  respect_buf_cwd = false, -- Change cwd when opening a file
   on_attach = on_attach,
 
   -- UI
   update_focused_file = {
     enable = true,
-    update_root = true, -- Update the root directory if file is not under current root
+    update_root = false, -- Update the root directory if file is not under current root
   },
   view = {
     preserve_window_proportions = true,
