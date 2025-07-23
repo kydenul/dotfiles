@@ -52,7 +52,7 @@ auto_session.setup({
 
   -- Pre and post hooks for session save/restore
   pre_save_cmds = {
-    "NvimTreeClose", -- Close nvim-tree before saving session
+    -- "NvimTreeClose", -- Close nvim-tree before saving session
   },
 
   post_restore_cmds = {
