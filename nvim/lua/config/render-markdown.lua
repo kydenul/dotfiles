@@ -9,9 +9,11 @@ if not is_ok then
 end
 
 rmd.setup({
+  completions = { lsp = { enabled = true } },
+
   sign = {
     -- Turn on / off sign rendering.
-    enabled = false,
+    enabled = true,
     -- Applies to background of sign text.
     highlight = "RenderMarkdownSign",
   },
