@@ -20,7 +20,7 @@ auto_session.setup({
   -- Session options
   auto_session_enable_last_session = false,
   auto_session_create_enabled = true,
-  auto_session_use_git_branch = true,
+  auto_session_use_git_branch = false,
 
   -- Suppress session create/restore messages
   auto_session_suppress_dirs = {
