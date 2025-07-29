@@ -116,7 +116,18 @@ end
 -- 2. Add the configuration below. The syntax is `lspconfig.<name>.setup(...)`
 -- Hint (find <name> here) : https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
 lspconfig.bashls.setup({ on_attach = on_attach })
-lspconfig.pylsp.setup({ on_attach = on_attach })
+lspconfig.pylsp.setup({
+  on_attach = on_attach,
+  settings = {
+    pylsp = {
+      plugins = {
+        pycodestyle = {
+          maxLineLength = 120,
+        },
+      },
+    },
+  },
+})
 lspconfig.gopls.setup({
   on_attach = on_attach,
   cmd = { "gopls" },
