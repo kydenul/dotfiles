@@ -61,6 +61,7 @@ local kind_icons = {
 }
 
 cmp.setup({
+  preselect = cmp.PreselectMode.None,
   view = { entries = "custom" },
   snippet = {
     -- REQUIRED - you must specify a snippet engine
