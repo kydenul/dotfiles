@@ -182,24 +182,27 @@ local function current_buffer_tags(opts)
 end
 
 -- Enhanced keymaps with descriptions
-vim.keymap.set("n", "<leader>ff", builtin.find_files, { desc = "Find files" })
-vim.keymap.set("n", "<leader>fb", builtin.buffers, { desc = "Find buffers" })
+vim.keymap.set("n", "<leader>ff", builtin.find_files, { desc = "[Telescope] Find files" })
+vim.keymap.set("n", "<leader>fb", builtin.buffers, { desc = "[Telescope] Find buffers" })
 vim.keymap.set("n", "<leader>fg", function()
   builtin.live_grep(util.live_grep_opts({}))
-end, { desc = "Live grep" })
-vim.keymap.set("n", "<leader>ft", builtin.help_tags, { desc = "Find help tags" })
-vim.keymap.set("n", "<leader>/", builtin.current_buffer_fuzzy_find, { desc = "Fuzzy find in buffer" })
-vim.keymap.set("n", "<leader>fo", current_buffer_tags, { desc = "Find buffer tags" })
-vim.keymap.set("n", "<leader>fd", builtin.diagnostics, { desc = "Find diagnostics" })
-vim.keymap.set("n", "<leader>fr", builtin.resume, { desc = "Resume last picker" })
+end, { desc = "[Telescope] Live grep" })
+vim.keymap.set("n", "<leader>ft", builtin.help_tags, { desc = "[Telescope] Find help tags" })
+vim.keymap.set("n", "<leader>/", builtin.current_buffer_fuzzy_find, { desc = "[Telescope] Fuzzy find in buffer" })
+vim.keymap.set("n", "<leader>fo", current_buffer_tags, { desc = "[Telescope] Find buffer tags" })
+vim.keymap.set("n", "<leader>fd", builtin.diagnostics, { desc = "[Telescope] Find diagnostics" })
+vim.keymap.set("n", "<leader>fr", builtin.resume, { desc = "[Telescope] Resume last picker" })
 
 -- Additional useful telescope mappings
-vim.keymap.set("n", "<leader>fc", builtin.commands, { desc = "Find commands" })
-vim.keymap.set("n", "<leader>fk", builtin.keymaps, { desc = "Find keymaps" })
-vim.keymap.set("n", "<leader>fs", builtin.grep_string, { desc = "Find string under cursor" })
-vim.keymap.set("n", "<leader>fh", builtin.command_history, { desc = "Find command history" })
-vim.keymap.set("n", "<leader>fm", builtin.marks, { desc = "Find marks" })
-vim.keymap.set("n", "<leader>fj", builtin.jumplist, { desc = "Find jumplist" })
+vim.keymap.set("n", "<leader>fc", builtin.commands, { desc = "[Telescope] Find commands" })
+vim.keymap.set("n", "<leader>fk", builtin.keymaps, { desc = "[Telescope] Find keymaps" })
+vim.keymap.set("n", "<leader>fs", builtin.grep_string, { desc = "[Telescope] Find string under cursor" })
+vim.keymap.set("n", "<leader>fh", builtin.command_history, { desc = "[Telescope] Find command history" })
+vim.keymap.set("n", "<leader>fm", builtin.marks, { desc = "[Telescope] Find marks" })
+vim.keymap.set("n", "<leader>fj", builtin.jumplist, { desc = "[Telescope] Find jumplist" })
+
+-- Todo-Comment
+vim.keymap.set("n", "<leader>td", ":TodoTelescope<CR>", { desc = "[Todo-Comment] Telescope" })
 
 -- Git commands with improved error handling
 local git_log = { "git", "log", "--pretty=format:%h %s (%ci) <%an>\n" }

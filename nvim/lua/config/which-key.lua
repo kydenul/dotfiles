@@ -9,7 +9,7 @@ end
 
 which_key.setup({
   -- Use classic preset (other options: "modern", "helix")
-  preset = "modern",
+  preset = "helix",
 
   -- Delay before showing the popup (in ms)
   delay = function(ctx)

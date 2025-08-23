@@ -4,9 +4,6 @@ local util = require("util")
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
--- Enable 24-bit color
-vim.opt.termguicolors = true
-
 local tree_ok, tree = pcall(require, "nvim-tree")
 if not tree_ok then
   util.log_warn("nvim-tree init failed.")

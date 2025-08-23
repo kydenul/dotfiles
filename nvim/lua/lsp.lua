@@ -48,6 +48,12 @@ vim.keymap.del("n", "grn")
 vim.keymap.del("n", "gra")
 vim.keymap.del("n", "grr")
 vim.keymap.del("n", "gri")
+vim.keymap.del("n", "grt")
+
+-- Highlight symbol under cursor
+vim.api.nvim_set_hl(0, "LspReferenceText", { bg = "#504945", bold = true })
+vim.api.nvim_set_hl(0, "LspReferenceRead", { link = "LspReferenceText" })
+vim.api.nvim_set_hl(0, "LspReferenceWrite", { link = "LspReferenceText" })
 
 -- Use an on_attach function to only map the following keys
 -- after the language server attaches to the current buffer.
@@ -62,13 +68,13 @@ local on_attach = function(client, bufnr)
 
   vim.keymap.set("n", "<leader>ih", function()
     vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
-  end, bufopts("Toggle Inlay Hints"))
+  end, bufopts("[LSP] Toggle Inlay Hints"))
 
-  vim.keymap.set("n", "gD", vim.lsp.buf.declaration, bufopts("Go to Declaration"))
-  vim.keymap.set("n", "gd", vim.lsp.buf.definition, bufopts("Go to Definition"))
-  vim.keymap.set("n", "gr", "<cmd>Telescope lsp_references<CR>", bufopts("Go to References"))
-  vim.keymap.set("n", "gi", vim.lsp.buf.implementation, bufopts("Go to Implementation"))
-  vim.keymap.set("n", "gh", vim.lsp.buf.hover, bufopts("Hover"))
+  vim.keymap.set("n", "gD", vim.lsp.buf.declaration, bufopts("[LSP] Go to Declaration"))
+  vim.keymap.set("n", "gd", vim.lsp.buf.definition, bufopts("[LSP] Go to Definition"))
+  vim.keymap.set("n", "gr", "<cmd>Telescope lsp_references<CR>", bufopts("[LSP] Go to References"))
+  vim.keymap.set("n", "gi", vim.lsp.buf.implementation, bufopts("[LSP] Go to Implementation"))
+  vim.keymap.set("n", "gK", vim.lsp.buf.hover, bufopts("[LSP] Hover"))
 
   -- K: show diagnostics if available, otherwise show hover information
   vim.keymap.set("n", "K", function()
@@ -78,22 +84,22 @@ local on_attach = function(client, bufnr)
     else
       vim.lsp.buf.hover()
     end
-  end, bufopts("Hover"))
-  vim.keymap.set("n", "<C-k>", vim.lsp.buf.signature_help, bufopts("Signature Help"))
+  end, bufopts("[LSP] Diagnostic or Hover"))
+  vim.keymap.set("n", "<C-k>", vim.lsp.buf.signature_help, bufopts("[LSP] Signature Help"))
 
   -- Highlighting when the cursor is on a symbol
   vim.api.nvim_create_autocmd(
     { "CursorHold", "CursorHoldI" },
-    { callback = vim.lsp.buf.document_highlight, buffer = bufnr, desc = "Document Highlight" }
+    { callback = vim.lsp.buf.document_highlight, buffer = bufnr, desc = "[LSP] Document Highlight" }
   )
   vim.api.nvim_create_autocmd(
     { "CursorMoved", "CursorMovedI" },
-    { callback = vim.lsp.buf.clear_references, buffer = bufnr, desc = "Clear References" }
+    { callback = vim.lsp.buf.clear_references, buffer = bufnr, desc = "[LSP] Clear References" }
   )
 
   -- vim.keymap.set("n", "<space>D", vim.lsp.buf.type_definition, bufopts)
   -- vim.keymap.set("n", "<space>rn", vim.lsp.buf.rename, bufopts)
-  vim.keymap.set("n", "<space>ca", vim.lsp.buf.code_action, bufopts("Code Action"))
+  vim.keymap.set("n", "<space>ca", vim.lsp.buf.code_action, bufopts("[LSP] Code Action"))
 
   -- Format
   vim.api.nvim_buf_create_user_command(bufnr, "Fmt", function(opts)
@@ -108,7 +114,12 @@ local on_attach = function(client, bufnr)
   end, { range = true })
 
   -- The keymap remains the same
-  vim.keymap.set("n", "<space>=", ":Fmt<CR>", { noremap = true, silent = true, buffer = bufnr, desc = "Format code" })
+  vim.keymap.set(
+    "n",
+    "<space>=",
+    ":Fmt<CR>",
+    { noremap = true, silent = true, buffer = bufnr, desc = "[LSP] Format code" }
+  )
 end
 
 -- How to add an LSP for a specific programming language?
@@ -116,6 +127,7 @@ end
 -- 2. Add the configuration below. The syntax is `lspconfig.<name>.setup(...)`
 -- Hint (find <name> here) : https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
 lspconfig.bashls.setup({ on_attach = on_attach })
+
 lspconfig.pylsp.setup({
   on_attach = on_attach,
   settings = {
@@ -128,6 +140,7 @@ lspconfig.pylsp.setup({
     },
   },
 })
+
 lspconfig.gopls.setup({
   on_attach = on_attach,
   cmd = { "gopls" },
@@ -139,6 +152,7 @@ lspconfig.gopls.setup({
   },
   root_dir = require("lspconfig.util").root_pattern("go.work", "go.mod", ".git"),
 })
+
 lspconfig.lua_ls.setup({
   on_attach = on_attach,
   settings = {
@@ -169,26 +183,49 @@ end, opts)
 vim.keymap.set("n", "]d", function()
   vim.diagnostic.goto_next()
 end, opts)
-vim.keymap.set("n", "<space>q", function()
-  vim.diagnostic.setloclist()
-end, opts)
+
+local signs_handler = {
+  text = {
+    [vim.diagnostic.severity.ERROR] = "",
+    [vim.diagnostic.severity.WARN] = "",
+    [vim.diagnostic.severity.INFO] = "",
+    [vim.diagnostic.severity.HINT] = "󰌶",
+  },
+  severity = {
+    vim.diagnostic.severity.ERROR,
+    vim.diagnostic.severity.WARN,
+    vim.diagnostic.severity.INFO,
+    vim.diagnostic.severity.HINT,
+  },
+}
+
+local virtual_text_handler = {
+  spacing = 4,
+  prefix = function(diagnostic)
+    if diagnostic.severity == vim.diagnostic.severity.ERROR then
+      return ""
+    elseif diagnostic.severity == vim.diagnostic.severity.WARN then
+      return ""
+    elseif diagnostic.severity == vim.diagnostic.severity.INFO then
+      return ""
+    elseif diagnostic.severity == vim.diagnostic.severity.HINT then
+      return "󰌶"
+    end
+    return diagnostic.message
+  end,
+}
 
 -- Disable virtual text for diagnostics, as gitsigns will handle it.
 vim.diagnostic.config({
-  virtual_text = {
-    severity = { min = vim.diagnostic.severity.HINT },
-    spacing = 2,
-    prefix = "■",
-  },
-
-  signs = true,
   underline = true,
+  signs = signs_handler,
   update_in_insert = false,
+  virtual_text = virtual_text_handler,
+  virtual_lines = false,
   severity_sort = true,
-
   float = {
     border = "single",
     source = "always",
-    focusable = false,
+    focusable = true,
   },
 })

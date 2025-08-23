@@ -73,7 +73,7 @@ gs.setup({
         gs.next_hunk()
       end)
       return "<Ignore>"
-    end, { expr = true, desc = "Next git hunk" })
+    end, { expr = true, desc = "[Git] Next git hunk" })
 
     map("n", "[c", function()
       if vim.wo.diff then
@@ -83,17 +83,17 @@ gs.setup({
         gs.prev_hunk()
       end)
       return "<Ignore>"
-    end, { expr = true, desc = "Previous git hunk" })
+    end, { expr = true, desc = "[Git] Previous git hunk" })
 
-    map("n", "ghp", gs.preview_hunk, { desc = "Preview hunk" })
-    map("n", "ghi", gs.preview_hunk_inline, { desc = "Preview hunk inline" })
-    map("n", "ghr", gs.reset_hunk, { desc = "Reset hunk" })
+    map("n", "ghp", gs.preview_hunk, { desc = "[Git] Preview hunk" })
+    map("n", "ghi", gs.preview_hunk_inline, { desc = "[Git] Preview hunk inline" })
+    map("n", "ghr", gs.reset_hunk, { desc = "[Git] Reset hunk" })
     map("n", "ghb", function()
       gs.blame_line({ full = true })
-    end, { desc = "Blame line" })
-    map("n", "ghd", gs.diffthis, { desc = "Diff this" })
+    end, { desc = "[Git] Blame line" })
+    map("n", "ghd", gs.diffthis, { desc = "[Git] Diff this" })
     map("n", "ghD", function()
       gs.diffthis("~")
-    end, { desc = "Diff this ~" })
+    end, { desc = "[Git] Diff this ~" })
   end,
 })

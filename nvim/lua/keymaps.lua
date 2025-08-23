@@ -31,14 +31,17 @@ vim.keymap.set("n", "<leader>k", "<C-w>k", opts) -- 向上跳转
 vim.keymap.set("n", "<leader>l", "<C-w>l", opts) -- 向右跳转
 
 -- 文件
-vim.keymap.set("n", "<leader>w", ":w!<CR>", { desc = "Save" }) -- Save file
+vim.keymap.set("n", "<leader>w", ":w!<CR>", { desc = "[File] Save" }) -- Save file
+-- Quick save and quit
+vim.keymap.set("n", "<leader>q", "<Cmd>q<CR>", { noremap = true, silent = true, desc = "Quit" })
+vim.keymap.set("n", "<leader>Q", "<Cmd>qa<CR>", { noremap = true, silent = true, desc = "Quit all" })
 
 -- 取消高亮
 vim.keymap.set("n", "<leader>nh", ":nohl<CR>")
 
 -- 光标快速移动
-vim.keymap.set({ "n", "v" }, "H", "^", { desc = "Move to start of line" }) -- 移动光标至行首
-vim.keymap.set({ "n", "v" }, "L", "$", { desc = "Move to end of line" }) -- 移动光标至行尾
+vim.keymap.set({ "n", "v" }, "H", "^", { desc = "[Cursor] Move to start of line" })
+vim.keymap.set({ "n", "v" }, "L", "$", { desc = "[Cursor] Move to end of line" })
 
 ----------------------------------
 -- Visual mode --
@@ -57,20 +60,15 @@ vim.keymap.set("v", "p", '"_dP', opts)
 -- IncRename
 vim.keymap.set("n", "<leader>rn", function()
   return ":IncRename " .. vim.fn.expand("<cword>")
-end, { expr = true })
+end, { expr = true, desc = "[IncRename] Rename" })
 
 -- Toggle nvim-tree
 vim.keymap.set(
   { "n", "t" },
   "<leader>e",
   "<Cmd>NvimTreeFindFileToggle<CR>",
-  { noremap = true, silent = true, nowait = true }
+  { noremap = true, silent = true, nowait = true, desc = "[NvimTree] Toggle NvimTree" }
 )
 
 -- Neogit
-vim.keymap.set("n", "<leader>g", "<Cmd>Neogit<CR>", { noremap = true, silent = true, desc = "Neogit" })
-
--- Quick save and quit
-vim.keymap.set("n", "<leader>q", "<Cmd>q<CR>", { noremap = true, silent = true, desc = "Quit" })
-vim.keymap.set("n", "<leader>Q", "<Cmd>qa<CR>", { noremap = true, silent = true, desc = "Quit all" })
-
+vim.keymap.set("n", "<leader>g", "<Cmd>Neogit<CR>", { noremap = true, silent = true, desc = "[Git] Neogit" })

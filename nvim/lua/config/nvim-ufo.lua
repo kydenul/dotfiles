@@ -18,9 +18,20 @@ end
 --   zR: open all foldings
 
 -- Set up folding based on treesitter
+
+vim.o.statuscolumn =
+  '%=%l%s%#FoldColumn#%{foldlevel(v:lnum) > foldlevel(v:lnum - 1) ? (foldclosed(v:lnum) == -1 ? "v" : ">") : " " }%*'
+-- '%=%l%s%#FoldColumn#%{foldlevel(v:lnum) > foldlevel(v:lnum - 1) ? (foldclosed(v:lnum) == -1 ? "v" : ">") : "│" }%*'
+-- '%=%l%s%#FoldColumn#%{foldlevel(v:lnum) > foldlevel(v:lnum - 1) ? (foldclosed(v:lnum) == -1 ? "▾" : "▸") : " " }%*'
+-- '%=%l%s%#FoldColumn#%{foldlevel(v:lnum) > foldlevel(v:lnum - 1) ? (foldclosed(v:lnum) == -1 ? "" : "") : " " }%*'
+-- %= → 右对齐。
+-- %l → 显示当前行号。
+-- %s → sign column（诊断标记、git signs 等）。
+-- %#FoldColumn# ... %* → 在 fold column 区域显示内容，并应用 FoldColumn 高亮组
+
 vim.o.fillchars = [[eob: ,fold: ,foldopen:,foldsep: ,foldclose:]]
-vim.o.foldcolumn = "1" -- Show fold column
-vim.o.foldlevel = 99 -- Start with all folds open
+vim.o.foldcolumn = "0" -- Show fold column
+vim.o.foldlevel = 99 -- Start with all folds open, Using ufo provider need a large value, feel free to decrease the value
 vim.o.foldlevelstart = 99 -- Start with all folds open
 vim.o.foldenable = true -- Enable folding
 
@@ -55,7 +66,15 @@ local handler = function(virtText, lnum, endLnum, width, truncate)
   table.insert(newVirtText, { suffix, "MoreMsg" })
   return newVirtText
 end
+
+vim.api.nvim_create_autocmd("BufReadPre", {
+  callback = function()
+    vim.b.ufo_foldlevel = 0
+  end,
+})
+
 ufo.setup({
+  open_fold_hl_timeout = 0,
   fold_virt_text_handler = handler,
 
   provider_selector = function(bufnr, filetype, buftype)
@@ -66,3 +85,10 @@ ufo.setup({
     return { "treesitter", "indent" } -- Use treesitter for file buffers, fallback to indent
   end,
 })
+
+vim.keymap.set("n", "K", function()
+  local winid = require("ufo").peekFoldedLinesUnderCursor()
+  if not winid then
+    vim.lsp.buf.hover()
+  end
+end)

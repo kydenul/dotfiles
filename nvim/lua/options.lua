@@ -35,8 +35,9 @@ vim.wo.colorcolumn = "120" -- 垂直的高亮列的，通常用于提示代码�
 vim.opt.splitbelow = true -- open new vertical split bottom
 vim.opt.splitright = true -- open new horizontal splits right
 vim.opt.termguicolors = true -- enabl 24-bit RGB color in the TUI
-vim.opt.signcolumn = "yes"
+vim.opt.signcolumn = "yes:1"
 vim.opt.showmode = false -- we are experienced, wo don't need the "-- INSERT --" mode hint
+vim.opt.conceallevel = 2
 
 -- Searching
 vim.opt.incsearch = true -- search as characters are entered
@@ -68,30 +69,9 @@ vim.o.regexpengine = 0 -- Use automatic regexp engine selection
 -- 补全增强
 vim.o.wildmenu = true
 
--------------------------------------
--------------------------------------
--- NOTE ColorScheme -> trigger
--- silent! colorscheme gruvbox gruvbox-material
--------------------------------------
--------------------------------------
--- vim.cmd([[
---     augroup colorscheme_mock
---     autocmd!
---     autocmd ColorScheme * hi Normal guibg=none | hi def link LspInlayHint Comment
---     augroup END
--- ]])
-
+vim.g.gruvbox_material_transparent_background = 1 -- 1, 2
 vim.g.gruvbox_material_foreground = "material" -- "original" "mix" "material"
 vim.g.gruvbox_material_background = "hard" -- 'hard'`, `'medium'`, `'soft'
 vim.g.gruvbox_material_float_style = "dim" -- 'bright', "dim"
 vim.g.gruvbox_material_enable_italic = true
 vim.cmd([[ silent! colorscheme gruvbox-material ]])
-
--- Cursor
-vim.api.nvim_set_hl(0, "Cursor", { fg = "#91D696", bg = "#91D696" })
-vim.opt.guicursor = { "n-v-c:block-Cursor", "i-ci-ve:ver25-Cursor", "r-cr:hor15-Cursor" }
-
--- Highlight symbol under cursor
-vim.api.nvim_set_hl(0, "LspReferenceText", { bg = "#504945", bold = true })
-vim.api.nvim_set_hl(0, "LspReferenceRead", { link = "LspReferenceText" })
-vim.api.nvim_set_hl(0, "LspReferenceWrite", { link = "LspReferenceText" })

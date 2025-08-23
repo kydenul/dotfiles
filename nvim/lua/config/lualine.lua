@@ -16,11 +16,11 @@ lualine.setup({
     section_separators = { left = "", right = "" },
     disabled_filetypes = {
       statusline = { "dashboard", "alpha" },
-      winbar = {},
+      winbar = { "dap-repl" },
     },
     ignore_focus = { "NvimTree", "neo-tree", "Outline" },
     always_divide_middle = true,
-    globalstatus = true, -- Use Neovim's global statusline
+    globalstatus = false, -- Use Neovim's global statusline
     refresh = {
       statusline = 100,
       tabline = 100,

@@ -47,11 +47,18 @@ require("lazy").setup({
   },
 
   {
+    "nvim-tree/nvim-web-devicons",
+    opts = {
+      override = { copilot = { icon = "", color = "#cba6f7", name = "Copilot" } },
+    },
+  },
+
+  {
     "folke/noice.nvim",
     event = "VeryLazy",
     dependencies = {
-      -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
       "MunifTanjim/nui.nvim",
+
       -- OPTIONAL:
       --   `nvim-notify` is only needed, if you want to use the notification view.
       --   If not available, we use `mini` as the fallback
@@ -60,11 +67,17 @@ require("lazy").setup({
         opts = {
           stages = "static",
           background_colour = "Normal",
-          timeout = 2000,
+          timeout = 3200,
           render = "compact",
         },
       },
     },
+
+    keys = {
+      { "<leader>sN", "<CMD>Noice pick<CR>", desc = "[Noice] Pick history messages" },
+      { "<leader>N", "<CMD>Noice<CR>", desc = "[Noice] Show history messages" },
+    },
+
     config = function()
       require("config.noice")
     end,
@@ -140,7 +153,7 @@ require("lazy").setup({
     end,
   },
 
-  -- Folding
+  -- Code Folding
   {
     "kevinhwang91/nvim-ufo",
     dependencies = { "kevinhwang91/promise-async" },
@@ -152,8 +165,20 @@ require("lazy").setup({
   -- Smart motion
   {
     "folke/flash.nvim",
-    event = "VeryLazy",
-    opts = {},
+    event = "BufReadPost",
+    opts = {
+      label = {
+        rainbow = {
+          enabled = true,
+          shade = 1,
+        },
+      },
+      modes = {
+        char = {
+          enabled = false,
+        },
+      },
+    },
     keys = {
       {
         ",",
@@ -161,7 +186,7 @@ require("lazy").setup({
         function()
           require("flash").jump()
         end,
-        desc = "Flash",
+        desc = "[Flash] Jump",
       },
     },
   },
@@ -171,6 +196,24 @@ require("lazy").setup({
     "stevearc/aerial.nvim",
     config = function()
       require("config/aerial")
+    end,
+  },
+
+  {
+    "HiPhish/rainbow-delimiters.nvim",
+    event = "BufReadPost",
+    submodules = false,
+    config = true,
+    main = "rainbow-delimiters.setup",
+  },
+
+  -- Show colors in the text: e.g. "#b3e2a7"
+  {
+    "norcalli/nvim-colorizer.lua",
+    event = "BufRead",
+    opts = {},
+    config = function(_)
+      require("colorizer").setup()
     end,
   },
 
@@ -208,6 +251,24 @@ require("lazy").setup({
     config = function()
       require("config.bufferline")
     end,
+  },
+
+  {
+    -- Conflicted with vscode_nvim, don't know why
+    "kevinhwang91/nvim-hlslens",
+    -- stylua: ignore
+    keys = {
+      { "n",  "nzz<Cmd>lua require('hlslens').start()<CR>", mode = "n", desc = "Next match",      noremap = true, silent = true },
+      { "N",  "Nzz<Cmd>lua require('hlslens').start()<CR>", mode = "n", desc = "Previous match",  noremap = true, silent = true },
+      { "*",  "*<Cmd>lua require('hlslens').start()<CR>",   mode = "n", desc = "Next match",      noremap = true, silent = true },
+      { "#",  "#<Cmd>lua require('hlslens').start()<CR>",   mode = "n", desc = "Previous match",  noremap = true, silent = true },
+
+      { "/" },
+      { "?" },
+    },
+    opts = {
+      nearest_only = true,
+    },
   },
 
   -- Make surrounding easier
@@ -313,17 +374,103 @@ require("lazy").setup({
   },
 
   -- Auto-completion engine
+  -- {
+  --   "hrsh7th/nvim-cmp",
+  --   dependencies = {
+  --     "lspkind.nvim",
+  --     "hrsh7th/cmp-nvim-lsp", -- lsp auto-completion
+  --     "hrsh7th/cmp-buffer", -- buffer auto-completion
+  --     "hrsh7th/cmp-path", -- path auto-completion
+  --     "hrsh7th/cmp-cmdline", -- cmdline auto-completion
+
+  --     -- Code snippet engine
+  --     "saadparwaiz1/cmp_luasnip",
+  --     {
+  --       "L3MON4D3/LuaSnip",
+  --       event = "InsertEnter",
+  --       dependencies = { "rafamadriz/friendly-snippets" },
+  --       config = function()
+  --         -- Load friendly snippets
+  --         require("luasnip.loaders.from_vscode").lazy_load({
+  --           include = { "c", "cpp", "go", "python", "sh", "json", "lua", "gitcommit", "sql", "markdown" },
+  --         })
+
+  --         -- Load custom snippets
+  --         require("config.snippets")
+
+  --         -- Configure LuaSnip
+  --         local luasnip = require("luasnip")
+  --         luasnip.config.setup({
+  --           history = true,
+  --           updateevents = "TextChanged,TextChangedI",
+  --           enable_autosnippets = true,
+  --           ext_opts = {
+  --             [require("luasnip.util.types").choiceNode] = {
+  --               active = {
+  --                 virt_text = { { "●", "Orange" } },
+  --               },
+  --             },
+  --           },
+  --         })
+  --       end,
+  --     },
+
+  --     -- Copilot
+  --     "zbirenbaum/copilot-cmp", -- copilot 与 nvim-cmp 之间的桥梁
+  --     {
+  --       "zbirenbaum/copilot.lua",
+  --       cmd = "Copilot",
+  --       event = "InsertEnter",
+  --       config = function()
+  --         require("copilot").setup({
+  --           -- 禁用 Copilot 的默认面板和建议 => 因为我们将使用 nvim-cmp 来展示建议
+  --           panel = {
+  --             enabled = false,
+  --           },
+  --           suggestion = {
+  --             enabled = false,
+  --           },
+  --         })
+  --       end,
+  --     },
+
+  --     -- -- Codeium
+  --     -- {
+  --     --   "Exafunction/windsurf.vim",
+  --     --   config = function()
+  --     --     vim.g.codeium_no_map_tab = 1
+  --     --     vim.keymap.set("i", "<C-g>", function()
+  --     --       return vim.fn["codeium#Accept"]()
+  --     --     end, { expr = true, silent = true })
+  --     --     vim.keymap.set("i", "<C-;>", function()
+  --     --       return vim.fn["codeium#CycleCompletions"](1)
+  --     --     end, { expr = true, silent = true })
+  --     --     vim.keymap.set("i", "<C-,>", function()
+  --     --       return vim.fn["codeium#CycleCompletions"](-1)
+  --     --     end, { expr = true, silent = true })
+  --     --     vim.keymap.set("i", "<C-x>", function()
+  --     --       return vim.fn["codeium#Clear"]()
+  --     --     end, { expr = true, silent = true })
+  --     --   end,
+  --     -- },
+  --   },
+  --   config = function()
+  --     require("config.nvim-cmp")
+  --   end,
+  -- },
+
   {
-    "hrsh7th/nvim-cmp",
+    "saghen/blink.cmp",
+    -- optional: provides snippets for the snippet source
     dependencies = {
-      "lspkind.nvim",
-      "hrsh7th/cmp-nvim-lsp", -- lsp auto-completion
-      "hrsh7th/cmp-buffer", -- buffer auto-completion
-      "hrsh7th/cmp-path", -- path auto-completion
-      "hrsh7th/cmp-cmdline", -- cmdline auto-completion
+      "onsails/lspkind-nvim",
+      "fang2hou/blink-copilot",
+      -- Spell source based on Neovim's `spellsuggest`.
+      "ribru17/blink-cmp-spell",
+      ---Use treesitter to highlight the label text for the given list of sources.
+      "xzbdmw/colorful-menu.nvim",
 
       -- Code snippet engine
-      "saadparwaiz1/cmp_luasnip",
       {
         "L3MON4D3/LuaSnip",
         event = "InsertEnter",
@@ -355,15 +502,14 @@ require("lazy").setup({
       },
 
       -- Copilot
-      "zbirenbaum/copilot-cmp", -- copilot 与 nvim-cmp 之间的桥梁
+      "fang2hou/blink-copilot", -- copilot 与 blink-cmp 之间的桥梁
       {
         "zbirenbaum/copilot.lua",
         cmd = "Copilot",
         event = "InsertEnter",
         config = function()
           require("copilot").setup({
-            -- 禁用 Copilot 的默认面板和建议
-            -- 因为我们将使用 nvim-cmp 来展示建议
+            -- 禁用 Copilot 的默认面板和建议 => 因为我们将使用 nvim-cmp 来展示建议
             panel = {
               enabled = false,
             },
@@ -373,29 +519,19 @@ require("lazy").setup({
           })
         end,
       },
-
-      -- -- Codeium
-      -- {
-      --   "Exafunction/windsurf.vim",
-      --   config = function()
-      --     vim.g.codeium_no_map_tab = 1
-      --     vim.keymap.set("i", "<C-g>", function()
-      --       return vim.fn["codeium#Accept"]()
-      --     end, { expr = true, silent = true })
-      --     vim.keymap.set("i", "<C-;>", function()
-      --       return vim.fn["codeium#CycleCompletions"](1)
-      --     end, { expr = true, silent = true })
-      --     vim.keymap.set("i", "<C-,>", function()
-      --       return vim.fn["codeium#CycleCompletions"](-1)
-      --     end, { expr = true, silent = true })
-      --     vim.keymap.set("i", "<C-x>", function()
-      --       return vim.fn["codeium#Clear"]()
-      --     end, { expr = true, silent = true })
-      --   end,
-      -- },
     },
+
+    event = { "InsertEnter", "CmdlineEnter" },
+
+    -- use a release tag to download pre-built binaries
+    version = "*",
+    -- AND/OR build from source, requires nightly: https://rust-lang.github.io/rustup/concepts/channels.html#working-with-nightly-rust
+    -- build = 'cargo build --release',
+    -- If you use nix, you can build from source using latest nightly rust with:
+    -- build = 'nix run .#build-plugin',
+
     config = function()
-      require("config.nvim-cmp")
+      require("config.blink-cmp")
     end,
   },
 
@@ -440,14 +576,6 @@ require("lazy").setup({
     "aklt/plantuml-syntax",
     ft = "plantuml",
   },
-  -- PlantUML preview
-  {
-    "weirongxu/plantuml-previewer.vim",
-    ft = "plantuml",
-    dependencies = {
-      "tyru/open-browser.vim",
-    },
-  },
 
   -- DAP
   {
@@ -474,6 +602,16 @@ require("lazy").setup({
         -- DAP UI，提供变量、堆栈、断点等窗口
         "rcarriga/nvim-dap-ui",
         dependencies = { "nvim-neotest/nvim-nio" },
+
+        keys = {
+          {
+            "<leader>Du",
+            function()
+              require("dapui").toggle({ reset = true })
+            end,
+            desc = "[DAP ui] Toggle dapui",
+          },
+        },
 
         config = function()
           -- 在调试会话开始和结束时自动打开/关闭 DAP UI
