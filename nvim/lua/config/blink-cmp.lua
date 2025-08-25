@@ -226,13 +226,13 @@ blink.setup({
   completion = {
     -- NOTE: some LSPs may add auto brackets themselves anyway
     accept = { auto_brackets = { enabled = true } },
-    list = { selection = { preselect = false, auto_insert = false } },
+    list = { selection = { preselect = false, auto_insert = true } },
 
     menu = {
       border = "rounded",
       max_height = 30,
       draw = {
-        columns = { { "label", "label_description", gap = 1 }, { "kind_icon", "kind" } },
+        columns = { { "label", "label_description", gap = 2 }, { "kind_icon", "kind" } },
 
         components = {
           label = {
@@ -348,6 +348,17 @@ blink.setup({
           end
           return false
         end,
+        "fallback",
+      },
+
+      ["<S-Tab>"] = {
+        function(cmp)
+          if cmp.is_menu_visible() then
+            return cmp.select_prev()
+          end
+          return false
+        end,
+
         "fallback",
       },
 
