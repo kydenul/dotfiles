@@ -89,9 +89,11 @@ blink.setup({
       end,
 
       function()
-        if luasnip.jumpable(-1) then
+        if luasnip and luasnip.jumpable(-1) then
           luasnip.jump(-1)
+          return true
         end
+        return false
       end,
 
       "fallback",
@@ -99,7 +101,10 @@ blink.setup({
 
     ["<CR>"] = {
       function(cmp)
-        return cmp.accept()
+        if cmp.is_menu_visible() then
+          return cmp.accept()
+        end
+        return false
       end,
       "fallback",
     },
@@ -107,7 +112,24 @@ blink.setup({
     -- Close current completion and insert a newline
     ["<S-CR>"] = {
       function(cmp)
-        cmp.hide()
+        if cmp.is_menu_visible() then
+          cmp.hide()
+        end
+        -- 插入新行并保持缩进
+        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<CR>", true, false, true), "n", false)
+        return true
+      end,
+
+      "fallback",
+    },
+
+    -- 添加 Escape 键隐藏补全
+    ["<Esc>"] = {
+      function(cmp)
+        if cmp.is_menu_visible() then
+          cmp.hide()
+          return true
+        end
         return false
       end,
 
@@ -136,7 +158,7 @@ blink.setup({
       if success and node and vim.tbl_contains({ "comment", "line_comment", "block_comment" }, node:type()) then
         return { "buffer" }
       else
-        return { "copilot", "lsp", "path", "snippets", "buffer" }
+        return { "copilot", "lsp", "snippets", "buffer", "path" }
       end
     end,
 
@@ -159,12 +181,12 @@ blink.setup({
 
       lsp = {
         -- Default
-        -- Filter text items from the LSP provider, since we have the buffer provider for that
-        transform_items = function(_, items)
-          return vim.tbl_filter(function(item)
-            return item.kind ~= require("blink.cmp.types").CompletionItemKind.Text
-          end, items)
-        end,
+        -- -- Filter text items from the LSP provider, since we have the buffer provider for that
+        -- transform_items = function(_, items)
+        --   return vim.tbl_filter(function(item)
+        --     return item.kind ~= require("blink.cmp.types").CompletionItemKind.Text
+        --   end, items)
+        -- end,
         score_offset = 100,
         fallbacks = { "buffer" },
       },
@@ -182,7 +204,15 @@ blink.setup({
       path = {
         score_offset = 50,
         opts = {
-          get_cwd = function(_)
+          trailing_slash = true,
+          label_trailing_slash = true,
+
+          get_cwd = function(ctx)
+            local buffer_dir = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(ctx.bufnr), ":h")
+            if buffer_dir and buffer_dir ~= "" and vim.fn.isdirectory(buffer_dir) == 1 then
+              return buffer_dir
+            end
+
             return vim.fn.getcwd()
           end,
         },
@@ -217,7 +247,7 @@ blink.setup({
       },
 
       cmdline = {
-        min_keyword_length = 2,
+        min_keyword_length = 1,
         -- Ignores cmdline completions when executing shell commands
         enabled = function()
           return vim.fn.getcmdtype() ~= ":" or not vim.fn.getcmdline():match("^[%%0-9,'<>%-]*!")
@@ -292,14 +322,15 @@ blink.setup({
     documentation = {
       auto_show = true,
       -- Delay before showing the documentation window
-      auto_show_delay_ms = 240,
+      auto_show_delay_ms = 150,
+      update_delay_ms = 50,
 
       window = {
-        min_width = 10,
-        max_width = 120,
-        max_height = 20,
+        min_width = 15,
+        max_width = 100,
+        max_height = 25,
         border = "rounded",
-        winblend = 0,
+        winblend = 10,
         winhighlight = "Normal:BlinkCmpDoc,FloatBorder:BlinkCmpDocBorder,EndOfBuffer:BlinkCmpDoc",
         -- Note that the gutter will be disabled when border ~= 'none'
         scrollbar = true,
@@ -331,49 +362,50 @@ blink.setup({
     completion = {
       menu = {
         auto_show = true,
+        max_height = 15,
       },
     },
 
-    keymap = {
-      preset = "enter",
+    -- keymap = {
+    --   preset = "enter",
 
-      ["<Tab>"] = {
-        function(cmp)
-          if cmp.is_menu_visible() then
-            return cmp.select_next()
-          end
-          return false
-        end,
+    --   ["<Tab>"] = {
+    --     function(cmp)
+    --       if cmp.is_menu_visible() then
+    --         return cmp.select_next()
+    --       end
+    --       return false
+    --     end,
 
-        function(cmp)
-          if has_words_before() then
-            return cmp.show()
-          end
-          return false
-        end,
-        "fallback",
-      },
+    --     function(cmp)
+    --       if has_words_before() then
+    --         return cmp.show()
+    --       end
+    --       return false
+    --     end,
+    --     "fallback",
+    --   },
 
-      ["<S-Tab>"] = {
-        function(cmp)
-          if cmp.is_menu_visible() then
-            return cmp.select_prev()
-          end
-          return false
-        end,
+    --   ["<S-Tab>"] = {
+    --     function(cmp)
+    --       if cmp.is_menu_visible() then
+    --         return cmp.select_prev()
+    --       end
+    --       return false
+    --     end,
 
-        "fallback",
-      },
+    --     "fallback",
+    --   },
 
-      ["<CR>"] = {
-        function(cmp)
-          if vim.fn.getcmdtype() == ":" then
-            return cmp.accept_and_enter()
-          end
-          return false
-        end,
-        "fallback",
-      },
-    },
+    --   ["<CR>"] = {
+    --     function(cmp)
+    --       if vim.fn.getcmdtype() == ":" then
+    --         return cmp.accept_and_enter()
+    --       end
+    --       return false
+    --     end,
+    --     "fallback",
+    --   },
+    -- },
   },
 })

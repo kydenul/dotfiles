@@ -374,102 +374,17 @@ require("lazy").setup({
   },
 
   -- Auto-completion engine
-  -- {
-  --   "hrsh7th/nvim-cmp",
-  --   dependencies = {
-  --     "lspkind.nvim",
-  --     "hrsh7th/cmp-nvim-lsp", -- lsp auto-completion
-  --     "hrsh7th/cmp-buffer", -- buffer auto-completion
-  --     "hrsh7th/cmp-path", -- path auto-completion
-  --     "hrsh7th/cmp-cmdline", -- cmdline auto-completion
-
-  --     -- Code snippet engine
-  --     "saadparwaiz1/cmp_luasnip",
-  --     {
-  --       "L3MON4D3/LuaSnip",
-  --       event = "InsertEnter",
-  --       dependencies = { "rafamadriz/friendly-snippets" },
-  --       config = function()
-  --         -- Load friendly snippets
-  --         require("luasnip.loaders.from_vscode").lazy_load({
-  --           include = { "c", "cpp", "go", "python", "sh", "json", "lua", "gitcommit", "sql", "markdown" },
-  --         })
-
-  --         -- Load custom snippets
-  --         require("config.snippets")
-
-  --         -- Configure LuaSnip
-  --         local luasnip = require("luasnip")
-  --         luasnip.config.setup({
-  --           history = true,
-  --           updateevents = "TextChanged,TextChangedI",
-  --           enable_autosnippets = true,
-  --           ext_opts = {
-  --             [require("luasnip.util.types").choiceNode] = {
-  --               active = {
-  --                 virt_text = { { "●", "Orange" } },
-  --               },
-  --             },
-  --           },
-  --         })
-  --       end,
-  --     },
-
-  --     -- Copilot
-  --     "zbirenbaum/copilot-cmp", -- copilot 与 nvim-cmp 之间的桥梁
-  --     {
-  --       "zbirenbaum/copilot.lua",
-  --       cmd = "Copilot",
-  --       event = "InsertEnter",
-  --       config = function()
-  --         require("copilot").setup({
-  --           -- 禁用 Copilot 的默认面板和建议 => 因为我们将使用 nvim-cmp 来展示建议
-  --           panel = {
-  --             enabled = false,
-  --           },
-  --           suggestion = {
-  --             enabled = false,
-  --           },
-  --         })
-  --       end,
-  --     },
-
-  --     -- -- Codeium
-  --     -- {
-  --     --   "Exafunction/windsurf.vim",
-  --     --   config = function()
-  --     --     vim.g.codeium_no_map_tab = 1
-  --     --     vim.keymap.set("i", "<C-g>", function()
-  --     --       return vim.fn["codeium#Accept"]()
-  --     --     end, { expr = true, silent = true })
-  --     --     vim.keymap.set("i", "<C-;>", function()
-  --     --       return vim.fn["codeium#CycleCompletions"](1)
-  --     --     end, { expr = true, silent = true })
-  --     --     vim.keymap.set("i", "<C-,>", function()
-  --     --       return vim.fn["codeium#CycleCompletions"](-1)
-  --     --     end, { expr = true, silent = true })
-  --     --     vim.keymap.set("i", "<C-x>", function()
-  --     --       return vim.fn["codeium#Clear"]()
-  --     --     end, { expr = true, silent = true })
-  --     --   end,
-  --     -- },
-  --   },
-  --   config = function()
-  --     require("config.nvim-cmp")
-  --   end,
-  -- },
-
   {
-    "saghen/blink.cmp",
-    -- optional: provides snippets for the snippet source
+    "hrsh7th/nvim-cmp",
     dependencies = {
-      "onsails/lspkind-nvim",
-      -- Spell source based on Neovim's `spellsuggest`.
-      "ribru17/blink-cmp-spell",
-      ---Use treesitter to highlight the label text for the given list of sources.
-      "xzbdmw/colorful-menu.nvim",
+      "lspkind.nvim",
+      "hrsh7th/cmp-nvim-lsp", -- lsp auto-completion
+      "hrsh7th/cmp-buffer", -- buffer auto-completion
+      "hrsh7th/cmp-path", -- path auto-completion
+      "hrsh7th/cmp-cmdline", -- cmdline auto-completion
 
       -- Code snippet engine
+      "saadparwaiz1/cmp_luasnip",
       {
         "L3MON4D3/LuaSnip",
         event = "InsertEnter",
@@ -501,7 +416,7 @@ require("lazy").setup({
       },
 
       -- Copilot
-      "fang2hou/blink-copilot", -- copilot 与 blink-cmp 之间的桥梁
+      "zbirenbaum/copilot-cmp", -- copilot 与 nvim-cmp 之间的桥梁
       {
         "zbirenbaum/copilot.lua",
         cmd = "Copilot",
@@ -518,21 +433,106 @@ require("lazy").setup({
           })
         end,
       },
+
+      -- -- Codeium
+      -- {
+      --   "Exafunction/windsurf.vim",
+      --   config = function()
+      --     vim.g.codeium_no_map_tab = 1
+      --     vim.keymap.set("i", "<C-g>", function()
+      --       return vim.fn["codeium#Accept"]()
+      --     end, { expr = true, silent = true })
+      --     vim.keymap.set("i", "<C-;>", function()
+      --       return vim.fn["codeium#CycleCompletions"](1)
+      --     end, { expr = true, silent = true })
+      --     vim.keymap.set("i", "<C-,>", function()
+      --       return vim.fn["codeium#CycleCompletions"](-1)
+      --     end, { expr = true, silent = true })
+      --     vim.keymap.set("i", "<C-x>", function()
+      --       return vim.fn["codeium#Clear"]()
+      --     end, { expr = true, silent = true })
+      --   end,
+      -- },
     },
-
-    event = { "InsertEnter", "CmdlineEnter" },
-
-    -- use a release tag to download pre-built binaries
-    version = "*",
-    -- AND/OR build from source, requires nightly: https://rust-lang.github.io/rustup/concepts/channels.html#working-with-nightly-rust
-    -- build = 'cargo build --release',
-    -- If you use nix, you can build from source using latest nightly rust with:
-    -- build = 'nix run .#build-plugin',
-
     config = function()
-      require("config.blink-cmp")
+      require("config.nvim-cmp")
     end,
   },
+
+  --{
+  --  "saghen/blink.cmp",
+  --  -- optional: provides snippets for the snippet source
+  --  dependencies = {
+  --    "onsails/lspkind-nvim",
+  --    -- Spell source based on Neovim's `spellsuggest`.
+  --    "ribru17/blink-cmp-spell",
+  --    ---Use treesitter to highlight the label text for the given list of sources.
+  --    "xzbdmw/colorful-menu.nvim",
+
+  --    -- Code snippet engine
+  --    {
+  --      "L3MON4D3/LuaSnip",
+  --      event = "InsertEnter",
+  --      dependencies = { "rafamadriz/friendly-snippets" },
+  --      config = function()
+  --        -- Load friendly snippets
+  --        require("luasnip.loaders.from_vscode").lazy_load({
+  --          include = { "c", "cpp", "go", "python", "sh", "json", "lua", "gitcommit", "sql", "markdown" },
+  --        })
+
+  --        -- Load custom snippets
+  --        require("config.snippets")
+
+  --        -- Configure LuaSnip
+  --        local luasnip = require("luasnip")
+  --        luasnip.config.setup({
+  --          history = true,
+  --          updateevents = "TextChanged,TextChangedI",
+  --          enable_autosnippets = true,
+  --          ext_opts = {
+  --            [require("luasnip.util.types").choiceNode] = {
+  --              active = {
+  --                virt_text = { { "●", "Orange" } },
+  --              },
+  --            },
+  --          },
+  --        })
+  --      end,
+  --    },
+
+  --    -- Copilot
+  --    "fang2hou/blink-copilot", -- copilot 与 blink-cmp 之间的桥梁
+  --    {
+  --      "zbirenbaum/copilot.lua",
+  --      cmd = "Copilot",
+  --      event = "InsertEnter",
+  --      config = function()
+  --        require("copilot").setup({
+  --          -- 禁用 Copilot 的默认面板和建议 => 因为我们将使用 nvim-cmp 来展示建议
+  --          panel = {
+  --            enabled = false,
+  --          },
+  --          suggestion = {
+  --            enabled = false,
+  --          },
+  --        })
+  --      end,
+  --    },
+  --  },
+
+  --  event = { "InsertEnter", "CmdlineEnter" },
+
+  --  -- use a release tag to download pre-built binaries
+  --  version = "*",
+  --  -- AND/OR build from source, requires nightly: https://rust-lang.github.io/rustup/concepts/channels.html#working-with-nightly-rust
+  --  -- build = 'cargo build --release',
+  --  -- If you use nix, you can build from source using latest nightly rust with:
+  --  -- build = 'nix run .#build-plugin',
+
+  --  config = function()
+  --    require("config.blink-cmp")
+  --  end,
+  --},
 
   -- LSP Rename
   {
