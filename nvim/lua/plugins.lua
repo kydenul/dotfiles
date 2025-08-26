@@ -464,7 +464,6 @@ require("lazy").setup({
     -- optional: provides snippets for the snippet source
     dependencies = {
       "onsails/lspkind-nvim",
-      "fang2hou/blink-copilot",
       -- Spell source based on Neovim's `spellsuggest`.
       "ribru17/blink-cmp-spell",
       ---Use treesitter to highlight the label text for the given list of sources.

@@ -151,6 +151,9 @@ blink.setup({
         opts = {
           kind_icon = "",
           kind_hl = "DevIconCopilot",
+
+          max_attempts = 2,
+          max_completions = 1, -- Override global max_completions,
         },
       },
 
