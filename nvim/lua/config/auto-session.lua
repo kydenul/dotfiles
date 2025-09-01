@@ -76,14 +76,19 @@ if telescope_ok then
 end
 
 -- Session management
-vim.keymap.set("n", "<leader>ss", "<Cmd>SessionSave<CR>", { noremap = true, silent = true, desc = "Save session" })
+vim.keymap.set("n", "<leader>ss", "<Cmd>AutoSession save<CR>", { noremap = true, silent = true, desc = "Save session" })
 vim.keymap.set(
   "n",
   "<leader>sr",
-  "<Cmd>SessionRestore<CR>",
+  "<Cmd>AutoSession restore<CR>",
   { noremap = true, silent = true, desc = "Restore session" }
 )
-vim.keymap.set("n", "<leader>sd", "<Cmd>SessionDelete<CR>", { noremap = true, silent = true, desc = "Delete session" })
+vim.keymap.set(
+  "n",
+  "<leader>sd",
+  "<Cmd>AutoSession delete<CR>",
+  { noremap = true, silent = true, desc = "Delete session" }
+)
 vim.keymap.set(
   "n",
   "<leader>sf",
