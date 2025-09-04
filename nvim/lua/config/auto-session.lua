@@ -11,7 +11,7 @@ end
 -- Setup auto-session with sensible defaults
 auto_session.setup({
   -- Enable automatic session management
-  auto_save_enabled = true,
+  auto_save_enabled = false,
   auto_restore_enabled = true,
 
   -- Session directory
@@ -41,14 +41,10 @@ auto_session.setup({
   },
 
   -- Auto save session on exit
-  auto_save = {
-    enabled = true,
-  },
+  auto_save = { enabled = true },
 
   -- Auto restore session on startup
-  auto_restore = {
-    enabled = true,
-  },
+  auto_restore = { enabled = true },
 
   -- Pre and post hooks for session save/restore
   pre_save_cmds = {
