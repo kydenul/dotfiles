@@ -53,35 +53,30 @@ require("lazy").setup({
     },
   },
 
-  -- {
-  --   "folke/noice.nvim",
-  --   event = "VeryLazy",
-  --   dependencies = {
-  --     "MunifTanjim/nui.nvim",
+  {
+    "folke/noice.nvim",
+    event = "VeryLazy",
+    dependencies = {
+      "MunifTanjim/nui.nvim",
 
-  --     -- OPTIONAL:
-  --     --   `nvim-notify` is only needed, if you want to use the notification view.
-  --     --   If not available, we use `mini` as the fallback
-  --     {
-  --       "rcarriga/nvim-notify",
-  --       opts = {
-  --         stages = "static",
-  --         background_colour = "Normal",
-  --         timeout = 3200,
-  --         render = "compact",
-  --       },
-  --     },
-  --   },
+      --     -- OPTIONAL:
+      --     --   `nvim-notify` is only needed, if you want to use the notification view.
+      --     --   If not available, we use `mini` as the fallback
+      --     {
+      --       "rcarriga/nvim-notify",
+      --       opts = {
+      --         stages = "static",
+      --         background_colour = "Normal",
+      --         timeout = 3200,
+      --         render = "compact",
+      --       },
+      --     },
+    },
 
-  --   keys = {
-  --     { "<leader>sN", "<CMD>Noice pick<CR>", desc = "[Noice] Pick history messages" },
-  --     { "<leader>N", "<CMD>Noice<CR>", desc = "[Noice] Show history messages" },
-  --   },
-
-  --   config = function()
-  --     require("config.noice")
-  --   end,
-  -- },
+    config = function()
+      require("config.noice")
+    end,
+  },
 
   -- ==============================================================
   -- ==============================================================
@@ -98,6 +93,7 @@ require("lazy").setup({
   -- ==============================================================
   {
     "folke/todo-comments.nvim",
+    event = { "BufReadPost", "BufNewFile" },
     dependencies = { "nvim-lua/plenary.nvim" },
     opts = {},
   },

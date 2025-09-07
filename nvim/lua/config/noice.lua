@@ -11,29 +11,25 @@ require("noice").setup({
     progress = { enabled = false }, -- 这个功能会影响性能 => 关闭
   },
 
-  routes = {
-    {
-      filter = {
-        event = "msg_show",
-        kind = "search_count",
-      },
-      opts = { skip = true },
-    },
-    {
-      filter = {
-        event = "msg_show",
-        kind = "",
-      },
-      opts = { skip = true },
-    },
-  },
-
   -- you can enable a preset for easier configuration
   presets = {
-    bottom_search = true, -- use a classic bottom cmdline for search
+    bottom_search = false, -- use a classic bottom cmdline for search
     command_palette = false, -- position the cmdline and popupmenu together
     long_message_to_split = true, -- long messages will be sent to a split
     inc_rename = true, -- enables an input dialog for inc-rename.nvim
-    lsp_doc_border = true, -- add a border to hover docs and signature help
+    lsp_doc_border = false, -- add a border to hover docs and signature help
   },
 })
+
+vim.keymap.set(
+  "n",
+  "<leader>sn",
+  "<CMD>Noice pick<CR>",
+  { noremap = true, silent = true, desc = "[Noice] Pick history messages" }
+)
+vim.keymap.set(
+  "n",
+  "<leader>N",
+  "<CMD>Noice <CR>",
+  { noremap = true, silent = true, desc = "[Noice] Pick history messages" }
+)
