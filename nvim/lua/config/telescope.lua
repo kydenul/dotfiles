@@ -291,3 +291,8 @@ end, {})
 vim.api.nvim_create_user_command("Marks", function()
   builtin.marks({ initial_mode = "normal" })
 end, {})
+
+-- S 代表 Spectre 或者 Search & Replace
+vim.keymap.set("n", "<leader>S", "<cmd>Spectre search_word_under_cursor<CR>", {
+  desc = "[S]earch word under cursor with Spectre",
+})

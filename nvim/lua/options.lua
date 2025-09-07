@@ -69,7 +69,7 @@ vim.o.regexpengine = 0 -- Use automatic regexp engine selection
 -- 补全增强
 vim.o.wildmenu = true
 
-vim.g.gruvbox_material_transparent_background = 2 -- 1, 2
+vim.g.gruvbox_material_transparent_background = 2 -- 0, 1, 2
 vim.g.gruvbox_material_foreground = "material" -- "original" "mix" "material"
 vim.g.gruvbox_material_background = "hard" -- 'hard'`, `'medium'`, `'soft'
 vim.g.gruvbox_material_float_style = "dim" -- 'bright', "dim"

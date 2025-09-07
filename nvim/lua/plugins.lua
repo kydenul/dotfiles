@@ -145,6 +145,9 @@ require("lazy").setup({
     end,
   },
 
+  -- Search & Replace
+  { "nvim-pack/nvim-spectre" },
+
   -- Session management
   {
     "rmagatti/auto-session",
