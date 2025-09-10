@@ -72,21 +72,20 @@ telescope.setup({
     file_sorter = sorter,
 
     -- Layout
-    layout_strategy = "horizontal",
-    -- layout_strategy = "vertical",
+    layout_strategy = "horizontal", -- "vertical",
     layout_config = {
       vertical = {
         preview_cutoff = 10,
         width = 0.96,
         height = 0.96,
-        prompt_position = "top", -- "bottom"
+        prompt_position = "bottom", -- "top" / "bottom"
       },
 
       horizontal = {
         preview_cutoff = 10,
         width = 0.96,
         height = 0.96,
-        prompt_position = "top", -- "bottom"
+        prompt_position = "bottom", -- "top" / "bottom"
       },
     },
     preview = {

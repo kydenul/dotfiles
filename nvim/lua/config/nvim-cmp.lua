@@ -16,13 +16,12 @@ if not lspkind_ok then
   return
 end
 
-local copilot_cmp_ok, copilot_cmp = pcall(require, "copilot_cmp")
-if not copilot_cmp_ok then
-  vim.notify("copilot_cmp failed to load", vim.log.levels.ERROR)
-  return
-end
-
-copilot_cmp.setup({})
+-- local copilot_cmp_ok, copilot_cmp = pcall(require, "copilot_cmp")
+-- if not copilot_cmp_ok then
+--   vim.notify("copilot_cmp failed to load", vim.log.levels.WARN)
+--   return
+-- end
+-- copilot_cmp.setup({})
 
 -- Helper function to check if there are words before cursor position
 local has_words_before = function()
@@ -58,6 +57,7 @@ local kind_icons = {
   Operator = "󰆕",
   TypeParameter = "󰅲",
   Copilot = "",
+  Windsurf = "",
 }
 
 cmp.setup({
@@ -152,6 +152,7 @@ cmp.setup({
           vim_item.kind = string.format("%s %s", kind_icons[vim_item.kind], vim_item.kind)
           vim_item.menu = ({
             copilot = "[Copilot]",
+            windsurf = "[Windsurf]",
             nvim_lsp = "[Lsp]",
             luasnip = "[LuaSnip]",
             nvim_lua = "[Lua]",
@@ -170,6 +171,7 @@ cmp.setup({
   -- Set source precedence with proper priority
   sources = cmp.config.sources({
     { name = "copilot" }, -- For Github Copilot
+    { name = "windsurf" },
     { name = "nvim_lsp" }, -- For nvim-lsp
     { name = "luasnip", option = { use_show_condition = false } }, -- For luasnip user
     { name = "buffer" }, -- For buffer word completion
