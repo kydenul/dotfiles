@@ -56,8 +56,8 @@ local kind_icons = {
   Event = "",
   Operator = "󰆕",
   TypeParameter = "󰅲",
-  Copilot = "",
-  Windsurf = "",
+  Copilot = "",
+  Windsurf = "",
 }
 
 cmp.setup({
@@ -170,7 +170,7 @@ cmp.setup({
   },
   -- Set source precedence with proper priority
   sources = cmp.config.sources({
-    { name = "copilot" }, -- For Github Copilot
+    -- { name = "copilot" }, -- For Github Copilot
     { name = "windsurf" },
     { name = "nvim_lsp" }, -- For nvim-lsp
     { name = "luasnip", option = { use_show_condition = false } }, -- For luasnip user

@@ -174,7 +174,7 @@ blink.setup({
           kind_icon = "",
           kind_hl = "DevIconCopilot",
 
-          max_attempts = 2,
+          max_attempts = 1,
           max_completions = 1, -- Override global max_completions,
         },
       },
@@ -365,47 +365,5 @@ blink.setup({
         max_height = 15,
       },
     },
-
-    -- keymap = {
-    --   preset = "enter",
-
-    --   ["<Tab>"] = {
-    --     function(cmp)
-    --       if cmp.is_menu_visible() then
-    --         return cmp.select_next()
-    --       end
-    --       return false
-    --     end,
-
-    --     function(cmp)
-    --       if has_words_before() then
-    --         return cmp.show()
-    --       end
-    --       return false
-    --     end,
-    --     "fallback",
-    --   },
-
-    --   ["<S-Tab>"] = {
-    --     function(cmp)
-    --       if cmp.is_menu_visible() then
-    --         return cmp.select_prev()
-    --       end
-    --       return false
-    --     end,
-
-    --     "fallback",
-    --   },
-
-    --   ["<CR>"] = {
-    --     function(cmp)
-    --       if vim.fn.getcmdtype() == ":" then
-    --         return cmp.accept_and_enter()
-    --       end
-    --       return false
-    --     end,
-    --     "fallback",
-    --   },
-    -- },
   },
 })

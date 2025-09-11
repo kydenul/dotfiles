@@ -20,7 +20,7 @@ lualine.setup({
     },
     ignore_focus = { "NvimTree", "neo-tree", "Outline" },
     always_divide_middle = true,
-    globalstatus = false, -- Use Neovim's global statusline
+    globalstatus = true, -- Use Neovim's global statusline
     refresh = {
       statusline = 100,
       tabline = 100,
@@ -46,7 +46,7 @@ lualine.setup({
         -- 2: Absolute path
         -- 3: Absolute path, with tilde as the home directory
         -- 4: Filename and parent dir, with tilde as the home directory
-        path = 1,
+        path = 3,
         file_status = true,
       },
     },
@@ -63,7 +63,10 @@ lualine.setup({
       },
     },
 
-    lualine_y = { { "datetime", style = "%H:%M:%S" }, "progress" },
+    lualine_y = {
+      { "datetime", style = "%H:%M:%S" },
+      "progress",
+    },
     lualine_z = { "location" },
   },
 

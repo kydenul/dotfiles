@@ -19,7 +19,7 @@ aerial.setup({
 
   layout = {
     default_direction = "right",
-    max_width = { 64, 0.2 },
+    max_width = { 128, 0.2 },
     min_width = 24,
     width = nil, -- automatic
     resize_to_content = true,
