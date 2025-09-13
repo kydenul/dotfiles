@@ -11,7 +11,8 @@
 ```bash
 # Input method auto switch
 $ brew tap daipeihust/tap # yay install im-select
-$ brew install im-select
+$ brew install im-select, pngpaste
+$ brew install latex2html
 
 # MacOS
 $ brew install fd
@@ -448,3 +449,7 @@ In development, related code is usually written together without empty lines. Us
     # For Ubuntu/Debian
     sudo apt install xsel
     ```
+
+TODO
+
+- [x] [nvim-spectre](https://github.com/nvim-pack/nvim-spectre) A search panel for neovim.

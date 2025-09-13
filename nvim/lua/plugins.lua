@@ -392,11 +392,12 @@ require("lazy").setup({
   {
     "hrsh7th/nvim-cmp",
     dependencies = {
-      "lspkind.nvim",
+      "onsails/lspkind.nvim",
       "hrsh7th/cmp-nvim-lsp", -- lsp auto-completion
       "hrsh7th/cmp-buffer", -- buffer auto-completion
       "hrsh7th/cmp-path", -- path auto-completion
       "hrsh7th/cmp-cmdline", -- cmdline auto-completion
+      "xzbdmw/colorful-menu.nvim",
 
       -- Code snippet engine
       "saadparwaiz1/cmp_luasnip",
@@ -478,7 +479,7 @@ require("lazy").setup({
   --  "saghen/blink.cmp",
   --  -- optional: provides snippets for the snippet source
   --  dependencies = {
-  --    "onsails/lspkind-nvim",
+  --    "onsails/lspkind.nvim",
   --    -- Spell source based on Neovim's `spellsuggest`.
   --    "ribru17/blink-cmp-spell",
   --    ---Use treesitter to highlight the label text for the given list of sources.
@@ -565,25 +566,82 @@ require("lazy").setup({
     end,
   },
 
-  -- Markdown support
-  {
-    "preservim/vim-markdown",
-    require = { "godlygeek/tabular" },
-    ft = { "markdown" },
-  },
-
   -- Markdown preview
   {
     "MeanderingProgrammer/render-markdown.nvim",
+    ft = { "markdown", "Avante" },
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
       "nvim-tree/nvim-web-devicons",
+      "3rd/image.nvim",
+
+      {
+        "AndrewRadev/switch.vim",
+        config = function()
+          vim.keymap.set("n", "`", function()
+            vim.cmd([[Switch]])
+          end, { desc = "Switch strings" })
+
+          vim.g.switch_custom_definitions = {
+            { "> [!TODO]", "> [!WIP]", "> [!DONE]", "> [!FAIL]" },
+            { "height", "width" },
+          }
+        end,
+      },
+
+      --  Automated bullet lists
+      {
+        "bullets-vim/bullets.vim",
+        ft = { "markdown" },
+      },
+
+      -- Image Clip For Markdown
+      {
+        "HakonHarnes/img-clip.nvim",
+        ft = { "tex", "markdown" },
+        opts = {
+          default = {
+            dir_path = "./docs/images",
+            use_absolute_path = false,
+            copy_images = true,
+            prompt_for_file_name = false,
+            file_name = "img-%y%m%d-%H%M%S",
+          },
+
+          filetypes = {
+            markdown = { template = "![image$CURSOR]($FILE_PATH)" },
+
+            tex = {
+              dir_path = "./figs",
+              extension = "png",
+              process_cmd = "",
+              template = [[
+    \begin{figure}[h]
+      \centering
+      \includegraphics[width=0.8\textwidth]{$FILE_PATH}
+    \end{figure}
+        ]], ---@type string | fun(context: table): string
+            },
+          },
+        },
+        keys = {
+          { "<leader>P", "<cmd>PasteImage<cr>", desc = "Paste image from system clipboard" },
+        },
+      },
     },
 
     config = function()
       require("config.render-markdown")
     end,
   },
+
+  -- {
+  --   "3rd/image.nvim",
+  --   build = false, -- so that it doesn't build the rock https://github.com/3rd/image.nvim/issues/91#issuecomment-2453430239
+  --   opts = {
+  --     processor = "magick_cli",
+  --   },
+  -- },
 
   -- PlantUML syntax
   {

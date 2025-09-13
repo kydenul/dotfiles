@@ -8,6 +8,8 @@ if not ok then
   return
 end
 
+vim.o.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
+
 -- Setup auto-session with sensible defaults
 auto_session.setup({
   -- Enable automatic session management

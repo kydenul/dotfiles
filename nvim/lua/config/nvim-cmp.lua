@@ -16,6 +16,12 @@ if not lspkind_ok then
   return
 end
 
+local cmenu_ok, cmenu = pcall(require, "colorful-menu")
+if not cmenu_ok then
+  vim.notify("colorful-menu failed to load", vim.log.levels.ERROR)
+  return
+end
+
 -- local copilot_cmp_ok, copilot_cmp = pcall(require, "copilot_cmp")
 -- if not copilot_cmp_ok then
 --   vim.notify("copilot_cmp failed to load", vim.log.levels.WARN)
@@ -129,49 +135,50 @@ cmp.setup({
       end
     end, { "i", "s" }),
   }),
+
   -- Let's configure the item's appearance
   -- source: https://github.com/hrsh7th/nvim-cmp/wiki/Menu-Appearance
   formatting = {
-    -- Customize the appearance of the completion menu
-    format = lspkind.cmp_format({
-      -- Show only symbol annotations "text_symbol" "symbol_text"
-      mode = "symbol_text",
-      -- Prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
-      maxwidth = 120,
-      -- When the popup menu exceeds maxwidth, the truncated part would show ellipsis_char instead (must define maxwidth first)
-      ellipsis_char = "...",
-      symbol_map = {
-        Copilot = kind_icons.Copilot,
-      },
+    fields = { "kind", "abbr", "menu" },
 
-      -- The function below will be called before any actual modifications from lspkind
-      -- so that you can provide more controls on popup customization. (See [#30](https://github.com/onsails/lspkind-nvim/pull/30))
-      before = function(entry, vim_item)
-        if not lspkind_ok then
-          -- This concatenates the icons with the name of the item kind
-          vim_item.kind = string.format("%s %s", kind_icons[vim_item.kind], vim_item.kind)
-          vim_item.menu = ({
-            copilot = "[Copilot]",
-            windsurf = "[Windsurf]",
-            nvim_lsp = "[Lsp]",
-            luasnip = "[LuaSnip]",
-            nvim_lua = "[Lua]",
-            buffer = "[Buffer]",
-            path = "[Path]",
-            latex_symbols = "[Latex]",
-          })[entry.source.name]
-          return vim_item
-        else
-          -- From lspkind
-          return lspkind.cmp_format()(entry, vim_item)
-        end
-      end,
-    }),
+    format = function(entry, vim_item)
+      local kind = lspkind.cmp_format({
+        -- Show only symbol annotations "text_symbol" "symbol_text" 'symbol'
+        mode = "symbol",
+
+        -- Prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
+        maxwidth = {
+          menu = 36, -- leading text (labelDetails)
+          abbr = 120, -- actual suggestion item
+        },
+
+        -- When the popup menu exceeds maxwidth, the truncated part would show ellipsis_char instead (must define maxwidth first)
+        ellipsis_char = "...",
+        show_labelDetails = true, -- show labelDetails in menu. Disabled by default
+
+        symbol_map = { Copilot = kind_icons.Copilot },
+      })(entry, vim.deepcopy(vim_item))
+      local highlights_info = cmenu.cmp_highlights(entry)
+
+      -- highlight_info is nil means we are missing the ts parser, it's
+      -- better to fallback to use default `vim_item.abbr`. What this plugin
+      -- offers is two fields: `vim_item.abbr_hl_group` and `vim_item.abbr`.
+      if highlights_info ~= nil then
+        vim_item.abbr_hl_group = highlights_info.highlights
+        vim_item.abbr = highlights_info.text
+      end
+      local strings = vim.split(kind.kind, "%s", { trimempty = true })
+      -- vim_item.kind = " " .. (strings[1] or "") .. " "
+      vim_item.kind = strings[1] or ""
+      vim_item.menu = ""
+
+      return vim_item
+    end,
   },
+
   -- Set source precedence with proper priority
   sources = cmp.config.sources({
     -- { name = "copilot" }, -- For Github Copilot
-    { name = "windsurf" },
     { name = "nvim_lsp" }, -- For nvim-lsp
     { name = "luasnip", option = { use_show_condition = false } }, -- For luasnip user
     { name = "buffer" }, -- For buffer word completion
@@ -185,7 +192,7 @@ cmp.setup({
     fetching_timeout = 500, -- Timeout for fetching completions
     confirm_resolve_timeout = 80, -- Timeout for resolving completion items
     async_budget = 1, -- Maximum time per async operation
-    max_view_entries = 200, -- Maximum number of completion items
+    max_view_entries = 24, -- Maximum number of completion items
   },
 })
 
