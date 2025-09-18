@@ -153,8 +153,6 @@ rmd.setup({
     lsp = { enabled = true },
   },
 
-  completions = { lsp = { enabled = true } },
-
   sign = {
     -- Turn on / off sign rendering.
     enabled = true,

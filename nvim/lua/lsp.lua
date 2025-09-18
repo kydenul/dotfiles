@@ -29,6 +29,7 @@ mason.setup({
     "lua_ls", -- lua_ls
     "cmake", -- CMake
     "bashls", -- Bash
+    "typescript-language-server", -- Typescript
   },
 })
 
@@ -51,9 +52,14 @@ vim.keymap.del("n", "gri")
 vim.keymap.del("n", "grt")
 
 -- Highlight symbol under cursor
-vim.api.nvim_set_hl(0, "LspReferenceText", { bg = "#504945", bold = true })
+vim.api.nvim_set_hl(
+  0,
+  "LspReferenceText",
+  { fg = "#E8E8FF", bg = "#504945", bold = true, underline = true, italic = true }
+)
 vim.api.nvim_set_hl(0, "LspReferenceRead", { link = "LspReferenceText" })
 vim.api.nvim_set_hl(0, "LspReferenceWrite", { link = "LspReferenceText" })
+vim.api.nvim_set_hl(0, "LspDocumentHighlight", { link = "LspReferenceText" })
 
 -- Use an on_attach function to only map the following keys
 -- after the language server attaches to the current buffer.
@@ -172,6 +178,8 @@ lspconfig.lua_ls.setup({
 --     of your project. Each line in the file should contain a single compiler flag.
 -- src: https://clangd.llvm.org/installation#compile_commandsjson
 lspconfig.clangd.setup({ on_attach = on_attach })
+
+lspconfig.ts_ls.setup({ on_attach = on_attach })
 
 -- Customized on_attach function.
 -- See `:help vim.diagnostic.*` for documentation on any of the below functions.
