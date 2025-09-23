@@ -108,6 +108,12 @@ require("lazy").setup({
     },
   },
 
+  -- Smooth Scrolling
+  {
+    "karb94/neoscroll.nvim",
+    opts = {},
+  },
+
   {
     "folke/noice.nvim",
     event = "VeryLazy",
