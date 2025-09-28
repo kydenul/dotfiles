@@ -32,6 +32,7 @@ mason.setup({
     "cmake", -- CMake
     "bashls", -- Bash
     "typescript-language-server", -- Typescript
+    "intelephense",
   },
 })
 
@@ -41,6 +42,8 @@ vim.lsp.enable("clangd")
 vim.lsp.enable("gopls")
 vim.lsp.enable("lua_ls")
 vim.lsp.enable("pylsp")
+vim.lsp.enable("ts_ls")
+vim.lsp.enable("intelephense")
 
 -- NOTE: Remove Global Default Key mapping
 vim.keymap.del("n", "grn")
