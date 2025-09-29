@@ -53,7 +53,6 @@ rmd.setup({
     done = { raw = "[!DONE]", rendered = " Done", highlight = "RenderMarkdownSuccess", category = "obsidian" },
   },
 
-  -- sign = { enabled = false },
   code = {
     -- general
     width = "block",
@@ -63,7 +62,7 @@ rmd.setup({
     left_pad = 1,
     right_pad = 1,
     -- language info
-    position = "right",
+    position = "left",
     language_icon = true,
     language_name = true,
     -- avoid making headings ugly
