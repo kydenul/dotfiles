@@ -57,14 +57,17 @@ rmd.setup({
     -- general
     width = "block",
     min_width = 120,
+
     -- borders
-    border = "thin",
+    -- border = "thin",
     left_pad = 1,
     right_pad = 1,
+
     -- language info
     position = "left",
     language_icon = true,
     language_name = true,
+
     -- avoid making headings ugly
     highlight_inline = "RenderMarkdownCodeInfo",
   },
@@ -145,8 +148,10 @@ rmd.setup({
       head_background = true,
     },
   },
+
   -- https://github.com/MeanderingProgrammer/render-markdown.nvim/issues/509
   win_options = { concealcursor = { rendered = "nvc" } },
+
   completions = {
     blink = { enabled = true },
     lsp = { enabled = true },

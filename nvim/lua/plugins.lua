@@ -650,12 +650,6 @@ require("lazy").setup({
         end,
       },
 
-      --  Automated bullet lists
-      {
-        "bullets-vim/bullets.vim",
-        ft = { "markdown" },
-      },
-
       -- Image Clip For Markdown
       {
         "HakonHarnes/img-clip.nvim",
@@ -677,10 +671,10 @@ require("lazy").setup({
               extension = "png",
               process_cmd = "",
               template = [[
-    \begin{figure}[h]
+      \begin{figure}[h]
       \centering
       \includegraphics[width=0.8\textwidth]{$FILE_PATH}
-    \end{figure}
+      \end{figure}
         ]], ---@type string | fun(context: table): string
             },
           },
