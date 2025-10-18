@@ -4,9 +4,6 @@ local util = require("util")
 local telescope = require("telescope")
 local sorters = require("telescope.sorters")
 local builtin = require("telescope.builtin")
-local make_entry = require("telescope.make_entry")
-local finders = require("telescope.finders")
-local Path = require("plenary.path")
 local actions = require("telescope.actions")
 local _ = require("telescope.actions.state")
 
@@ -72,25 +69,26 @@ telescope.setup({
     file_sorter = sorter,
 
     -- Layout
-    layout_strategy = "horizontal", -- "vertical",
+    layout_strategy = "flex", -- "vertical" / "horizontal"
     layout_config = {
+      prompt_position = "top",
+
       vertical = {
         preview_cutoff = 10,
         width = 0.96,
         height = 0.96,
-        prompt_position = "bottom", -- "top" / "bottom"
       },
 
       horizontal = {
         preview_cutoff = 10,
         width = 0.96,
         height = 0.96,
-        prompt_position = "bottom", -- "top" / "bottom"
       },
     },
     preview = {
       filesize_limit = 1,
       treesitter = true,
+      timeout = 250,
     },
 
     path_display = { "truncate" },
@@ -105,6 +103,11 @@ telescope.setup({
       "--column",
       "--smart-case",
       "--hidden",
+
+      "--glob=!.git/*",
+      "--glob=!node_modules/*",
+      "--glob=!.venv/*",
+      "--glob=!__pycache__/*",
     },
   },
 
@@ -113,6 +116,7 @@ telescope.setup({
       hidden = true,
       find_command = { "fd", "--type", "f", "--strip-cwd-prefix" },
     },
+
     buffers = {
       show_all_buffers = true,
       sort_lastused = true,
@@ -128,67 +132,13 @@ telescope.setup({
   },
 })
 
--- Helper functions for setting options
-local function set_opts(opts)
-  opts = opts or {}
-  opts.bufnr = opts.bufnr or vim.api.nvim_get_current_buf()
-  opts.winnr = opts.winnr or vim.api.nvim_get_current_win()
-  return opts
-end
-
--- Tags functions with improved error handling
-local function awk_tags(opts)
-  opts = set_opts(opts)
-
-  local tagfiles = opts.ctags_file and { opts.ctags_file } or vim.fn.tagfiles()
-  for i, ctags_file in ipairs(tagfiles) do
-    tagfiles[i] = vim.fn.expand(ctags_file, true)
-  end
-
-  if vim.tbl_isempty(tagfiles) then
-    util.log_err("No tags file found.")
-    return
-  end
-
-  opts.entry_maker = opts.entry_maker or make_entry.gen_from_ctags(opts)
-
-  -- Use pcall to handle potential errors with awk command
-  local status, result = pcall(function()
-    return finders.new_oneshot_job(vim.iter({ "awk", opts.awk, tagfiles }):flatten():totable(), opts)
-  end)
-
-  if not status then
-    util.log_err("Error creating tags finder: " .. tostring(result))
-    return
-  end
-
-  opts.finder = result
-  return builtin.tags(opts)
-end
-
-local function current_buffer_tags(opts)
-  opts = set_opts(opts)
-  opts.prompt_title = "Current Buffer Tags"
-  opts.only_current_file = true
-  opts.only_sort_tags = true
-  opts.path_display = "hidden"
-
-  local cwd = vim.fn.expand(opts.cwd or vim.loop.cwd())
-  local current_file = Path:new(vim.api.nvim_buf_get_name(opts.bufnr)):normalize(cwd)
-  opts.awk = string.format("$2 == %q{print $0}", current_file)
-
-  return awk_tags(opts)
-end
-
 -- Enhanced keymaps with descriptions
 vim.keymap.set("n", "<leader>ff", builtin.find_files, { desc = "[Telescope] Find files" })
 vim.keymap.set("n", "<leader>fb", builtin.buffers, { desc = "[Telescope] Find buffers" })
 vim.keymap.set("n", "<leader>fg", function()
   builtin.live_grep(util.live_grep_opts({}))
 end, { desc = "[Telescope] Live grep" })
-vim.keymap.set("n", "<leader>ft", builtin.help_tags, { desc = "[Telescope] Find help tags" })
 vim.keymap.set("n", "<leader>/", builtin.current_buffer_fuzzy_find, { desc = "[Telescope] Fuzzy find in buffer" })
-vim.keymap.set("n", "<leader>fo", current_buffer_tags, { desc = "[Telescope] Find buffer tags" })
 vim.keymap.set("n", "<leader>fd", builtin.diagnostics, { desc = "[Telescope] Find diagnostics" })
 vim.keymap.set("n", "<leader>fr", builtin.resume, { desc = "[Telescope] Resume last picker" })
 
@@ -201,7 +151,7 @@ vim.keymap.set("n", "<leader>fm", builtin.marks, { desc = "[Telescope] Find mark
 vim.keymap.set("n", "<leader>fj", builtin.jumplist, { desc = "[Telescope] Find jumplist" })
 
 -- Todo-Comment
-vim.keymap.set("n", "<leader>td", ":TodoTelescope<CR>", { desc = "[Todo-Comment] Telescope" })
+vim.keymap.set("n", "<leader>ftd", ":TodoTelescope<CR>", { desc = "[Todo-Comment] Telescope" })
 
 -- Git commands with improved error handling
 local git_log = { "git", "log", "--pretty=format:%h %s (%ci) <%an>\n" }
@@ -265,22 +215,6 @@ vim.api.nvim_create_user_command("Diag", function()
     severity_limit = "WARNING",
   })
 end, {})
-
--- Tags command with improved error handling
-vim.api.nvim_create_user_command("Tags", function(opts)
-  if opts.args and opts.args ~= "" then
-    awk_tags({
-      fname_width = 0.4,
-      prompt_title = string.format("Tags ~ %q", opts.args),
-      awk = string.format("$1 ~ %q{print $0}", opts.args),
-    })
-  else
-    builtin.tags({
-      fname_width = 0.4,
-      show_line = true,
-    })
-  end
-end, { nargs = "?" })
 
 -- Additional useful commands
 vim.api.nvim_create_user_command("Oldfiles", function()

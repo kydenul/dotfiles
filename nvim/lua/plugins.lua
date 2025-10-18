@@ -375,7 +375,7 @@ require("lazy").setup({
     "nvim-telescope/telescope.nvim",
     branch = "0.1.x",
     event = "BufReadPost",
-    cmd = { "Glg", "Gst", "Diag", "Tags" },
+    cmd = { "Glg", "Gst", "Diag" },
     dependencies = {
       "nvim-lua/plenary.nvim",
       -- ripgrep is a system-level dependency and needs to be installed separately.

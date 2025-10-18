@@ -52,8 +52,20 @@ lualine.setup({
     },
 
     lualine_x = {
+      -- 显示 Noice 模式（包括宏录制）
+      {
+        require("noice").api.status.mode.get,
+        cond = require("noice").api.status.mode.has,
+        color = { fg = "#ff9e64" },
+      },
+      {
+        require("noice").api.status.command.get,
+        cond = require("noice").api.status.command.has,
+        color = { fg = "#ff9e64" },
+      },
+
       "encoding",
-      -- "fileformat",
+      "fileformat",
       "filetype",
       {
         "filesize",
