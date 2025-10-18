@@ -103,39 +103,18 @@ require("lazy").setup({
 
   {
     "nvim-tree/nvim-web-devicons",
-    opts = {
-      override = { copilot = { icon = "", color = "#cba6f7", name = "Copilot" } },
-    },
+    opts = { override = { copilot = { icon = "", color = "#cba6f7", name = "Copilot" } } },
   },
 
   -- Smooth Scrolling
-  {
-    "karb94/neoscroll.nvim",
-    opts = {},
-  },
+  "karb94/neoscroll.nvim",
 
   {
     "folke/noice.nvim",
     event = "VeryLazy",
-    dependencies = {
-      "MunifTanjim/nui.nvim",
-
-      --     -- OPTIONAL:
-      --     --   `nvim-notify` is only needed, if you want to use the notification view.
-      --     --   If not available, we use `mini` as the fallback
-      --     {
-      --       "rcarriga/nvim-notify",
-      --       opts = {
-      --         stages = "static",
-      --         background_colour = "Normal",
-      --         timeout = 3200,
-      --         render = "compact",
-      --       },
-      --     },
-    },
-
+    dependencies = { "MunifTanjim/nui.nvim" },
     config = function()
-      require("config.noice")
+      require("config.nvim-noice")
     end,
   },
 
@@ -145,7 +124,7 @@ require("lazy").setup({
   -- gcc / gc / gcu
   -- ==============================================================
   -- ==============================================================
-  { "tpope/vim-commentary" },
+  "tpope/vim-commentary",
 
   -- ==============================================================
   -- ==============================================================
@@ -156,7 +135,6 @@ require("lazy").setup({
     "folke/todo-comments.nvim",
     event = { "BufReadPost", "BufNewFile" },
     dependencies = { "nvim-lua/plenary.nvim" },
-    opts = {},
   },
 
   -- yanky
@@ -271,7 +249,6 @@ require("lazy").setup({
   {
     "norcalli/nvim-colorizer.lua",
     event = "BufRead",
-    opts = {},
     config = function(_)
       require("colorizer").setup()
     end,
@@ -316,19 +293,17 @@ require("lazy").setup({
   {
     -- Conflicted with vscode_nvim, don't know why
     "kevinhwang91/nvim-hlslens",
-    -- stylua: ignore
-    keys = {
-      { "n",  "nzz<Cmd>lua require('hlslens').start()<CR>", mode = "n", desc = "Next match",      noremap = true, silent = true },
-      { "N",  "Nzz<Cmd>lua require('hlslens').start()<CR>", mode = "n", desc = "Previous match",  noremap = true, silent = true },
-      { "*",  "*<Cmd>lua require('hlslens').start()<CR>",   mode = "n", desc = "Next match",      noremap = true, silent = true },
-      { "#",  "#<Cmd>lua require('hlslens').start()<CR>",   mode = "n", desc = "Previous match",  noremap = true, silent = true },
+        -- stylua: ignore
+        keys = {
+            { "n", "nzz<Cmd>lua require('hlslens').start()<CR>", mode = "n", desc = "Next match",     noremap = true, silent = true },
+            { "N", "Nzz<Cmd>lua require('hlslens').start()<CR>", mode = "n", desc = "Previous match", noremap = true, silent = true },
+            { "*", "*<Cmd>lua require('hlslens').start()<CR>",   mode = "n", desc = "Next match",     noremap = true, silent = true },
+            { "#", "#<Cmd>lua require('hlslens').start()<CR>",   mode = "n", desc = "Previous match", noremap = true, silent = true },
 
-      { "/" },
-      { "?" },
-    },
-    opts = {
-      nearest_only = true,
-    },
+            { "/" },
+            { "?" },
+        },
+    opts = { nearest_only = true },
   },
 
   -- Make surrounding easier
