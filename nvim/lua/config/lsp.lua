@@ -9,6 +9,12 @@ if not mason_ok then
   return
 end
 
+local mason_lspconfig_ok, mason_lspconfig = pcall(require, "mason-lspconfig")
+if not mason_lspconfig_ok then
+  util.log_warn("mason lspconfig load failed")
+  return
+end
+
 -- NOTE: mason
 mason.setup({
   ui = {
@@ -20,7 +26,10 @@ mason.setup({
     border = "rounded",
   },
   max_concurrent_installers = 4,
+})
 
+-- NOTE: Mason-LSPConfig integration
+mason_lspconfig.setup({
   automatic_installation = true,
   -- Use mason-lspconfig for better integration
   ensure_installed = {
@@ -62,11 +71,15 @@ vim.api.nvim_set_hl(0, "LspReferenceRead", { link = "LspReferenceText" })
 vim.api.nvim_set_hl(0, "LspReferenceWrite", { link = "LspReferenceText" })
 vim.api.nvim_set_hl(0, "LspDocumentHighlight", { link = "LspReferenceText" })
 
--- Define LSP-related keymaps
+-- ============================================================================
+-- LSP Attach Autocmd
+-- ============================================================================
 vim.api.nvim_create_autocmd("LspAttach", {
   group = vim.api.nvim_create_augroup("lsp-attach", { clear = true }),
 
   callback = function(event)
+    local bufnr = event.buf
+
     -- See `:help vim.lsp.*` for documentation on any of the below functions
     local bufopts = function(desc)
       return { noremap = true, silent = true, buffer = event.buf, desc = desc }
@@ -74,7 +87,9 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
     -- notification wrapper of original gd
     vim.keymap.set("n", "gd", function()
-      local params = vim.lsp.util.make_position_params(0, "utf-8")
+      local clients = vim.lsp.get_clients({ bufnr = bufnr })
+      local offset_encoding = clients[1] and clients[1].offset_encoding or "utf-16"
+      local params = vim.lsp.util.make_position_params(0, offset_encoding)
       vim.lsp.buf_request(0, "textDocument/definition", params, function(_, result, _, _)
         if not result or vim.tbl_isempty(result) then
           vim.notify("No definition found", vim.log.levels.INFO)
@@ -116,8 +131,12 @@ vim.api.nvim_create_autocmd("LspAttach", {
       { buffer = event.buf, desc = "LSP: Goto Implementation" }
     )
 
-    vim.keymap.set("n", "gK", vim.lsp.buf.hover, bufopts("[LSP] Hover"))
-    -- K: show diagnostics if available, otherwise show hover information
+    -- ------------------------------------------------------------------------
+    -- Documentation and Diagnostics
+    -- ------------------------------------------------------------------------
+    vim.keymap.set("n", "gK", vim.lsp.buf.hover, bufopts("LSP: Hover"))
+
+    -- Smart K: show diagnostics if available, otherwise hover
     vim.keymap.set("n", "K", function()
       local line_diagnostics = vim.diagnostic.get(0, { lnum = vim.fn.line(".") - 1 })
       if next(line_diagnostics) then
@@ -125,23 +144,32 @@ vim.api.nvim_create_autocmd("LspAttach", {
       else
         vim.lsp.buf.hover()
       end
-    end, bufopts("[LSP] Diagnostic or Hover"))
-    vim.keymap.set("n", "<space>ca", vim.lsp.buf.code_action, bufopts("[LSP] Code Action"))
+    end, bufopts("LSP: Diagnostic or Hover"))
 
-    -- Format
-    vim.api.nvim_buf_create_user_command(event.buf, "Fmt", function(opts)
-      local range
-      if opts.range == 2 then
-        -- The range is inclusive, so we need to go to the end of the line.
-        -- -1 means the end of the line.
-        range = { ["start"] = { opts.line1, 0 }, ["end"] = { opts.line2, -1 } }
-      end
+    -- ------------------------------------------------------------------------
+    -- Code Actions and Formatting
+    -- ------------------------------------------------------------------------
+    vim.keymap.set({ "n", "v" }, "<space>ca", vim.lsp.buf.code_action, bufopts("LSP: Code Action"))
 
-      vim.lsp.buf.format({ async = true, range = range })
-    end, { range = true })
+    -- -- Format => Use conform
+    -- vim.api.nvim_buf_create_user_command(event.buf, "Fmt", function(opts)
+    --   local range
+    --   if opts.range == 2 then
+    --     -- The range is inclusive, so we need to go to the end of the line.
+    --     -- -1 means the end of the line.
+    --     range = { ["start"] = { opts.line1, 0 }, ["end"] = { opts.line2, -1 } }
+    --   end
 
-    -- The keymap remains the same
-    vim.keymap.set("n", "<space>=", ":Fmt<CR>", bufopts("[LSP] Format code"))
+    --   vim.lsp.buf.format({ async = true, range = range })
+    -- end, { range = true, desc = "LSP: Format code" })
+
+    -- -- The keymap remains the same
+    -- vim.keymap.set("n", "<space>=", ":Fmt<CR>", bufopts("LSP: Format code"))
+    -- vim.keymap.set("v", "<space>=", ":'<,'>Fmt<CR>", bufopts("LSP: Format selection"))
+
+    -- ------------------------------------------------------------------------
+    -- Toggle Features
+    -- ------------------------------------------------------------------------
 
     -- toggle diagnostics
     vim.keymap.set(
@@ -152,10 +180,20 @@ vim.api.nvim_create_autocmd("LspAttach", {
         return function()
           if diag_status == 1 then
             diag_status = 0
-            vim.diagnostic.config({ underline = false, virtual_text = false, signs = false, update_in_insert = false })
+            vim.diagnostic.config({
+              underline = false,
+              virtual_text = false,
+              signs = false,
+              update_in_insert = false,
+            })
           else
             diag_status = 1
-            vim.diagnostic.config({ underline = true, virtual_text = true, signs = true, update_in_insert = true })
+            vim.diagnostic.config({
+              underline = true,
+              virtual_text = true,
+              signs = true,
+              update_in_insert = true,
+            })
           end
         end
       end)(),
@@ -171,7 +209,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
     -- Inlay hint
     if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
-      -- vim.lsp.inlay_hint.enable()
       vim.keymap.set("n", "<leader>th", function()
         vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = event.buf }))
       end, { buffer = event.buf, desc = "LSP: Toggle Inlay Hints" })
@@ -201,23 +238,17 @@ vim.api.nvim_create_autocmd("LspAttach", {
         callback = function(event2)
           vim.lsp.buf.clear_references()
           vim.api.nvim_clear_autocmds({ group = "kickstart-lsp-highlight", buffer = event2.buf })
-          -- vim.cmd 'setl foldexpr <'
         end,
       })
     end
-
-    -- require("Comment").setup()
   end,
 })
 
 -- NOTE: LspInfo, LspLog, LspRestart
-local api, lsp = vim.api, vim.lsp
-api.nvim_create_user_command("LspInfo", ":checkhealth vim.lsp", { desc = "Alias to `:checkhealth vim.lsp`" })
-api.nvim_create_user_command("LspLog", function()
-  vim.cmd(string.format("tabnew %s", lsp.get_log_path()))
-end, {
-  desc = "Opens the Nvim LSP client log.",
-})
+vim.api.nvim_create_user_command("LspInfo", ":checkhealth vim.lsp", { desc = "Alias to `:checkhealth vim.lsp`" })
+vim.api.nvim_create_user_command("LspLog", function()
+  vim.cmd(string.format("tabnew %s", vim.lsp.get_log_path()))
+end, { desc = "Opens the Nvim LSP client log" })
 
 local complete_client = function(arg)
   return vim
@@ -230,7 +261,7 @@ local complete_client = function(arg)
     end)
     :totable()
 end
-api.nvim_create_user_command("LspRestart", function(info)
+vim.api.nvim_create_user_command("LspRestart", function(info)
   for _, name in ipairs(info.fargs) do
     if vim.lsp.config[name] == nil then
       vim.notify(("Invalid server name '%s'"):format(info.args))

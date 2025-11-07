@@ -38,6 +38,52 @@ vim.g.rainbow_delimiters = { highlight = highlight }
 
 -- Configure and initialize indent-blankline
 ibl.setup({
-  indent = { char = "│" },
-  scope = { highlight = highlight },
+  -- Indent guide configuration
+  indent = {
+    char = "│",
+    -- Alternative characters: "▏", "┊", "┆", "¦", "│"
+    tab_char = "│",
+    smart_indent_cap = true,
+    priority = 1,
+  },
+
+  -- Scope configuration (current code block highlighting)
+  scope = {
+    enabled = true,
+    char = "│",
+    highlight = highlight,
+    show_start = true,
+    show_end = true,
+    show_exact_scope = true,
+    injected_languages = true,
+    priority = 1024,
+  },
+
+  -- Whitespace configuration
+  whitespace = { remove_blankline_trail = true },
+
+  -- Exclude certain file types and buffer types
+  exclude = {
+    filetypes = {
+      "help",
+      "alpha",
+      "dashboard",
+      "neo-tree",
+      "Trouble",
+      "trouble",
+      "lazy",
+      "mason",
+      "notify",
+      "toggleterm",
+      "lazyterm",
+      "NvimTree",
+      "packer",
+      "lspinfo",
+      "TelescopePrompt",
+      "TelescopeResults",
+      "checkhealth",
+      "",
+    },
+    buftypes = { "terminal", "nofile", "quickfix", "prompt" },
+  },
 })

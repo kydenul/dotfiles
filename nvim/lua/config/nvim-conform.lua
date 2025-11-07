@@ -98,7 +98,7 @@ conform.setup({
 
   -- 保存时自动格式化
   format_on_save = {
-    timeout_ms = 1000,
+    timeout_ms = 1500,
     lsp_fallback = true,
   },
 })
@@ -110,4 +110,4 @@ vim.keymap.set({ "n", "v" }, "<leader>=", function()
     async = false,
     timeout_ms = 1000,
   })
-end, { desc = "Format file or range (in visual mode)" })
+end, { desc = "[Conform] Format file or range(in visual mode)" })

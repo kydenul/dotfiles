@@ -19,11 +19,10 @@ aerial.setup({
 
   layout = {
     default_direction = "right",
-    max_width = { 128, 0.2 },
+    max_width = 128,
     min_width = 24,
-    width = nil, -- automatic
     resize_to_content = true,
-    preserve_equality = true,
+    preserve_equality = false,
     placement = "edge",
   },
 
@@ -34,9 +33,8 @@ aerial.setup({
   },
 
   window = {
-    width = nil,
     height = nil,
-    border = "rounded",
+    border = "none",
     background_highlight = "Normal",
   },
 
