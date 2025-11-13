@@ -27,8 +27,8 @@ return {
 
     lsp = {
       signature = { enabled = true },
+      hover = { enabled = true },
       progress = { enabled = false }, -- 这个功能会影响性能 => 关闭
-      hover = { enabled = false },
 
       -- override markdown rendering so that **cmp** and other plugins use **Treesitter**
       override = {
