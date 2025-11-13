@@ -1,9 +1,8 @@
-require("util")
-require("keymaps")
-require("plugins")
+require("custom.util")
+require("custom.keymaps")
+require("custom.floding")
 
--- require("lsp")
-require("config/lsp")
+require("klazy")
 
 -- It must be loaded in last
-require("options")
+require("custom.options")
