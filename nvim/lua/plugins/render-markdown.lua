@@ -7,6 +7,47 @@ return {
     "nvim-treesitter/nvim-treesitter",
     "nvim-tree/nvim-web-devicons",
 
+    {
+      "AndrewRadev/switch.vim",
+      config = function()
+        --stylua: ignore
+        vim.keymap.set("n", "`", function() vim.cmd([[Switch]]) end, { desc = "Switch strings" })
+        vim.g.switch_custom_definitions =
+          { { "> [!TODO]", "> [!WIP]", "> [!DONE]", "> [!FAIL]" }, { "height", "width" } }
+      end,
+    },
+
+    -- Image Clip For Markdown
+    {
+      "HakonHarnes/img-clip.nvim",
+      ft = { "tex", "markdown" },
+      opts = {
+        default = {
+          dir_path = "./images",
+          use_absolute_path = false,
+          copy_images = true,
+          prompt_for_file_name = false,
+          file_name = "img-%y%m%d-%H%M%S",
+        },
+
+        filetypes = {
+          markdown = { template = "![image$CURSOR]($FILE_PATH)" },
+          tex = {
+            dir_path = "./figs",
+            extension = "png",
+            process_cmd = "",
+            template = [[
+              \begin{figure}[h]
+              \centering
+              \includegraphics[width=0.8\textwidth]{$FILE_PATH}
+              \end{figure}
+            ]], ---@type string | fun(context: table): string
+          },
+        },
+      },
+      keys = { { "<leader>P", "<cmd>PasteImage<cr>", desc = "Paste image from system clipboard" } },
+    },
+
     -- ==============================================================
     -- Image Preview
     -- ==============================================================
