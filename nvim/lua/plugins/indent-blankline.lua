@@ -19,7 +19,7 @@ return {
     -- Scope configuration (current code block highlighting)
     scope = {
       enabled = true,
-      char = "│,",
+      char = "│",
       highlight = {
         "RainbowBlue",
         "RainbowRed",
