@@ -263,10 +263,9 @@ return {
     end
 
     -- Set highlight groups for nvim-cmp
-    -- gray
     vim.api.nvim_set_hl(0, "CmpItemAbbrDeprecated", { bg = "NONE", fg = "#7E8294", strikethrough = true })
-    -- blue
-    vim.api.nvim_set_hl(0, "CmpItemAbbrMatch", { bg = "NONE", fg = "#569CD6", bold = true })
+
+    vim.api.nvim_set_hl(0, "CmpItemAbbrMatch", { bg = "NONE", fg = "#20C997", bold = true })
     vim.api.nvim_set_hl(0, "CmpItemAbbrMatchFuzzy", { link = "CmpIntemAbbrMatch" })
 
     -- light blue
