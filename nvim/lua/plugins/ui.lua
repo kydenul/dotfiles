@@ -1,6 +1,4 @@
 return {
-  { "echasnovski/mini.icons", version = "*" },
-
   -- ==============================================================
   -- Colorschemes
   -- ==============================================================
@@ -8,6 +6,19 @@ return {
     "sainnhe/gruvbox-material",
     lazy = true,
     priority = 1000,
+  },
+
+  {
+    "neanias/everforest-nvim",
+    version = false,
+    lazy = false,
+    priority = 1000, -- make sure to load this before all the other start plugins
+    -- Optional; default configuration will be used if setup isn't called.
+    config = function()
+      require("everforest").setup({
+        background = "hard",
+      })
+    end,
   },
 
   {
@@ -24,25 +35,14 @@ return {
         integrations = {
           aerial = true,
           diffview = true,
-          mini = {
-            enabled = true,
-            indentscope_color = "sky",
-          },
           noice = true,
-          telescope = {
-            enabled = true,
-          },
-          nvimtree = true,
-          neotree = true,
           which_key = true,
-          treesitter = true,
-          notify = true,
-          gitsigns = true,
-          flash = true,
+          notify = false,
           blink_cmp = true,
           mason = true,
           snacks = false,
         },
+
         highlight_overrides = {
           mocha = function(mocha)
             return {

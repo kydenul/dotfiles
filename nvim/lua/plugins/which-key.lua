@@ -6,6 +6,7 @@
 
 return {
   "folke/which-key.nvim",
+  event = "VeryLazy",
   opts = {
     -- Use classic preset (other options: "modern", "helix")
     preset = "helix",
