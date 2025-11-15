@@ -2,17 +2,55 @@
 
 return {
   "NeogitOrg/neogit",
+
+  lazy = true,
+
   dependencies = {
     "nvim-lua/plenary.nvim",
     "sindrets/diffview.nvim",
     "nvim-telescope/telescope.nvim",
 
-    -- Git integration
-    "tpope/vim-fugitive",
+    {
+      "isakbm/gitgraph.nvim",
+      dependencies = { "sindrets/diffview.nvim" },
+      ---@type I.GGConfig
+      opts = {
+        git_cmd = "git",
+        symbols = {
+          merge_commit = "M",
+          commit = "*",
+        },
+
+        format = {
+          timestamp = "%H:%M:%S %d-%m-%Y",
+          fields = { "hash", "timestamp", "author", "branch_name", "tag" },
+        },
+
+        hooks = {
+          -- Check diff of a commit
+          on_select_commit = function(commit)
+            vim.notify("DiffviewOpen " .. commit.hash .. "^!")
+            vim.cmd(":DiffviewOpen " .. commit.hash .. "^!")
+          end,
+
+          -- Check diff from commit a -> commit b
+          on_select_range_commit = function(from, to)
+            vim.notify("DiffviewOpen " .. from.hash .. "~1.." .. to.hash)
+            vim.cmd(":DiffviewOpen " .. from.hash .. "~1.." .. to.hash)
+          end,
+        },
+      },
+    },
   },
+
   cmd = "Neogit",
   keys = {
-    { "<leader>g", "<cmd>Neogit<cr>", desc = "Open Neogit" },
+    { "<leader>gg", "<cmd>Neogit<cr>", desc = "[Neogit] TUI Toggle" },
+
+    { "gho", "<cmd>DiffviewOpen<cr>", desc = "[Diffview] Open" },
+    { "ghc", "<cmd>DiffviewClose<cr>", desc = "[Diffview] Close" },
+    -- stylua: ignore
+    { "ghg", function() require("gitgraph").draw({}, { all = true, max_count = 5000 }) end, desc = "[GitGraph] Draw" },
   },
 
   opts = {
