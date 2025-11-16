@@ -4,11 +4,14 @@ return {
   "rmagatti/auto-session",
 
   lazy = false,
+
+  dependencies = { "nvim-telescope/telescope.nvim" },
+
   keys = {
-    { "<leader>ss", "<cmd>AutoSession save<CR>", desc = "Save session" },
-    { "<leader>sr", "<cmd>SessionRestore<CR>", desc = "Restore session" },
-    { "<leader>sd", "<cmd>AutoSession delete<CR>", desc = "Delete session" },
-    { "<leader>sf", "<cmd>AutoSession search<CR>", desc = "Session search" },
+    { "<leader>ss", "<cmd>AutoSession save<CR>", desc = "[Session] Save" },
+    { "<leader>sr", "<cmd>AutoSession restore<CR>", desc = "[Session] Restore" },
+    { "<leader>sd", "<cmd>AutoSession delete<CR>", desc = "[Session] Delete" },
+    { "<leader>sf", "<cmd>AutoSession search<CR>", desc = "[Session] Search" },
   },
 
   opts = {
@@ -29,10 +32,21 @@ return {
       "/tmp",
       "/bin",
     },
+
+    -- Session Lens
+    session_lens = {
+      picker = "telescope", -- "telescope"|"snacks"|"fzf"|"select"|nil
+      load_on_setup = true,
+      theme_conf = { border = true },
+      previewer = "summary", -- 'summary'|'active_buffer'|function
+    },
   },
 
   config = function(_, opts)
     vim.o.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
+
+    -- Load Telescope extension
+    require("telescope").load_extension("session-lens")
 
     require("auto-session").setup(opts)
   end,
