@@ -35,5 +35,7 @@ return {
     -- open Gemini CLI directly
     -- stylua: ignore
     { "<leader>kg", function() require("sidekick.cli").toggle({ name = "gemini", focus = true }) end, desc = "[Sidekick] Toggle Gemini" },
+    -- stylua: ignore
+    { "<leader>kc", function() require("sidekick.cli").toggle({ name = "claude", focus = true }) end, desc = "[Sidekick] Toggle Claude" },
   },
 }
