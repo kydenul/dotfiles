@@ -16,9 +16,34 @@ return {
       ---@type I.GGConfig
       opts = {
         git_cmd = "git",
+
         symbols = {
-          merge_commit = "M",
-          commit = "*",
+          merge_commit = "",
+          commit = "",
+          merge_commit_end = "",
+          commit_end = "",
+
+          -- Advanced symbols
+          GVER = "",
+          GHOR = "",
+          GCLD = "",
+          GCRD = "╭",
+          GCLU = "",
+          GCRU = "",
+          GLRU = "",
+          GLRD = "",
+          GLUD = "",
+          GRUD = "",
+          GFORKU = "",
+          GFORKD = "",
+          GRUDCD = "",
+          GRUDCU = "",
+          GLUDCD = "",
+          GLUDCU = "",
+          GLRDCL = "",
+          GLRDCR = "",
+          GLRUCL = "",
+          GLRUCR = "",
         },
 
         format = {
