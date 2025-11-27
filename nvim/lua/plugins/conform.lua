@@ -11,9 +11,9 @@ return {
       run_on_start = true,
       ensure_installed = {
         -- Golang
-        "gofumpt",
-        "goimports-reviser",
-        "golangci-lint",
+        -- "gofumpt",
+        -- "goimports-reviser",
+        -- "golangci-lint",
 
         -- Python
         "isort",

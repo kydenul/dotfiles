@@ -6,7 +6,7 @@
     "editor.cursorStyle":"line",
     "editor.cursorBlinking":"solid",
     "editor.cursorSmoothCaretAnimation": "on",
-    "editor.fontFamily": "'Hack Nerd Font Mono', 'Fira Code', 'Source Code Pro'",
+    "editor.fontFamily": "'Maple Mono NF CN','Hack Nerd Font Mono', 'Fira Code', 'Source Code Pro'",
     "editor.lineNumbers": "relative",
     "editor.guides.bracketPairs": "active",
     "editor.rulers": [120],
@@ -45,7 +45,6 @@
     "chat.commandCenter.enabled": false,
 
     "diffEditor.ignoreTrimWhitespace": true,
-    "diffEditor.hideUnchangedRegions.enabled": true,
 
     // -----------------------------------------------------------------
     // Vim
@@ -369,4 +368,5 @@
         "plaintext": false,
         "markdown": true,
     },
+    "files.autoSave": "off",
 }
