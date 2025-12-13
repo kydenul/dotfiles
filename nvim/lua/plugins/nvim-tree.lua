@@ -80,10 +80,75 @@ return {
         sorter = "case_sensitive",
       },
       filters = {
-        dotfiles = false,
-        git_clean = false,
-        no_buffer = false,
-        custom = {}, -- Custom list of ignored files/directories
+        dotfiles = false, -- Display files starting with a dot, e.g. .gitignore
+        git_clean = false, -- Display untracked files
+        no_buffer = false, -- Display all files with unOpen and Open buffers
+
+        -- Custom list of ignored files/directories
+        custom = {
+          -- macOS system files
+          "^%.DS_Store$",
+          "^%.AppleDouble$",
+          "^%.LSOverride$",
+          "^%._",
+
+          -- Windows system files
+          "^Thumbs%.db$",
+          "^Desktop%.ini$",
+
+          -- Editor/IDE files
+          "^%.vscode$",
+          "^%.idea$",
+          "^%.vs$",
+          "%.swp$",
+          "%.swo$",
+          "%.swn$",
+
+          -- Version control
+          "^%.git$",
+          "^%.svn$",
+          "^%.hg$",
+
+          -- Dependencies & build artifacts
+          "^node_modules$",
+          "^%.next$",
+          "^%.nuxt$",
+          "^dist$",
+          "^build$",
+          "^out$",
+          "^target$", -- Rust/Java
+          "^vendor$", -- Go/PHP
+
+          -- Package manager files
+          "^%.pnpm%-store$",
+          "^%.yarn$",
+          "^%.npm$",
+
+          -- Language-specific
+          "__pycache__",
+          "%.pyc$",
+          "%.pyo$",
+          "%.class$", -- Java
+          "%.o$", -- C/C++
+          "%.so$", -- Shared libraries
+          "%.dylib$", -- macOS libraries
+          "%.dll$", -- Windows libraries
+
+          -- Logs and temp files
+          "%.log$",
+          "%.tmp$",
+          "%.temp$",
+
+          -- Coverage and test reports
+          "^coverage$",
+          "^%.coverage$",
+          "^%.pytest_cache$",
+          "^%.nyc_output$",
+
+          -- Environment files (optional - remove if you need to see them)
+          -- "^%.env$",
+          -- "^%.env%.local$",
+        },
       },
 
       -- Git integration
