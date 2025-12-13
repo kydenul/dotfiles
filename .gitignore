@@ -1,0 +1,32 @@
+# Sensitive files - Do NOT commit
+.zshrc
+.zsh_secrets
+CLAUDE.md
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Thumbnails
+Thumbs.db
+
+# Temporary files
+*.swp
+*.swo
+*~
+.*.sw?
+
+# Editor directories
+.vscode/
+.idea/
+
+# Local environment files
+*.local
+.env
+.env.local
+
+# Backup files
+*.bak
+*.backup
