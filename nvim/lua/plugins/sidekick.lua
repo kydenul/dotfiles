@@ -2,7 +2,17 @@ return {
   "folke/sidekick.nvim",
   opts = {
     -- add any options here
-    cli = { mux = { enabled = true, backend = "tmux" } },
+    cli = {
+      mux = { enabled = true, backend = "tmux" },
+
+      tools = {
+        ["CodeBuddy-Code"] = {
+          -- cmd = { "codebuddy-code", "--flag" },
+          cmd = { "codebuddy-code" },
+        },
+      },
+    },
+
     nes = { enabled = false },
   },
 
@@ -37,5 +47,8 @@ return {
     { "<leader>kg", function() require("sidekick.cli").toggle({ name = "gemini", focus = true }) end, desc = "[Sidekick] Toggle Gemini" },
     -- stylua: ignore
     { "<leader>kc", function() require("sidekick.cli").toggle({ name = "claude", focus = true }) end, desc = "[Sidekick] Toggle Claude" },
+
+    -- stylua: ignore
+    { "<leader>kn", function() require("sidekick.cli").toggle({ name = "CodeBuddy-Code", focus = true }) end, desc = "[Sidekick] Toggle CodeBuddy-Code" },
   },
 }
