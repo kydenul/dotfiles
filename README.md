@@ -48,9 +48,9 @@ ln -s ~/.dotfiles/.markdownlint.json ~/.markdownlint.json
 ln -s ~/.dotfiles/vscode/keybindings.json ~/Library/Application\ Support/Code/User/keybindings.json
 ln -s ~/.dotfiles/vscode/settings.json ~/Library/Application\ Support/Code/User/settings.json
 
-# Windsurf (macOS)
-ln -s ~/.dotfiles/windsurf/keybindings.json ~/Library/Application\ Support/Windsurf/User/keybindings.json
-ln -s ~/.dotfiles/windsurf/settings.json ~/Library/Application\ Support/Windsurf/User/settings.json
+# Claude SubAgents
+ln -s ~/.dotfiles/claude/agents ~/.codebuddy-code/agents
+ln -s ~/.dotfiles/claude/agents ~/.claude/agents
 
 # Reload configurations
 source ~/.zshrc
@@ -68,6 +68,7 @@ tmux source-file ~/.tmux.conf  # in tmux session
 - **Plugins**: z, git, extract, web-search, zsh-autosuggestions, zsh-syntax-highlighting
 
 **Custom Aliases**:
+
 ```bash
 vim -> nvim          # Use Neovim by default
 la, ll, c            # Navigation shortcuts
@@ -98,10 +99,12 @@ kicat, kssh, kdiff   # Kitty kittens
 Modern Neovim configuration powered by **lazy.nvim** with comprehensive LSP support, AI-assisted coding, and an extensive plugin ecosystem.
 
 **Requirements**:
+
 - [Neovim 0.9+](https://github.com/neovim/neovim/releases)
 - [Nerd Font](https://www.nerdfonts.com/) (for icons)
 
 **Configuration Structure**:
+
 ```
 nvim/
 ├── init.lua              # Entry point
@@ -118,6 +121,7 @@ nvim/
 **Plugin Manager**: [lazy.nvim](https://github.com/folke/lazy.nvim) - Fast startup, auto-bootstrapping, lockfile support
 
 **LSP & Intelligence**:
+
 - Mason-managed LSP servers (Go, TypeScript, C++, Python, Lua, Bash, Markdown, PHP)
 - Auto-completion (nvim-cmp) with LSP, buffer, path sources
 - GitHub Copilot integration
@@ -125,19 +129,23 @@ nvim/
 - Code formatting (conform.nvim) and debugging (nvim-dap)
 
 **Navigation & Search**:
+
 - File explorer (nvim-tree), fuzzy finder (telescope), outline (aerial)
 - Smart jump (flash.nvim), project-wide search (nvim-spectre)
 
 **Git Integration**:
+
 - Sign indicators (gitsigns), full Git client (neogit), wrapper (vim-fugitive)
 
 **UI Enhancements**:
+
 - Colorscheme: Catppuccin
 - Statusline (lualine), buffer tabs (bufferline)
 - Enhanced UI (noice.nvim), diagnostics (trouble.nvim)
 - Markdown rendering (render-markdown.nvim)
 
 **Essential Commands**:
+
 ```vim
 :Lazy           " Plugin manager
 :Mason          " LSP/tools manager
@@ -158,6 +166,7 @@ Configuration in `nvim/lua/custom/options.lua` - up to ~75KB per operation.
 **Leader Key**: `<Space>`
 
 ### Window & File Management
+
 | Key | Action |
 |-----|--------|
 | `<leader>sv` / `<leader>sh` | Split window vertically / horizontally |
@@ -168,6 +177,7 @@ Configuration in `nvim/lua/custom/options.lua` - up to ~75KB per operation.
 | `<leader>e` | Toggle file explorer |
 
 ### Navigation & Editing
+
 | Key | Action |
 |-----|--------|
 | `jk` | Exit insert mode |
@@ -178,6 +188,7 @@ Configuration in `nvim/lua/custom/options.lua` - up to ~75KB per operation.
 | `<leader>nh` | Clear search highlights |
 
 ### Visual Mode
+
 | Key | Action |
 |-----|--------|
 | `J` / `K` | Move selected lines up / down |
@@ -185,6 +196,7 @@ Configuration in `nvim/lua/custom/options.lua` - up to ~75KB per operation.
 | `p` | Paste without copying replaced text |
 
 ### Plugin Shortcuts
+
 | Key | Action |
 |-----|--------|
 | `<leader>ff` | Find files (Telescope) |
@@ -205,13 +217,17 @@ Configuration in `nvim/lua/custom/options.lua` - up to ~75KB per operation.
 ## Troubleshooting
 
 ### Markdown Preview Issues
+
 If you encounter `Error: Cannot find module 'tslib'`, manually install the preview bundle:
+
 ```vim
 :call mkdp#util#install()
 ```
 
 ### Linux Clipboard Not Working
+
 Install clipboard support:
+
 ```bash
 # Arch Linux
 sudo pacman -S xsel
@@ -221,6 +237,7 @@ sudo apt install xsel
 ```
 
 ### Plugin Installation Fails
+
 ```vim
 :Lazy restore     " Restore from lockfile
 :Lazy clear       " Clear cache
@@ -228,6 +245,7 @@ sudo apt install xsel
 ```
 
 ### LSP Not Working
+
 ```vim
 :Mason            " Install/reinstall language servers
 :LspInfo          " Check LSP status
