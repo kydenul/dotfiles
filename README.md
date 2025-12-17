@@ -49,8 +49,11 @@ ln -s ~/.dotfiles/vscode/keybindings.json ~/Library/Application\ Support/Code/Us
 ln -s ~/.dotfiles/vscode/settings.json ~/Library/Application\ Support/Code/User/settings.json
 
 # Claude SubAgents
-ln -s ~/.dotfiles/claude/agents ~/.codebuddy-code/agents
 ln -s ~/.dotfiles/claude/agents ~/.claude/agents
+ln -s ~/.dotfiles/claude/agents ~/.codebuddy-code/agents
+
+ln -s ~/.dotfiles/claude/commands ~/.claude/commands
+ln -s ~/.dotfiles/claude/commands ~/.codebuddy-code/commands
 
 # Reload configurations
 source ~/.zshrc
