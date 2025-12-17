@@ -2,6 +2,11 @@
 
 return {
   "stevearc/aerial.nvim",
+  cmd = { "AerialToggle", "AerialOpen", "AerialClose", "AerialNext", "AerialPrev" },
+  keys = {
+    { "<F12>", "<cmd>AerialToggle!<CR>", desc = "Toggle Aerial" },
+    { "<leader>at", "<cmd>AerialToggle!<CR>", desc = "Toggle Aerial" },
+  },
 
   dependencies = {
     "nvim-treesitter/nvim-treesitter",
@@ -12,16 +17,6 @@ return {
     on_attach = function(bufnr) -- 当 aerial 附加到缓冲区时设置快捷键
       vim.keymap.set("n", "{", "<cmd>AerialPrev<CR>", { buffer = bufnr, desc = "PrevSymbol" })
       vim.keymap.set("n", "}", "<cmd>AerialNext<CR>", { buffer = bufnr, desc = "NextSymbol" })
-
-      vim.keymap.set("n", "<F12>", "<cmd>AerialToggle!<CR>", { desc = "Toggle Aerial" })
-      vim.keymap.set("n", "<leader>at", "<cmd>AerialToggle!<CR>", { desc = "Toggle Aerial" })
-
-      -- Telescope 集成
-      local found_telescope, telescope = pcall(require, "telescope")
-      if found_telescope then
-        telescope.load_extension("aerial")
-        vim.keymap.set("n", "<leader>a.", "<cmd>Telescope aerial<CR>", { desc = "搜索符号" })
-      end
     end,
 
     layout = {

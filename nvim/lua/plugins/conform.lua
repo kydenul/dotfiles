@@ -39,7 +39,7 @@ return {
   -- Conform formatter
   {
     "stevearc/conform.nvim",
-    event = { "BufWritePre" },
+    event = "BufWritePre",
     cmd = { "ConformInfo" },
     dependencies = {
       "williamboman/mason.nvim",
