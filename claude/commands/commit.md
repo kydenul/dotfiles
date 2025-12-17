@@ -2,6 +2,8 @@
 
 This command helps you create well-formatted commits with conventional commit messages and emoji.
 
+**IMPORTANT**: When creating commit messages, DO NOT include any Claude-related information, AI-generation footers, or Co-Authored-By tags. Generate standard, clean commit messages following conventional commit format with emoji only.
+
 ## Usage
 
 To create a commit, just type:
@@ -27,7 +29,7 @@ Or with options:
 4. Performs a `git diff` to understand what changes are being committed
 5. Analyzes the diff to determine if multiple distinct logical changes are present
 6. If multiple distinct changes are detected, suggests breaking the commit into multiple smaller commits
-7. For each commit (or the single commit if not split), creates a commit message using emoji conventional commit format
+7. For each commit (or the single commit if not split), creates a **clean, standard** commit message using emoji conventional commit format (WITHOUT any Claude-related footers or Co-Authored-By tags)
 
 ## Best Practices for Commits
 
@@ -158,7 +160,8 @@ Example of splitting commits:
 
 ## Important Notes
 
-- The generated commit message **DOES NOT** include the information about Claude or Claude CLI
+- **CRITICAL**: The generated commit message **MUST NOT** include any information about Claude, Claude Code, Claude CLI, AI-generation, or Co-Authored-By tags. Generate clean, standard commit messages ONLY.
+- **CRITICAL**: DO NOT append any footer like "🤖 Generated with [Claude Code]" or "Co-Authored-By: Claude" to commit messages.
 - By default, pre-commit checks (`pnpm lint`, `pnpm build`, `pnpm generate:docs`) will run to ensure code quality
 - If these checks fail, you'll be asked if you want to proceed with the commit anyway or fix the issues first
 - If specific files are already staged, the command will only commit those files
