@@ -6,10 +6,7 @@ return {
       mux = { enabled = true, backend = "tmux" },
 
       tools = {
-        ["CodeBuddy-Code"] = {
-          -- cmd = { "codebuddy-code", "--flag" },
-          cmd = { "codebuddy-code" },
-        },
+        ["Claude-Internal"] = { cmd = { "claude-internal" } },
       },
     },
 
@@ -49,6 +46,6 @@ return {
     { "<leader>kc", function() require("sidekick.cli").toggle({ name = "claude", focus = true }) end, desc = "[Sidekick] Toggle Claude" },
 
     -- stylua: ignore
-    { "<leader>kn", function() require("sidekick.cli").toggle({ name = "CodeBuddy-Code", focus = true }) end, desc = "[Sidekick] Toggle CodeBuddy-Code" },
+    { "<leader>ki", function() require("sidekick.cli").toggle({ name = "Claude-Internal", focus = true }) end, desc = "[Sidekick] Toggle Claude-Internal" },
   },
 }
