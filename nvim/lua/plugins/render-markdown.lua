@@ -48,20 +48,57 @@ return {
       keys = { { "<leader>P", "<cmd>PasteImage<cr>", desc = "Paste image from system clipboard" } },
     },
 
-    -- ==============================================================
-    -- Image Preview
-    -- ==============================================================
     {
-      "3rd/image.nvim",
-      build = false,
-      opts = {
-        backend = "kitty", -- XXX
-        processor = "magick_cli", -- XXX
-        integrations = {
-          markdown = {
-            only_render_image_at_cursor = true,
-            only_render_image_at_cursor_mode = "inline", -- "popup" or "inline"
+      "3rd/diagram.nvim",
+      dependencies = {
+        -- ==============================================================
+        -- Image Preview
+        -- ==============================================================
+        {
+          "3rd/image.nvim",
+          build = false,
+          opts = {
+            backend = "kitty", -- XXX
+            processor = "magick_cli", -- XXX
+            integrations = {
+              markdown = {
+                only_render_image_at_cursor = true,
+                only_render_image_at_cursor_mode = "inline", -- "popup" or "inline"
+              },
+            },
           },
+        },
+      },
+
+      opts = {
+        -- Disable automatic rendering for manual-only workflow
+        events = {
+          render_buffer = { "InsertLeave", "BufWinEnter", "TextChanged" }, -- Empty = no automatic rendering
+          clear_buffer = { "BufLeave" },
+        },
+        renderer_options = {
+          mermaid = {
+            background = "transparent", -- nil | "transparent" | "white" | "#hex"
+            theme = "dark", -- "dark",
+            scale = 2,
+            cli_args = "--no-sandbox", -- nil | { "--no-sandbox" } | { "-p", "/path/to/puppeteer" } | ...
+          },
+
+          plantuml = {
+            charset = "utf-8",
+            cli_args = nil, -- nil | { "-Djava.awt.headless=true" } | ...
+          },
+        },
+      },
+      keys = {
+        {
+          "<leader>m",
+          function()
+            require("diagram").show_diagram_hover()
+          end,
+          mode = "n",
+          ft = { "markdown", "norg" },
+          desc = "Show diagram in new tab",
         },
       },
     },
