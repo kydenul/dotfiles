@@ -81,7 +81,7 @@ return {
             background = "transparent", -- nil | "transparent" | "white" | "#hex"
             theme = "dark", -- "dark",
             scale = 2,
-            cli_args = "--no-sandbox", -- nil | { "--no-sandbox" } | { "-p", "/path/to/puppeteer" } | ...
+            cli_args = { "--no-sandbox" }, -- nil | { "--no-sandbox" } | { "-p", "/path/to/puppeteer" } | ...
           },
 
           plantuml = {
