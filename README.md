@@ -43,6 +43,7 @@ chmod 600 ~/.zsh_secrets
 
 # Create symlinks
 ln -s ~/.dotfiles/nvim ~/.config/nvim
+ln -s ~/.dotfiles/zed ~/.config/zed
 ln -s ~/.dotfiles/.zshrc ~/.zshrc
 ln -s ~/.dotfiles/.tmux.conf ~/.tmux.conf
 ln -s ~/.dotfiles/.markdownlint.json ~/.markdownlint.json

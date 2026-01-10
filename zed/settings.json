@@ -1,0 +1,68 @@
+// Zed settings
+//
+// For information on how to configure Zed, see the Zed
+// documentation: https://zed.dev/docs/configuring-zed
+//
+// To see all of Zed's default settings without changing your
+// custom settings, run `zed: open default settings` from the
+// command palette (cmd-shift-p / ctrl-shift-p)
+{
+  // Shows line numbers relative to cursor position
+  "relative_line_numbers": "enabled",
+
+  "gutter": {
+    "line_numbers": true,
+  },
+
+  // Hides the minimap (code overview sidebar)
+  "minimap": { "show": "never" },
+
+  // Only shows vertical scrollbar, hides horizontal one
+  "scrollbar": {
+    "axes": {
+      "horizontal": false,
+      "vertical": true,
+    },
+  },
+
+  "cursor_shape": "bar",
+  "cursor_blink": false,
+  "autosave": "off",
+  "show_edit_predictions": true,
+
+  // Primary
+  "buffer_font_family": "Maple Mono NF CN",
+  // Fallbacks
+  "buffer_font_fallbacks": ["Hack Nerd Font Mono"],
+  // UI elements font size
+  "ui_font_size": 16,
+  // Code editor font size
+  "buffer_font_size": 18,
+  "theme": {
+    "mode": "system",
+    "light": "Gruvbox Light",
+    "dark": "Gruvbox Dark Hard",
+  },
+
+  // Code Formatting
+  "show_whitespaces": "boundary",
+  "wrap_guides": [120],
+  "soft_wrap": "editor_width",
+
+  "base_keymap": "VSCode",
+  "vim_mode": true,
+  "vim": {
+    "use_system_clipboard": "always",
+    "highlight_on_yank_duration": 500,
+    "toggle_relative_line_numbers": true,
+  },
+  "telemetry": { "diagnostics": false, "metrics": false },
+
+  // Close Collaboration panel
+  "collaboration_panel": { "button": false },
+
+  "outline_panel": {
+    "button": true,
+    "dock": "right",
+  },
+}

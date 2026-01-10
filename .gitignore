@@ -2,6 +2,9 @@
 .zshrc
 .zsh_secrets
 CLAUDE.md
+zed/*
+!zed/keymap.json
+!zed/settings.json
 
 # macOS
 .DS_Store

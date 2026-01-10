@@ -1,0 +1,60 @@
+// Zed keymap
+//
+// For information on binding keys, see the Zed
+// documentation: https://zed.dev/docs/key-bindings
+//
+// To see the default key bindings run `zed: open default keymap`
+// from the command palette.
+[
+  {
+    "context": "Workspace",
+    "bindings": {
+      "space o": "command_palette::Toggle",
+      "space w": "workspace::Save",
+      "space g": "git_panel::ToggleFocus",
+      "space e": "project_panel::ToggleFocus",
+      "space q": "pane::CloseActiveItem",
+
+      "space f f": "file_finder::Toggle",
+      "space a t": ["workspace::SendKeystrokes", "cmd-r"],
+    },
+  },
+
+  {
+    "context": "Editor && vim_mode == insert",
+    "bindings": {
+      "j k": "vim::NormalBefore",
+    },
+  },
+
+  {
+    "context": "VimControl && !menu",
+    "bindings": {
+      // Put key bindings here if you want them to work in normal & visual mode.
+    },
+  },
+  {
+    "context": "vim_mode == normal && !menu",
+    "bindings": {
+      // Use neovim's yank behavior: yank to end of line.
+      "shift-y": ["workspace::SendKeystrokes", "y $"],
+
+      "H": "vim::StartOfLineDownward",
+      "L": "vim::EndOfLineDownward",
+    },
+  },
+  {
+    "context": "vim_mode == insert",
+    "bindings": {
+      // "j k": "vim::NormalBefore" // In insert mode, make jk escape to normal mode.
+    },
+  },
+  {
+    "context": "EmptyPane || SharedScreen",
+    "bindings": {
+      // Put key bindings here (in addition to the context above) if you want them to
+      // work when no editor exists.
+      // "space f": "file_finder::Toggle"
+    },
+  },
+]

@@ -42,6 +42,7 @@
     "terminal.integrated.smoothScrolling": true,
     "terminal.integrated.inheritEnv": false,
 
+    "files.autoSave": "off",
     "chat.commandCenter.enabled": false,
 
     "diffEditor.ignoreTrimWhitespace": true,
@@ -238,8 +239,7 @@
     // -----------------------------------------------------------------
     // Golang
     "gopls": {  
-        "ui.semanticTokens": true,
-        "formatting.gofumpt": true,
+        "ui.semanticTokens": true
     },
     "go.formatTool": "gofumpt",
     "go.toolsManagement.autoUpdate": true,
@@ -368,5 +368,4 @@
         "plaintext": false,
         "markdown": true,
     },
-    "files.autoSave": "off",
 }
