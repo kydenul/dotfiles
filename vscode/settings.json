@@ -238,11 +238,8 @@
 
     // -----------------------------------------------------------------
     // Golang
-    "gopls": {  
-        "ui.semanticTokens": true
-    },
+    "gopls": {  "ui.semanticTokens": true },
     "go.formatTool": "gofumpt",
-    "go.toolsManagement.autoUpdate": true,
     "go.inlayHints.parameterNames": false,
     "go.lintTool": "golangci-lint",
     "go.lintFlags": [ "--fast" ],

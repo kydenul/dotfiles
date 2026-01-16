@@ -69,6 +69,3 @@ vim.keymap.set(
   "<Cmd>NvimTreeFindFileToggle<CR>",
   { noremap = true, silent = true, nowait = true, desc = "[NvimTree] Toggle NvimTree" }
 )
-
--- Neogit
-vim.keymap.set("n", "<leader>g", "<Cmd>Neogit<CR>", { noremap = true, silent = true, desc = "[Git] Neogit" })

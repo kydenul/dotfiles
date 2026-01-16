@@ -70,7 +70,7 @@ return {
 
   cmd = "Neogit",
   keys = {
-    { "<leader>gg", "<cmd>Neogit<cr>", desc = "[Neogit] TUI Toggle" },
+    { "<leader>g", "<cmd>Neogit<cr>", desc = "[Neogit] TUI Toggle" },
 
     { "gho", "<cmd>DiffviewOpen<cr>", desc = "[Diffview] Open" },
     { "ghc", "<cmd>DiffviewClose<cr>", desc = "[Diffview] Close" },

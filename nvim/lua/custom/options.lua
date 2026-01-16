@@ -69,14 +69,13 @@ vim.o.regexpengine = 0 -- Use automatic regexp engine selection
 -- 补全增强
 vim.o.wildmenu = true
 
--- vim.g.gruvbox_material_transparent_background = 0 -- 0, 1, 2
--- vim.g.gruvbox_material_foreground = "material" -- "original" "mix" "material"
--- vim.g.gruvbox_material_background = "hard" -- 'hard'`, `'medium'`, `'soft'
--- vim.g.gruvbox_material_float_style = "dim" -- 'bright', "dim"
--- vim.g.gruvbox_material_enable_italic = true
--- vim.cmd([[ silent! colorscheme gruvbox-material ]])
--- vim.cmd([[ silent! colorscheme gruvbox-material ]])
+vim.g.gruvbox_material_transparent_background = 0 -- 0, 1, 2
+vim.g.gruvbox_material_foreground = "material" -- "original" "mix" "material"
+vim.g.gruvbox_material_background = "hard" -- 'hard'`, `'medium'`, `'soft'
+vim.g.gruvbox_material_float_style = "blend" -- 'bright', "dim", blend
+vim.g.gruvbox_material_enable_italic = true
+vim.cmd([[ silent! colorscheme gruvbox-material ]])
 
 -- setup must be called before loading
-vim.cmd.colorscheme("catppuccin")
+-- vim.cmd.colorscheme("catppuccin")
 -- vim.cmd([[colorscheme everforest]])

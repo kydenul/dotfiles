@@ -71,14 +71,13 @@ return {
       },
       view = {
         preserve_window_proportions = true,
-        adaptive_size = false, -- Don't resize on each file open
-        width = 30,
+        adaptive_size = true, -- Don't resize on each file open
+        -- width = 30,
       },
 
       -- Sorting and filtering
-      sort = {
-        sorter = "case_sensitive",
-      },
+      sort = { sorter = "case_sensitive" },
+
       filters = {
         dotfiles = false, -- Display files starting with a dot, e.g. .gitignore
         git_clean = false, -- Display untracked files
