@@ -49,5 +49,38 @@ return {
     require("telescope").load_extension("session-lens")
 
     require("auto-session").setup(opts)
+
+    -- Check and clean up invalid sessions on startup
+    vim.schedule(function()
+      local session_dir = opts.root_dir
+
+      -- Ensure session directory exists
+      if vim.fn.isdirectory(session_dir) == 0 then
+        return
+      end
+
+      -- URL decode helper function
+      local function url_decode(str)
+        str = str:gsub("%%(%x%x)", function(hex)
+          return string.char(tonumber(hex, 16))
+        end)
+        return str
+      end
+
+      -- Iterate through all session files
+      local sessions = vim.fn.glob(session_dir .. "*.vim", false, true)
+      for _, session_file in ipairs(sessions) do
+        -- Extract directory path from session filename
+        -- Session files are URL-encoded like: %2FUsers%2Fkyden%2Fproject.vim
+        local session_name = vim.fn.fnamemodify(session_file, ":t:r") -- Get filename without extension
+        local dir_path = url_decode(session_name)
+
+        -- Check if the directory still exists
+        if vim.fn.isdirectory(dir_path) == 0 then
+          vim.fn.delete(session_file)
+          vim.notify("Cleaned up invalid session for non-existent directory: " .. dir_path, vim.log.levels.INFO)
+        end
+      end
+    end)
   end,
 }
