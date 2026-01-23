@@ -122,8 +122,8 @@ return {
 
     -- Completion settings
     completion = {
-      -- Don't auto-select first item
-      list = { selection = { preselect = false, auto_insert = false } },
+      -- Auto-select first item
+      list = { selection = { preselect = true, auto_insert = false } },
 
       -- Menu configuration
       menu = {
