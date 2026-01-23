@@ -2,6 +2,7 @@
 
 return {
   "hrsh7th/nvim-cmp",
+  enabled = false, -- Set to true to enable
   event = { "InsertEnter", "CmdlineEnter" },
 
   dependencies = {
@@ -174,16 +175,14 @@ return {
       -- Let's configure the item's appearance
       -- source: https://github.com/hrsh7th/nvim-cmp/wiki/Menu-Appearance
       formatting = {
-        fields = { "kind", "abbr", "menu" },
+        -- fields = { "icon", "kind", "abbr", "menu" },
+        fields = { "icon", "abbr", "menu" },
 
         format = function(entry, vim_item)
           local kind = lspkind.cmp_format({
-            -- Show only symbol annotations "text_symbol" "symbol_text" 'symbol'
-            mode = "symbol",
-
             -- Prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
             maxwidth = {
-              menu = 36, -- leading text (labelDetails)
+              menu = 48, -- leading text (labelDetails)
               abbr = 128, -- actual suggestion item
             },
 
