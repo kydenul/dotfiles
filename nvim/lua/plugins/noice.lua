@@ -26,7 +26,7 @@ return {
     messages = { enabled = false },
 
     lsp = {
-      signature = { enabled = true },
+      signature = { enabled = false },
       hover = { enabled = true },
       progress = { enabled = true },
 

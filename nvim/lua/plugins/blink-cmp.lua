@@ -134,8 +134,9 @@ return {
           -- Use treesitter highlighting for LSP items
           treesitter = { "lsp" },
 
-          -- Columns layout (similar to nvim-cmp)
+          -- Columns layout
           columns = {
+            -- { "kind_icon", "kind" },
             { "kind_icon" },
             { "label", "label_description", gap = 1 },
           },
@@ -240,7 +241,14 @@ return {
     vim.api.nvim_set_hl(0, "BlinkCmpKindUnit", { link = "BlinkCmpKindKeyword" })
 
     -- Set up LSP capabilities for blink-cmp
-    local capabilities = require("blink.cmp").get_lsp_capabilities()
-    vim.g.blink_cmp_capabilities = capabilities
+    -- Set up LSP capabilities for nvim-cmp
+    -- This ensures LSP servers use nvim-cmp for autocompletion
+    local capabilities = vim.lsp.protocol.make_client_capabilities()
+    local has_cmp_lsp, cmp_lsp = pcall(require, "cmp_nvim_lsp")
+    if has_cmp_lsp then
+      capabilities = cmp_lsp.default_capabilities(capabilities)
+      -- Make this available to lspconfig
+      vim.g.cmp_capabilities = capabilities
+    end
   end,
 }
