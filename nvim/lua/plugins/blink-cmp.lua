@@ -87,7 +87,7 @@ return {
     appearance = {
       nerd_font_variant = "mono",
 
-      -- Custom kind icons (matching nvim-cmp config)
+      -- Custom kind icons
       kind_icons = {
         Text = "",
         Method = "󰆧",
@@ -127,6 +127,7 @@ return {
 
       -- Menu configuration
       menu = {
+        max_height = 50,
         auto_show = true,
         border = "rounded",
         winhighlight = "Normal:Normal,FloatBorder:FloatBorder,CursorLine:Visual,Search:None",
@@ -139,6 +140,7 @@ return {
             -- { "kind_icon", "kind" },
             { "kind_icon" },
             { "label", "label_description", gap = 1 },
+            { "source_name" },
           },
         },
       },
@@ -160,64 +162,46 @@ return {
     -- Signature help
     signature = {
       enabled = true,
-      window = {
-        border = "rounded",
-        winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
-      },
+      window = { border = "rounded", winhighlight = "Normal:Normal,FloatBorder:FloatBorder" },
     },
 
-    -- Sources configuration (matching nvim-cmp priority)
+    -- Sources configuration
     sources = {
       default = { "lsp", "snippets", "path", "buffer" },
 
       -- Provider-specific settings
       providers = {
-        lsp = {
-          score_offset = 100, -- Higher priority for LSP
-        },
-        snippets = {
-          score_offset = 90,
-        },
-        path = {
-          score_offset = 80,
-        },
-        buffer = {
-          score_offset = 70,
-        },
+        lsp = { score_offset = 100 },
+        snippets = { score_offset = 90 },
+        path = { score_offset = 80 },
+        buffer = { score_offset = 70 },
       },
     },
 
     -- Cmdline completion configuration
     cmdline = {
       enabled = true,
-      keymap = {
-        preset = "inherit", -- Use same keymaps as insert mode
-        ["<CR>"] = { "accept", "fallback" },
-      },
-      completion = {
-        menu = {
-          auto_show = true, -- Auto show menu in cmdline
-        },
-      },
+      keymap = { preset = "inherit", ["<CR>"] = { "accept", "fallback" } },
+      completion = { menu = { auto_show = true } },
       sources = function()
         local type = vim.fn.getcmdtype()
+
         -- Search commands
         if type == "/" or type == "?" then
           return { "buffer" }
         end
+
         -- Commands
         if type == ":" then
           return { "cmdline", "path" }
         end
+
         return {}
       end,
     },
 
     -- Fuzzy matching configuration
-    fuzzy = {
-      implementation = "prefer_rust_with_warning",
-      sorts = { "exact", "score", "sort_text" },
-    },
+    fuzzy = { implementation = "prefer_rust_with_warning", sorts = { "exact", "score", "sort_text" } },
   },
 
   config = function(_, opts)

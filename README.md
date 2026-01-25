@@ -42,8 +42,8 @@ EOF
 chmod 600 ~/.zsh_secrets
 
 # Create symlinks
-ln -s ~/.dotfiles/nvim ~/.config/nvim
-ln -s ~/.dotfiles/zed ~/.config/zed
+ln -s ~/.dotfiles/nvim ~/.config/
+ln -s ~/.dotfiles/zed ~/.config/
 ln -s ~/.dotfiles/.zshrc ~/.zshrc
 ln -s ~/.dotfiles/.tmux.conf ~/.tmux.conf
 ln -s ~/.dotfiles/.markdownlint.json ~/.markdownlint.json
@@ -143,6 +143,48 @@ nvim/
 **Git Integration**:
 
 - Sign indicators (gitsigns), full Git client (neogit), wrapper (vim-fugitive)
+
+```bash
+git config --global core.editor "nvim"
+git config --global commit.template
+nvim ~/.gitmessage
+git config --global commit.template ~/.gitmessage
+```
+
+> [!TIP] **Commit Message Template**
+>
+>```text
+># <type>: <subject>
+># |<----  Try to limit to 50 characters  ---->|
+>
+># Explain why this change is being made (optional, wrap at 72 characters)
+># |<----   Try to limit each line to 72 characters   ---->|
+>
+>
+># --- COMMIT END ---
+># Type can be:
+>#   feat:     A new feature
+>#   fix:      A bug fix
+>#   docs:     Documentation changes
+>#   style:    Code style changes (formatting, missing semi colons, etc)
+>#   refactor: Code refactoring
+>#   perf:     Performance improvements
+>#   test:     Adding or updating tests
+>#   chore:    Build process or auxiliary tool changes
+>#   revert:   Revert a previous commit
+>#
+># Examples:
+>#   feat: add user authentication
+>#   fix: resolve cart calculation error
+>#   docs: update installation guide in README
+>#
+># Remember:
+># - Use imperative mood: "add" not "added" or "adds"
+># - Don't capitalize first letter
+># - No period at the end of subject line
+># - Separate subject from body with a blank line
+># - Body explains what and why, not how
+>```
 
 **UI Enhancements**:
 

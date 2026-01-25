@@ -21,9 +21,9 @@ return {
       lsp_doc_border = { views = { hover = { border = { style = "single" } } } },
     },
 
-    cmdline = { enabled = false },
-    popupmenu = { enabled = false },
-    messages = { enabled = false },
+    cmdline = { enabled = true },
+    popupmenu = { enabled = true },
+    messages = { enabled = true },
 
     lsp = {
       signature = { enabled = false },
@@ -34,7 +34,7 @@ return {
       override = {
         ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
         ["vim.lsp.util.stylize_markdown"] = true,
-        ["cmp.entry.get_documentation"] = true, -- requires hrsh7th/nvim-cmp
+        ["cmp.entry.get_documentation"] = false, -- requires hrsh7th/nvim-cmp
       },
     },
   },
