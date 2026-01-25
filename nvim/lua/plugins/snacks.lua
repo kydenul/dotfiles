@@ -5,11 +5,9 @@ return {
   opts = {
     input = { enabled = true },
     bigfile = { enabled = true, size = 10 * 1024 * 1024 },
-
-    notifier = {
-      enabled = true,
-      timeout = 2000,
-    },
+    notifier = { enabled = true, timeout = 2000, style = "compact", top_down = false },
+    scroll = { enabled = true },
+    bufdelete = { enabled = true },
 
     image = {
       enabled = true,
@@ -19,6 +17,8 @@ return {
 
   keys = {
     --stylua: ignore
-    vim.keymap.set("n", "<leader>Z", function() Snacks.zen() end, { desc = "Toggle Zen Mode" }),
+    vim.keymap.set("n", "<leader>z", function() Snacks.zen() end, { desc = "Toggle Zen Mode" }),
+    --stylua: ignore
+    vim.keymap.set("n", "<leader>bd", function() Snacks.bufdelete() end, { desc = "Delete current buffer" }),
   },
 }
