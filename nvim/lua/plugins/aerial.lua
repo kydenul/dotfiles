@@ -14,7 +14,7 @@ return {
   },
 
   opts = {
-    on_attach = function(bufnr) -- 当 aerial 附加到缓冲区时设置快捷键
+    on_attach = function(bufnr)
       vim.keymap.set("n", "{", "<cmd>AerialPrev<CR>", { buffer = bufnr, desc = "PrevSymbol" })
       vim.keymap.set("n", "}", "<cmd>AerialNext<CR>", { buffer = bufnr, desc = "NextSymbol" })
     end,

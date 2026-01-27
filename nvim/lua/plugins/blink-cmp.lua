@@ -10,6 +10,7 @@ return {
   dependencies = {
     "rafamadriz/friendly-snippets",
     { "L3MON4D3/LuaSnip", version = "v2.*" },
+    { "onsails/lspkind.nvim" },
 
     -- Codeium
     {
@@ -86,38 +87,7 @@ return {
     -- Appearance configuration
     appearance = {
       nerd_font_variant = "mono",
-
-      -- Custom kind icons
-      kind_icons = {
-        Text = "",
-        Method = "󰆧",
-        Function = "󰊕",
-        Constructor = "",
-        Field = "󰇽",
-        Variable = "󰂡",
-        Class = "",
-        Interface = "",
-        Module = "",
-        Property = "󰜢",
-        Unit = "",
-        Value = "󰎠",
-        Enum = "",
-        Keyword = "󰌋",
-        Snippet = "",
-        Color = "󰏘",
-        File = "󰈙",
-        Reference = "",
-        Folder = "󰉋",
-        EnumMember = "",
-        Constant = "󰏿",
-        Struct = "",
-        Event = "",
-        Operator = "",
-        TypeParameter = "",
-
-        Copilot = "",
-        Windsurf = "",
-      },
+      -- kind_icons will be set dynamically in config function
     },
 
     -- Completion settings
@@ -140,7 +110,7 @@ return {
             -- { "kind_icon", "kind" },
             { "kind_icon" },
             { "label", "label_description", gap = 1 },
-            { "source_name" },
+            -- { "source_name" },
           },
         },
       },
@@ -205,6 +175,51 @@ return {
   },
 
   config = function(_, opts)
+    -- Set kind_icons: prefer lspkind if available, fallback to custom icons
+    local has_lspkind, lspkind = pcall(require, "lspkind")
+    if has_lspkind and lspkind.symbol_map then
+      -- Use lspkind's preset icons
+      local icons = vim.deepcopy(lspkind.symbol_map)
+      -- Add custom icons for AI completions
+      icons.Copilot = ""
+      icons.Windsurf = ""
+      icons.Codeium = ""
+      opts.appearance.kind_icons = icons
+    else
+      -- Fallback to custom icons
+      opts.appearance.kind_icons = {
+        Text = "",
+        Method = "󰆧",
+        Function = "󰊕",
+        Constructor = "",
+        Field = "󰇽",
+        Variable = "󰂡",
+        Class = "",
+        Interface = "",
+        Module = "",
+        Property = "󰜢",
+        Unit = "",
+        Value = "󰎠",
+        Enum = "",
+        Keyword = "󰌋",
+        Snippet = "",
+        Color = "󰏘",
+        File = "󰈙",
+        Reference = "",
+        Folder = "󰉋",
+        EnumMember = "",
+        Constant = "󰏿",
+        Struct = "",
+        Event = "",
+        Operator = "",
+        TypeParameter = "",
+
+        Copilot = "",
+        Windsurf = "",
+        Codeium = "",
+      }
+    end
+
     require("blink.cmp").setup(opts)
 
     -- Set highlight groups for blink-cmp (matching nvim-cmp colors)
