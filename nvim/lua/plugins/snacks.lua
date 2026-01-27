@@ -6,13 +6,8 @@ return {
     input = { enabled = true },
     bigfile = { enabled = true, size = 10 * 1024 * 1024 },
     notifier = { enabled = true, timeout = 2000, style = "compact", top_down = false },
-    scroll = { enabled = true },
+    scroll = { enabled = true, animate = { duration = { step = 10, total = 200 }, easing = "linear" } },
     bufdelete = { enabled = true },
-
-    image = {
-      enabled = true,
-      doc = { enabled = true, inline = false, float = true, max_width = 50, max_height = 50 },
-    },
   },
 
   keys = {

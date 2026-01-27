@@ -21,14 +21,23 @@ return {
       lsp_doc_border = { views = { hover = { border = { style = "single" } } } },
     },
 
-    cmdline = { enabled = true },
+    cmdline = {
+      enabled = true,
+      view = "cmdline_popup",
+      format = {
+        cmdline = { pattern = "^:", icon = "", lang = "vim" },
+        search_down = { pattern = "^/", icon = "", lang = "regex" },
+        search_up = { pattern = "^%?", icon = "", lang = "regex" },
+        lua = { pattern = "^:%s*lua%s+", icon = "", lang = "lua" },
+      },
+    },
     popupmenu = { enabled = true },
     messages = { enabled = true },
 
     lsp = {
       signature = { enabled = false },
       hover = { enabled = true },
-      progress = { enabled = true },
+      progress = { enabled = false },
 
       -- override markdown rendering so that **cmp** and other plugins use **Treesitter**
       override = {
