@@ -8,6 +8,7 @@ return {
     notifier = { enabled = true, timeout = 2000, style = "compact", top_down = false },
     scroll = { enabled = true, animate = { duration = { step = 10, total = 200 }, easing = "linear" } },
     bufdelete = { enabled = true },
+    indent = { enabled = true },
   },
 
   keys = {
