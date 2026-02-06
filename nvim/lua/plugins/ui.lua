@@ -4,8 +4,13 @@ return {
   -- ==============================================================
   {
     "sainnhe/gruvbox-material",
-    lazy = true,
+    lazy = false,
     priority = 1000,
+    config = function()
+      vim.g.gruvbox_material_background = "hard" -- 'hard', 'medium', 'soft'
+      vim.g.gruvbox_material_foreground = "material" -- 'material', 'mix', 'original'
+      vim.g.gruvbox_material_transparent_background = 2 -- 0, 1, 2
+    end,
   },
 
   {

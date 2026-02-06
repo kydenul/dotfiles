@@ -33,7 +33,7 @@ vim.keymap.set("n", "<leader>l", "<C-w>l", opts) -- 向右跳转
 -- 文件
 vim.keymap.set("n", "<leader>w", ":w!<CR>", { desc = "[File] Save" }) -- Save file
 -- Quick save and quit
-vim.keymap.set("n", "<leader>q", "<Cmd>q<CR>", { noremap = true, silent = true, desc = "Quit" })
+-- vim.keymap.set("n", "<leader>q", "<Cmd>q<CR>", { noremap = true, silent = true, desc = "Quit" })
 vim.keymap.set("n", "<leader>Q", "<Cmd>qa<CR>", { noremap = true, silent = true, desc = "Quit all" })
 
 -- 取消高亮

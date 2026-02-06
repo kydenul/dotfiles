@@ -16,5 +16,7 @@ return {
     vim.keymap.set("n", "<leader>z", function() Snacks.zen() end, { desc = "Toggle Zen Mode" }),
     --stylua: ignore
     vim.keymap.set("n", "<leader>bd", function() Snacks.bufdelete() end, { desc = "Delete current buffer" }),
+    --stylua: ignore
+    vim.keymap.set("n", "<leader>q", function() Snacks.bufdelete() end, { desc = "Delete current buffer" }),
   },
 }
