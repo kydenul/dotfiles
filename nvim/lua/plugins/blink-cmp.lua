@@ -3,7 +3,7 @@
 
 return {
   "saghen/blink.cmp",
-  enabled = true, -- Set to true to enable, and disable nvim-cmp
+  enabled = true,
   event = { "InsertEnter", "CmdlineEnter" },
   version = "1.*",
 
@@ -97,7 +97,7 @@ return {
 
       -- Menu configuration
       menu = {
-        max_height = 50,
+        max_height = 36,
         auto_show = true,
         border = "rounded",
         winhighlight = "Normal:Normal,FloatBorder:FloatBorder,CursorLine:Visual,Search:None",
@@ -107,8 +107,8 @@ return {
 
           -- Columns layout
           columns = {
-            -- { "kind_icon", "kind" },
-            { "kind_icon" },
+            { "kind_icon", "kind", gap = 1 },
+            -- { "kind_icon" },
             { "label", "label_description", gap = 1 },
             -- { "source_name" },
           },
