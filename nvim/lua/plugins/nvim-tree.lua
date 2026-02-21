@@ -12,11 +12,6 @@ return {
 
   cmd = { "NvimTreeToggle", "NvimTreeFocus", "NvimTreeFindFile" },
 
-  keys = {
-    { "<leader>e", "<CMD>NvimTreeToggle<CR>", desc = "[Explorer] Toggle" },
-    { "<leader>o", "<CMD>NvimTreeFocus<CR>", desc = "[Explorer] Focus" },
-  },
-
   init = function()
     -- Disable netrw at the very start
     vim.g.loaded_netrw = 1
@@ -30,7 +25,7 @@ return {
       local api = require("nvim-tree.api")
 
       local function opts(desc)
-        return { desc = "nvim-tree: " .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
+        return { desc = "[NvimTree] " .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
       end
 
       -- Use the default mappings
@@ -39,7 +34,10 @@ return {
       -- Custom mappings
       vim.keymap.set("n", "u", api.tree.change_root_to_parent, opts("Up"))
       vim.keymap.set("n", "h", api.node.navigate.parent_close, opts("Close Directory"))
+      vim.keymap.set("n", "l", api.node.open.edit, opts("Open"))
       vim.keymap.set("n", "v", api.node.open.vertical, opts("Open: Vertical Split"))
+      vim.keymap.set("n", "s", api.node.open.horizontal, opts("Open: Horizontal Split"))
+      vim.keymap.set("n", ".", api.tree.change_root_to_node, opts("CD"))
     end
 
     tree.setup({

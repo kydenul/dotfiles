@@ -63,9 +63,5 @@ vim.keymap.set("n", "<leader>rn", function()
 end, { expr = true, desc = "[IncRename] Rename" })
 
 -- Toggle nvim-tree
-vim.keymap.set(
-  { "n", "t" },
-  "<leader>e",
-  "<Cmd>NvimTreeFindFileToggle<CR>",
-  { noremap = true, silent = true, nowait = true, desc = "[NvimTree] Toggle NvimTree" }
-)
+-- stylua: ignore
+vim.keymap.set({ "n", "t" }, "<leader>e", "<Cmd>NvimTreeToggle<CR>", { noremap = true, silent = true, nowait = true, desc = "[NvimTree] Toggle" })
