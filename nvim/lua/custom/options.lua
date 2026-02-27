@@ -70,5 +70,5 @@ vim.o.regexpengine = 0 -- Use automatic regexp engine selection
 vim.o.wildmenu = true
 
 -- setup must be called before loading
-vim.cmd.colorscheme("gruvbox-material")
--- vim.cmd.colorscheme("catppuccin")
+-- vim.cmd.colorscheme("gruvbox-material")
+vim.cmd.colorscheme("catppuccin")
