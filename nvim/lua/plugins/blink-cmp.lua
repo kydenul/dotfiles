@@ -3,7 +3,6 @@
 
 return {
   "saghen/blink.cmp",
-  enabled = true,
   event = { "InsertEnter", "CmdlineEnter" },
   version = "1.*",
 
@@ -107,8 +106,8 @@ return {
 
           -- Columns layout
           columns = {
-            { "kind_icon", "kind", gap = 1 },
-            -- { "kind_icon" },
+            -- { "kind_icon", "kind", gap = 1 },
+            { "kind_icon" },
             { "label", "label_description", gap = 1 },
             -- { "source_name" },
           },
@@ -238,16 +237,5 @@ return {
     vim.api.nvim_set_hl(0, "BlinkCmpKindKeyword", { bg = "NONE", fg = "#D4D4D4" })
     vim.api.nvim_set_hl(0, "BlinkCmpKindProperty", { link = "BlinkCmpKindKeyword" })
     vim.api.nvim_set_hl(0, "BlinkCmpKindUnit", { link = "BlinkCmpKindKeyword" })
-
-    -- Set up LSP capabilities for blink-cmp
-    -- Set up LSP capabilities for nvim-cmp
-    -- This ensures LSP servers use nvim-cmp for autocompletion
-    local capabilities = vim.lsp.protocol.make_client_capabilities()
-    local has_cmp_lsp, cmp_lsp = pcall(require, "cmp_nvim_lsp")
-    if has_cmp_lsp then
-      capabilities = cmp_lsp.default_capabilities(capabilities)
-      -- Make this available to lspconfig
-      vim.g.cmp_capabilities = capabilities
-    end
   end,
 }

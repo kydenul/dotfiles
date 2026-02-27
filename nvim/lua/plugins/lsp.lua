@@ -99,7 +99,7 @@ return {
 
     -- NOTE: Highlight symbol under cursor
     -- stylua: ignore
-    vim.api.nvim_set_hl(0, "LspReferenceText", { fg = "#E0E0FF", bg = "#A04945" })
+    vim.api.nvim_set_hl(0, "LspReferenceText", { fg = "#20C997", bg = "#A04945" })
     vim.api.nvim_set_hl(0, "LspReferenceRead", { link = "LspReferenceText" })
     vim.api.nvim_set_hl(0, "LspReferenceWrite", { link = "LspReferenceText" })
     vim.api.nvim_set_hl(0, "LspDocumentHighlight", { link = "LspReferenceText" })
