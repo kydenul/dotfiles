@@ -41,6 +41,12 @@ export GLMKey="your-key-here"
 EOF
 chmod 600 ~/.zsh_secrets
 
+# (Optional) Enable window with ctrl+command+click
+# Set
+defaults write -g NSWindowShouldDragOnGesture -bool true
+# UnSet
+defaults delete -g NSWindowShouldDragOnGesture
+
 # Create symlinks
 ln -s ~/.dotfiles/nvim ~/.config/
 ln -s ~/.dotfiles/zed ~/.config/
