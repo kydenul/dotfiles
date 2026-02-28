@@ -24,16 +24,19 @@ return {
     config = function()
       require("catppuccin").setup({
         transparent_background = true,
-        term_colors = true,
+        term_colors = false,
         integrations = {
           aerial = true,
           diffview = true,
           noice = true,
-          which_key = true,
-          notify = false,
+          telescope = true,
+          treesitter = true,
+          notify = true,
+          gitsigns = true,
+          flash = true,
           blink_cmp = true,
           mason = true,
-          snacks = false,
+          snacks = true,
         },
 
         highlight_overrides = {
@@ -49,6 +52,10 @@ return {
               NormalFloat = { bg = mocha.base },
               FloatBorder = { bg = mocha.base },
               FloatTitle = { bg = mocha.base },
+              RenderMarkdownCode = { bg = mocha.crust },
+              Pmenu = { bg = mocha.surface0 },
+              Comment = { bg = nil },
+              statusline = { bg = nil },
             }
           end,
         },
