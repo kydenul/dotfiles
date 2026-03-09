@@ -16,7 +16,6 @@ return {
 
   opts = {
     presets = {
-      -- inc_rename = true, -- enables an input dialog for inc-rename.nvim
       long_message_to_split = true, -- long messages will be sent to a split
       lsp_doc_border = { views = { hover = { border = { style = "single" } } } },
     },
@@ -28,7 +27,6 @@ return {
         cmdline = { pattern = "^:", icon = "", lang = "vim" },
         search_down = { pattern = "^/", icon = "", lang = "regex" },
         search_up = { pattern = "^%?", icon = "", lang = "regex" },
-        lua = { pattern = "^:%s*lua%s+", icon = "", lang = "lua" },
       },
     },
     popupmenu = { enabled = true },
@@ -37,7 +35,7 @@ return {
     lsp = {
       signature = { enabled = false },
       hover = { enabled = true },
-      progress = { enabled = false },
+      progress = { enabled = true },
 
       -- override markdown rendering so that **cmp** and other plugins use **Treesitter**
       override = {

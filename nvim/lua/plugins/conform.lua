@@ -49,7 +49,7 @@ return {
       {
         "<leader>=",
         function()
-          require("conform").format({ lsp_fallback = true, async = false, timeout_ms = 1000 })
+          require("conform").format({ lsp_fallback = true, async = false, timeout_ms = 3000 })
         end,
         mode = { "n", "v" },
         desc = "[Conform] Format file or range(in visual mode)",
@@ -109,7 +109,7 @@ return {
 
       -- 保存时自动格式化
       format_on_save = {
-        timeout_ms = 1500,
+        timeout_ms = 3000,
         lsp_fallback = true,
       },
     },

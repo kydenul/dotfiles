@@ -124,7 +124,7 @@ return {
         },
       },
 
-      -- Ghost text preview (disabled to match nvim-cmp)
+      -- Ghost text preview
       ghost_text = { enabled = false },
     },
 
@@ -150,7 +150,7 @@ return {
     -- Cmdline completion configuration
     cmdline = {
       enabled = true,
-      keymap = { preset = "inherit", ["<CR>"] = { "accept", "fallback" } },
+      keymap = { preset = "inherit" },
       completion = { menu = { auto_show = true } },
       sources = function()
         local type = vim.fn.getcmdtype()
@@ -179,51 +179,20 @@ return {
     if has_lspkind and lspkind.symbol_map then
       -- Use lspkind's preset icons
       local icons = vim.deepcopy(lspkind.symbol_map)
+
       -- Add custom icons for AI completions
       icons.Copilot = ""
       icons.Windsurf = ""
       icons.Codeium = ""
-      opts.appearance.kind_icons = icons
-    else
-      -- Fallback to custom icons
-      opts.appearance.kind_icons = {
-        Text = "",
-        Method = "󰆧",
-        Function = "󰊕",
-        Constructor = "",
-        Field = "󰇽",
-        Variable = "󰂡",
-        Class = "",
-        Interface = "",
-        Module = "",
-        Property = "󰜢",
-        Unit = "",
-        Value = "󰎠",
-        Enum = "",
-        Keyword = "󰌋",
-        Snippet = "",
-        Color = "󰏘",
-        File = "󰈙",
-        Reference = "",
-        Folder = "󰉋",
-        EnumMember = "",
-        Constant = "󰏿",
-        Struct = "",
-        Event = "",
-        Operator = "",
-        TypeParameter = "",
 
-        Copilot = "",
-        Windsurf = "",
-        Codeium = "",
-      }
+      opts.appearance.kind_icons = icons
     end
 
     require("blink.cmp").setup(opts)
 
     -- Set highlight groups for blink-cmp (matching nvim-cmp colors)
     vim.api.nvim_set_hl(0, "BlinkCmpLabelDeprecated", { bg = "NONE", fg = "#7E8294", strikethrough = true })
-    vim.api.nvim_set_hl(0, "BlinkCmpLabelMatch", { bg = "NONE", fg = "#20C997", bold = true })
+    vim.api.nvim_set_hl(0, "BlinkCmpLabelMatch", { bg = "NONE", fg = "#C586C0", bold = true })
 
     -- Kind-specific highlights
     -- light blue
@@ -231,7 +200,7 @@ return {
     vim.api.nvim_set_hl(0, "BlinkCmpKindInterface", { link = "BlinkCmpKindVariable" })
     vim.api.nvim_set_hl(0, "BlinkCmpKindText", { link = "BlinkCmpKindVariable" })
     -- pink
-    vim.api.nvim_set_hl(0, "BlinkCmpKindFunction", { bg = "NONE", fg = "#C586C0" })
+    vim.api.nvim_set_hl(0, "BlinkCmpKindFunction", { bg = "NONE", fg = "#20C997" })
     vim.api.nvim_set_hl(0, "BlinkCmpKindMethod", { link = "BlinkCmpKindFunction" })
     -- front
     vim.api.nvim_set_hl(0, "BlinkCmpKindKeyword", { bg = "NONE", fg = "#D4D4D4" })
