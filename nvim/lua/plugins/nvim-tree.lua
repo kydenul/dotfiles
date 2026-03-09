@@ -71,6 +71,7 @@ return {
         preserve_window_proportions = true,
         adaptive_size = true, -- Don't resize on each file open
         width = 30,
+        max = 50,
       },
 
       -- Sorting and filtering
