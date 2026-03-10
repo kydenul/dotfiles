@@ -70,8 +70,7 @@ return {
       view = {
         preserve_window_proportions = true,
         adaptive_size = true, -- Don't resize on each file open
-        width = 30,
-        max = 50,
+        width = { min = 30, max = 48 },
       },
 
       -- Sorting and filtering
