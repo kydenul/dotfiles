@@ -33,7 +33,7 @@ return {
     context.setup({
       enable = true,
       max_lines = 5, -- 0 表示不限制上下文窗口的高度
-      separator = "─",
+      -- separator = "─",
     })
 
     -- Treesitter main setup
