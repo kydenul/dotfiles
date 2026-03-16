@@ -10,16 +10,18 @@ Personal development environment configuration for macOS, featuring Neovim, VSCo
 
 ```bash
 # macOS packages
-brew install neovim fd im-select pngpaste latex2html latexdiff mercurial
+brew install zsh neovim fd im-select pngpaste latex2html latexdiff mercurial
 
 # mmdc
 npm install -g @mermaid-js/mermaid-cli
 
 # Linux (Ubuntu/Debian)
-sudo apt install neovim fd-find xsel
+sudo apt install neovim fd-find xsel zsh
 
 # Linux (Arch)
-sudo pacman -S neovim xsel
+sudo pacman -S neovim xsel zsh
+
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 ```
 
 ### Installation
