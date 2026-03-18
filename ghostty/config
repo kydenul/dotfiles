@@ -2,9 +2,6 @@
 # Ghostty Configuration
 # ============================================================================
 
-# Auto Connect or Create tmux session named "backend"
-command = /bin/zsh -c "tmux new -A -s backend"
-
 # Theme
 theme = Catppuccin Mocha
 window-theme = auto
@@ -19,10 +16,9 @@ macos-option-as-alt = true
 background-opacity = 0.96
 background-blur-radius = 30
 macos-titlebar-style = hidden
+window-save-state = always
 window-padding-y = 0
 window-padding-x = 0
-window-decoration=false
-window-save-state = always
 
 # Buffer size in bytes: 25 MB
 scrollback-limit = 25000000
