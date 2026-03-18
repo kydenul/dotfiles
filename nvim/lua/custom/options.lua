@@ -11,8 +11,10 @@ if vim.fn.exists("$SSH_TTY") == 1 or vim.fn.exists("$SSH_CONNECTION") == 1 then
       local base64 = vim.base64.encode(text)
       local seq
       if vim.env.TMUX then
-        -- DCS passthrough: 绕过 tmux 直接发送到外层终端
+        -- DCS passthrough: 绕过 tmux 直接发送到外层终端（同步到本地剪切板）
         seq = string.format("\x1bPtmux;\x1b\x1b]52;%s;%s\x07\x1b\\", reg, base64)
+        -- 同时写入 tmux buffer，使跨 window 粘贴可用
+        vim.fn.system({ "tmux", "load-buffer", "-" }, text)
       else
         seq = string.format("\x1b]52;%s;%s\x1b\\", reg, base64)
       end
@@ -28,10 +30,8 @@ if vim.fn.exists("$SSH_TTY") == 1 or vim.fn.exists("$SSH_CONNECTION") == 1 then
     },
     paste = {
       -- tmux 内 OSC 52 paste 响应无法透传，改用 tmux buffer
-      ["+"] = vim.env.TMUX and { "tmux", "save-buffer", "-" }
-        or require("vim.ui.clipboard.osc52").paste("+"),
-      ["*"] = vim.env.TMUX and { "tmux", "save-buffer", "-" }
-        or require("vim.ui.clipboard.osc52").paste("*"),
+      ["+"] = vim.env.TMUX and { "tmux", "save-buffer", "-" } or require("vim.ui.clipboard.osc52").paste("+"),
+      ["*"] = vim.env.TMUX and { "tmux", "save-buffer", "-" } or require("vim.ui.clipboard.osc52").paste("*"),
     },
   }
 end
