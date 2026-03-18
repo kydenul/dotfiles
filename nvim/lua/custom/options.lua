@@ -27,8 +27,11 @@ if vim.fn.exists("$SSH_TTY") == 1 or vim.fn.exists("$SSH_CONNECTION") == 1 then
       ["*"] = osc52_copy("p"),
     },
     paste = {
-      ["+"] = require("vim.ui.clipboard.osc52").paste("+"),
-      ["*"] = require("vim.ui.clipboard.osc52").paste("*"),
+      -- tmux 内 OSC 52 paste 响应无法透传，改用 tmux buffer
+      ["+"] = vim.env.TMUX and { "tmux", "save-buffer", "-" }
+        or require("vim.ui.clipboard.osc52").paste("+"),
+      ["*"] = vim.env.TMUX and { "tmux", "save-buffer", "-" }
+        or require("vim.ui.clipboard.osc52").paste("*"),
     },
   }
 end
