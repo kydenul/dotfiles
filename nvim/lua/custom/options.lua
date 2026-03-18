@@ -2,13 +2,29 @@ local util = require("custom.util")
 
 -- Clipboard
 vim.opt.clipboard = "unnamedplus"
-if vim.fn.exists("$SSH_TTY") == 1 then
-  util.log_info("SSH_TTY detected")
+if vim.fn.exists("$SSH_TTY") == 1 or vim.fn.exists("$SSH_CONNECTION") == 1 then
+  util.log_info("SSH detected, enabling OSC 52 clipboard")
+
+  local function osc52_copy(reg)
+    return function(lines)
+      local text = table.concat(lines, "\n")
+      local base64 = vim.base64.encode(text)
+      local seq
+      if vim.env.TMUX then
+        -- DCS passthrough: 绕过 tmux 直接发送到外层终端
+        seq = string.format("\x1bPtmux;\x1b\x1b]52;%s;%s\x07\x1b\\", reg, base64)
+      else
+        seq = string.format("\x1b]52;%s;%s\x1b\\", reg, base64)
+      end
+      io.stderr:write(seq)
+    end
+  end
+
   vim.g.clipboard = {
     name = "OSC52",
     copy = {
-      ["+"] = require("vim.ui.clipboard.osc52").copy("+"),
-      ["*"] = require("vim.ui.clipboard.osc52").copy("*"),
+      ["+"] = osc52_copy("c"),
+      ["*"] = osc52_copy("p"),
     },
     paste = {
       ["+"] = require("vim.ui.clipboard.osc52").paste("+"),
