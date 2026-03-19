@@ -15,7 +15,7 @@ return {
   settings = {
     Lua = {
       runtime = { version = "LuaJIT" },
-      diagnostics = { globals = { "vim" } },
+      diagnostics = { globals = { "vim", "Snacks" } },
       telemetry = { enable = false },
     },
   },
