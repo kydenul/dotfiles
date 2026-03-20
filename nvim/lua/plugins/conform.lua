@@ -1,5 +1,5 @@
 -- Formatter & Linter
--- Mason + Conform
+-- Mason + Conform + nvim-lint
 
 return {
   -- Mason tool installer
@@ -18,6 +18,7 @@ return {
         -- Python
         "isort",
         "black",
+        "pylint",
 
         -- Lua
         "stylua",
@@ -61,7 +62,7 @@ return {
         lua = { "stylua" },
 
         -- Go
-        go = { "gofumpt", "goimports-reviser", "golangci-lint" },
+        go = { "gofumpt", "goimports-reviser" },
 
         -- Web languages => Prettier
         javascript = { "prettier" },
@@ -89,7 +90,7 @@ return {
         black = {
           prepend_args = {
             "--target-version",
-            "py313",
+            "py314",
             "--line-length",
             "88",
           },
@@ -115,5 +116,30 @@ return {
         lsp_fallback = true,
       },
     },
+  },
+
+  -- nvim-lint
+  {
+    "mfussenegger/nvim-lint",
+    event = { "BufReadPre", "BufNewFile" },
+    config = function()
+      local lint = require("lint")
+
+      lint.linters_by_ft = {
+        python = { "pylint" },
+        go = { "golangcilint" },
+        javascript = { "eslint_d" },
+        typescript = { "eslint_d" },
+        javascriptreact = { "eslint_d" },
+        typescriptreact = { "eslint_d" },
+      }
+
+      vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPost", "InsertLeave" }, {
+        group = vim.api.nvim_create_augroup("nvim-lint", { clear = true }),
+        callback = function()
+          lint.try_lint()
+        end,
+      })
+    end,
   },
 }
