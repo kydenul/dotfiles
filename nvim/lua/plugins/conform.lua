@@ -56,13 +56,13 @@ return {
     opts = {
       formatters_by_ft = {
         -- Python
-        python = { "isort", "black" },
+        python = { "isort", "black", "pylint" },
 
         -- Lua
         lua = { "stylua" },
 
         -- Go
-        go = { "gofumpt", "goimports-reviser" },
+        go = { "gofumpt", "goimports-reviser", "golangci-lint" },
 
         -- Web languages => Prettier
         javascript = { "prettier" },
@@ -92,7 +92,7 @@ return {
             "--target-version",
             "py314",
             "--line-length",
-            "88",
+            "120",
           },
         },
 
@@ -116,31 +116,5 @@ return {
         lsp_fallback = true,
       },
     },
-  },
-
-  -- nvim-lint
-  {
-    "mfussenegger/nvim-lint",
-    event = { "BufReadPre", "BufNewFile" },
-    config = function()
-      local lint = require("lint")
-
-      lint.linters_by_ft = {
-        python = { "pylint" },
-        go = { "golangcilint" },
-        javascript = { "eslint_d" },
-        typescript = { "eslint_d" },
-        javascriptreact = { "eslint_d" },
-        typescriptreact = { "eslint_d" },
-      }
-
-      vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPost", "InsertLeave" }, {
-        group = vim.api.nvim_create_augroup("nvim-lint", { clear = true }),
-        callback = function()
-          local root = vim.fs.root(0, { "go.mod", "package.json", ".eslintrc" })
-          lint.try_lint(nil, { cwd = root })
-        end,
-      })
-    end,
   },
 }
