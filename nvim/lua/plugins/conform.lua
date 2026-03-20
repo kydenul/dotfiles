@@ -22,15 +22,11 @@ return {
         -- Lua
         "stylua",
 
-        -- JSON
-        "jq",
-
-        -- Markdown
-        "markdownlint",
-
-        -- 其他常用工具
+        -- Web (JS/TS/JSON/HTML/CSS/YAML/Markdown)
         "prettier",
         "eslint_d",
+
+        -- Shell
         "shfmt",
       },
     },
@@ -67,15 +63,21 @@ return {
         -- Go
         go = { "gofumpt", "goimports-reviser", "golangci-lint" },
 
-        -- JSON
-        json = { "jq" },
-
-        -- Markdown
-        markdown = { "markdownlint" },
-
-        -- JavaScript/TypeScript
+        -- Web languages => Prettier
         javascript = { "prettier" },
         typescript = { "prettier" },
+        javascriptreact = { "prettier" },
+        typescriptreact = { "prettier" },
+        json = { "prettier" },
+        jsonc = { "prettier" },
+        yaml = { "prettier" },
+        html = { "prettier" },
+        css = { "prettier" },
+        scss = { "prettier" },
+        less = { "prettier" },
+        markdown = { "prettier" },
+        graphql = { "prettier" },
+        vue = { "prettier" },
 
         -- Shell
         sh = { "shfmt" },
