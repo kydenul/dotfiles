@@ -137,7 +137,8 @@ return {
       vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPost", "InsertLeave" }, {
         group = vim.api.nvim_create_augroup("nvim-lint", { clear = true }),
         callback = function()
-          lint.try_lint()
+          local root = vim.fs.root(0, { "go.mod", "package.json", ".eslintrc" })
+          lint.try_lint(nil, { cwd = root })
         end,
       })
     end,
