@@ -365,4 +365,5 @@
         "plaintext": false,
         "markdown": true,
     },
+    "diffEditor.hideUnchangedRegions.enabled": true,
 }
