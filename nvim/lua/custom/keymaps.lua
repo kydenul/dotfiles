@@ -18,17 +18,17 @@ vim.keymap.set("n", "<leader>sv", "<C-w>v") -- 水平新增窗口
 vim.keymap.set("n", "<leader>sh", "<C-w>s") -- 垂直新增窗口
 
 -- Resize with arrows
--- delta: 2 lines
-vim.keymap.set("n", "<C-j>", ":resize -3<CR>", opts)
-vim.keymap.set("n", "<C-k>", ":resize +3<CR>", opts)
-vim.keymap.set("n", "<C-h>", ":vertical resize -3<CR>", opts)
-vim.keymap.set("n", "<C-l>", ":vertical resize +3<CR>", opts)
+vim.keymap.set("n", "<leader>h", ":vertical resize +3<CR>", opts)
+vim.keymap.set("n", "<leader>l", ":vertical resize -3<CR>", opts)
+vim.keymap.set("n", "<leader>j", ":resize +3<CR>", opts)
+vim.keymap.set("n", "<leader>k", ":resize -3<CR>", opts)
 
--- leader + hjkl 在窗口之间跳转
-vim.keymap.set("n", "<leader>h", "<C-w>h", opts) -- 向左跳转
-vim.keymap.set("n", "<leader>j", "<C-w>j", opts) -- 向下跳转
-vim.keymap.set("n", "<leader>k", "<C-w>k", opts) -- 向上跳转
-vim.keymap.set("n", "<leader>l", "<C-w>l", opts) -- 向右跳转
+-- -- leader + hjkl 在窗口之间跳转
+-- vim.keymap.set("n", "<C-j>", "<C-w>j", opts)
+-- vim.keymap.set("n", "<C-k>", "<C-w>k", opts)
+-- vim.keymap.set("n", "<C-h>", "<C-w>h", opts)
+-- vim.keymap.set("n", "<C-l>", "<C-w>l", opts)
+-- NOTE: Use vim-tmux-navigator instead
 
 -- 文件
 vim.keymap.set("n", "<leader>w", ":w!<CR>", { desc = "[File] Save" }) -- Save file

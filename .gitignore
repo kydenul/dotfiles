@@ -1,7 +1,6 @@
 # Sensitive files - Do NOT commit
 .zshrc
 .zsh_secrets
-CLAUDE.md
 zed/*
 !zed/keymap.json
 !zed/settings.json
@@ -24,7 +23,9 @@ Thumbs.db
 # Editor directories
 .vscode/
 .idea/
+CLAUDE.md
 .claude/
+GEMINI.md
 
 # Local environment files
 *.local

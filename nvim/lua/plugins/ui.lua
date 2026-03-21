@@ -80,4 +80,9 @@ return {
       require("colorizer").setup()
     end,
   },
+
+  {
+    "christoomey/vim-tmux-navigator",
+    lazy = false,
+  },
 }

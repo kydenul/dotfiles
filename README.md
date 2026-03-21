@@ -95,8 +95,10 @@ kicat, kssh, kdiff   # Kitty kittens
 ### Tmux Configuration
 
 - **Prefix Key**: `Ctrl-Space` (avoids conflict with Vim)
-- **Pane Navigation**: `h/j/k/l` (Vim-style)
-- **Copy Mode**: `Escape` to enter, `v` to select (Vi-style)
+- **Plugin Manager**: [TPM](https://github.com/tmux-plugins/tpm) (Tmux Plugin Manager)
+- **Seamless Navigation**: Integrated with Neovim via [vim-tmux-navigator](https://github.com/christoomey/vim-tmux-navigator)
+- **Pane Navigation**: `Ctrl-h/j/k/l` to switch between Tmux panes and Neovim splits
+- **Copy Mode**: `Escape` to enter, `v` to select, `y` to yank (Vi-style)
 - **Mouse Support**: Enabled
 - **Status Bar**: Top position with custom colors
 
@@ -104,8 +106,11 @@ kicat, kssh, kdiff   # Kitty kittens
 
 - **Font**: Hack Nerd Font Mono (16pt)
 - **Terminal Type**: `xterm-256color` (for SSH compatibility)
-- **Tab Navigation**: `Cmd+1-9` to switch tabs
-- **Window Navigation**: `Cmd+[/]` for prev/next
+- **Deep Tmux Integration**: 
+    - `Cmd+1-9` to switch Tmux windows
+    - `Cmd+t` to create new Tmux window
+    - `Cmd+w` to close current Tmux pane
+    - `Cmd+z` to toggle zoom (fullscreen) pane
 
 ## Neovim (Nvim)
 
@@ -227,8 +232,8 @@ Configuration in `nvim/lua/custom/options.lua` - up to ~75KB per operation.
 | Key | Action |
 |-----|--------|
 | `<leader>sv` / `<leader>sh` | Split window vertically / horizontally |
-| `<leader>h/j/k/l` | Navigate between windows |
-| `<C-h/j/k/l>` | Resize windows |
+| `<C-h/j/k/l>` | Navigate between windows (and Tmux panes) |
+| `<leader>h/j/k/l` | Resize windows |
 | `<leader>w` | Save file |
 | `<leader>q` / `<leader>Q` | Quit window / Quit all |
 | `<leader>e` | Toggle file explorer |
