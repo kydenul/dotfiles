@@ -2,12 +2,12 @@ return {
   "akinsho/toggleterm.nvim",
 
   keys = {
-    { [[<C-\>]], desc = "Toggle terminal" },
+    { [[<C-t>]], desc = "Toggle terminal" },
     { "<leader>tp", "<cmd>lua _PYTHON_REPL_TOGGLE()<CR>", desc = "[Python] Toggle REPL", mode = "n" },
   },
 
   opts = {
-    open_mapping = [[<C-\>]],
+    open_mapping = [[<C-t>]],
     start_in_insert = true,
     persist_size = true,
     close_on_exit = true,

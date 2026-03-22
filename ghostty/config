@@ -1,24 +1,31 @@
 # ============================================================================
 # Ghostty Configuration
+# https://ghostty.org/docs/config/reference
 # ============================================================================
 
-# Theme
+# UI (Theme & Font & Window)
+# Gruvbox Dark / Catppuccin Mocha
 theme = Catppuccin Mocha
+# auto / ghostty
 window-theme = auto
 
-# Font
-font-family = "Maple Mono NF CN"
-font-size = 17
+background-image = ~/.config/images/alone.jpg
+background-image-opacity = 0.1
+background-image-fit = cover 
 
-copy-on-select = true
-mouse-hide-while-typing = true
-macos-option-as-alt = true
-background-opacity = 0.8
+font-family = "Maple Mono NF CN"
+font-size = 18
+background-opacity = 1
 background-blur-radius = 36
-macos-titlebar-style = hidden
 window-save-state = always
 window-padding-y = 0
 window-padding-x = 0
+
+# Mouse
+copy-on-select = true
+mouse-hide-while-typing = true
+macos-option-as-alt = true
+macos-titlebar-style = hidden
 
 # Buffer size in bytes: 25 MB
 scrollback-limit = 25000000
