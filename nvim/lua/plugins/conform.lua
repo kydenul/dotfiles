@@ -1,5 +1,5 @@
 -- Formatter & Linter
--- Mason + Conform + nvim-lint
+-- Mason + Conform
 
 return {
   -- Mason tool installer
