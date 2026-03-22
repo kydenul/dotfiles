@@ -16,7 +16,9 @@ return {
       "Exafunction/windsurf.vim",
       config = function()
         vim.g.codeium_no_map_tab = 1
-        vim.keymap.set("i", "<C-Enter>", function()
+
+        -- Mac: <Alt-CR>  Windows/Linux: <Alt-CR>
+        vim.keymap.set("i", "<M-CR>", function()
           return vim.fn["codeium#Accept"]()
         end, { expr = true, silent = true })
         vim.keymap.set("i", "<C-;>", function()
