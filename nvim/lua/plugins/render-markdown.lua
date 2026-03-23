@@ -239,7 +239,7 @@ return {
     },
 
     anti_conceal = {
-      disabled_modes = { "n" },
+      disabled_modes = {},
       ignore = {
         bullet = true, -- render bullet in insert mode
         head_border = true,
@@ -248,7 +248,7 @@ return {
     },
 
     -- https://github.com/MeanderingProgrammer/render-markdown.nvim/issues/509
-    win_options = { concealcursor = { rendered = "nvc" } },
+    win_options = { concealcursor = { rendered = "" } },
 
     completions = {
       blink = { enabled = true },
