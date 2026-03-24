@@ -5,7 +5,7 @@
 
 # UI (Theme & Font & Window)
 # Gruvbox Dark / Catppuccin Mocha
-theme = light:Catppuccin Latte,dark:Catppuccin Mocha
+theme = Catppuccin Mocha
 # auto / ghostty
 window-theme = auto
 
