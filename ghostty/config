@@ -5,9 +5,12 @@
 
 # UI (Theme & Font & Window)
 # Gruvbox Dark / Catppuccin Mocha
-theme = Catppuccin Mocha
+theme = light:Catppuccin Latte,dark:Catppuccin Mocha
 # auto / ghostty
 window-theme = auto
+
+keybind = global:ctrl+grave_accent=toggle_quick_terminal
+quick-terminal-position = bottom
 
 background-image = ~/.config/images/alone.jpg
 background-image-opacity = 0.1
