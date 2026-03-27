@@ -17,8 +17,8 @@ return {
       config = function()
         vim.g.codeium_no_map_tab = 1
 
-        -- Mac: <Alt-CR>  Windows/Linux: <Alt-CR>
-        vim.keymap.set("i", "<M-CR>", function()
+        -- Ctrl+Enter to accept AI suggestion
+        vim.keymap.set("i", "<C-CR>", function()
           return vim.fn["codeium#Accept"]()
         end, { expr = true, silent = true })
         vim.keymap.set("i", "<C-;>", function()
