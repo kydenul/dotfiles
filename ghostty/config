@@ -13,16 +13,22 @@ keybind = global:ctrl+grave_accent=toggle_quick_terminal
 quick-terminal-position = bottom
 
 background-image = ~/.config/images/alone.jpg
-background-image-opacity = 0.1
+background-image-opacity = 0.2
 background-image-fit = cover 
 
 font-family = "Maple Mono NF CN"
 font-size = 18
-background-opacity = 1
-background-blur-radius = 36
+# font-thicken = true
+# background-opacity = 0.85 
+# background-blur-radius = 36
 window-save-state = always
 window-padding-y = 0
 window-padding-x = 0
+
+# Quit after the last window is closed
+quit-after-last-window-closed = true
+# Keeps Ghostty running for 30 seconds after the last window is closed
+quit-after-last-window-closed-delay = 30s
 
 # Mouse
 copy-on-select = true
@@ -38,7 +44,7 @@ scrollback-limit = 25000000
 # ============================================================================
 
 # cmd+backspace => delete from cursor to the beginning of the lne
-keybind = super+backspace=esc:w
+keybind = super+backspace=text:\x15
 
 # ============================================================================
 # Tmux intergration
@@ -60,6 +66,11 @@ keybind = super+digit_9=text:\x00\x39
 # cmd+T: Create Tmux window (Tmux: prefix + c)
 keybind = super+t=text:\x00\x63
 
+# cmd+d: Split Tmux pane horizontally (Tmux: prefix + ")
+keybind = super+d=text:\x00\x25
+# cmd+shift+d: Split Tmux pane vertically (Tmux: prefix + %)
+keybind = super+shift+d=text:\x00\x22
+
 # cmd+W: Close current Tmux pane (Tmux: prefix + x)
 keybind = super+w=text:\x00\x78
 
@@ -70,6 +81,9 @@ keybind = super+r=text:\x00\x2c
 keybind = super+h=text:\x00\x70
 # cmd+L: Switch to the next Tmux window (Tmux: prefix + n)
 keybind = super+l=text:\x00\x6e
+
+# cmd+;: Switch to the previous Tmux pane (Tmux: prefix + ;)
+keybind = super+semicolon=text:\x00\x3b
 
 # cmd+Z: Switch fullscreen or restore（Tmux: prefix + z）
 keybind = super+z=text:\x00\x7a
