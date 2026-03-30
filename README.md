@@ -62,10 +62,12 @@ ln -s ~/.dotfiles/vscode/settings.json ~/Library/Application\ Support/Code/User/
 
 # Claude SubAgents
 ln -s ~/.dotfiles/claude/agents ~/.claude/agents
-ln -s ~/.dotfiles/claude/agents ~/.codebuddy-code/agents
+ln -s ~/.dotfiles/claude/agents ~/.claude-internal/agents
+ln -s ~/.dotfiles/claude/skills ~/.claude/skills
+ln -s ~/.dotfiles/claude/skills ~/.claude-internal/skills
 
 ln -s ~/.dotfiles/claude/commands ~/.claude/commands
-ln -s ~/.dotfiles/claude/commands ~/.codebuddy-code/commands
+ln -s ~/.dotfiles/claude/commands ~/.claude-internal/commands
 
 # Reload configurations
 source ~/.zshrc
@@ -106,11 +108,11 @@ kicat, kssh, kdiff   # Kitty kittens
 
 - **Font**: Hack Nerd Font Mono (16pt)
 - **Terminal Type**: `xterm-256color` (for SSH compatibility)
-- **Deep Tmux Integration**: 
-    - `Cmd+1-9` to switch Tmux windows
-    - `Cmd+t` to create new Tmux window
-    - `Cmd+w` to close current Tmux pane
-    - `Cmd+z` to toggle zoom (fullscreen) pane
+- **Deep Tmux Integration**:
+  - `Cmd+1-9` to switch Tmux windows
+  - `Cmd+t` to create new Tmux window
+  - `Cmd+w` to close current Tmux pane
+  - `Cmd+z` to toggle zoom (fullscreen) pane
 
 ## Neovim (Nvim)
 
@@ -166,38 +168,38 @@ git config --global commit.template ~/.gitmessage
 
 > [!TIP] **Commit Message Template**
 >
->```text
-># <type>: <subject>
-># |<----  Try to limit to 50 characters  ---->|
+> ```text
+> # <type>: <subject>
+> # |<----  Try to limit to 50 characters  ---->|
 >
-># Explain why this change is being made (optional, wrap at 72 characters)
-># |<----   Try to limit each line to 72 characters   ---->|
+> # Explain why this change is being made (optional, wrap at 72 characters)
+> # |<----   Try to limit each line to 72 characters   ---->|
 >
 >
-># --- COMMIT END ---
-># Type can be:
->#   feat:     A new feature
->#   fix:      A bug fix
->#   docs:     Documentation changes
->#   style:    Code style changes (formatting, missing semi colons, etc)
->#   refactor: Code refactoring
->#   perf:     Performance improvements
->#   test:     Adding or updating tests
->#   chore:    Build process or auxiliary tool changes
->#   revert:   Revert a previous commit
->#
-># Examples:
->#   feat: add user authentication
->#   fix: resolve cart calculation error
->#   docs: update installation guide in README
->#
-># Remember:
-># - Use imperative mood: "add" not "added" or "adds"
-># - Don't capitalize first letter
-># - No period at the end of subject line
-># - Separate subject from body with a blank line
-># - Body explains what and why, not how
->```
+> # --- COMMIT END ---
+> # Type can be:
+> #   feat:     A new feature
+> #   fix:      A bug fix
+> #   docs:     Documentation changes
+> #   style:    Code style changes (formatting, missing semi colons, etc)
+> #   refactor: Code refactoring
+> #   perf:     Performance improvements
+> #   test:     Adding or updating tests
+> #   chore:    Build process or auxiliary tool changes
+> #   revert:   Revert a previous commit
+> #
+> # Examples:
+> #   feat: add user authentication
+> #   fix: resolve cart calculation error
+> #   docs: update installation guide in README
+> #
+> # Remember:
+> # - Use imperative mood: "add" not "added" or "adds"
+> # - Don't capitalize first letter
+> # - No period at the end of subject line
+> # - Separate subject from body with a blank line
+> # - Body explains what and why, not how
+> ```
 
 **UI Enhancements**:
 
@@ -229,50 +231,50 @@ Configuration in `nvim/lua/custom/options.lua` - up to ~75KB per operation.
 
 ### Window & File Management
 
-| Key | Action |
-|-----|--------|
-| `<leader>sv` / `<leader>sh` | Split window vertically / horizontally |
-| `<C-h/j/k/l>` | Navigate between windows (and Tmux panes) |
-| `<leader>h/j/k/l` | Resize windows |
-| `<leader>w` | Save file |
-| `<leader>q` / `<leader>Q` | Quit window / Quit all |
-| `<leader>e` | Toggle file explorer |
+| Key                         | Action                                    |
+| --------------------------- | ----------------------------------------- |
+| `<leader>sv` / `<leader>sh` | Split window vertically / horizontally    |
+| `<C-h/j/k/l>`               | Navigate between windows (and Tmux panes) |
+| `<leader>h/j/k/l`           | Resize windows                            |
+| `<leader>w`                 | Save file                                 |
+| `<leader>q` / `<leader>Q`   | Quit window / Quit all                    |
+| `<leader>e`                 | Toggle file explorer                      |
 
 ### Navigation & Editing
 
-| Key | Action |
-|-----|--------|
-| `jk` | Exit insert mode |
-| `H` / `L` | Move to start / end of line |
-| `{` / `}` | Move to prev / next paragraph |
-| `%` | Jump between matching brackets |
-| `*` / `#` | Search word forward / backward |
-| `<leader>nh` | Clear search highlights |
+| Key          | Action                         |
+| ------------ | ------------------------------ |
+| `jk`         | Exit insert mode               |
+| `H` / `L`    | Move to start / end of line    |
+| `{` / `}`    | Move to prev / next paragraph  |
+| `%`          | Jump between matching brackets |
+| `*` / `#`    | Search word forward / backward |
+| `<leader>nh` | Clear search highlights        |
 
 ### Visual Mode
 
-| Key | Action |
-|-----|--------|
-| `J` / `K` | Move selected lines up / down |
-| `<` / `>` | Indent / dedent (keeps selection) |
-| `p` | Paste without copying replaced text |
+| Key       | Action                              |
+| --------- | ----------------------------------- |
+| `J` / `K` | Move selected lines up / down       |
+| `<` / `>` | Indent / dedent (keeps selection)   |
+| `p`       | Paste without copying replaced text |
 
 ### Plugin Shortcuts
 
-| Key | Action |
-|-----|--------|
-| `<leader>ff` | Find files (Telescope) |
-| `<leader>fg` | Find grep (Telescope) |
-| `<leader>fb` | Find buffers (Telescope) |
-| `<leader>/` | Search in current file |
-| `<leader>rn` | LSP rename |
-| `<leader>g` | Open Git interface (Neogit) |
-| `,` | Flash jump to position |
-| `gc` / `gcc` | Comment toggle |
-| `gt` / `gT` | Next / previous buffer |
-| `gz<motion><char>` | Add surroundings |
-| `gzd<char>` | Delete surroundings |
-| `<C-t>` | Toggle terminal |
+| Key                | Action                      |
+| ------------------ | --------------------------- |
+| `<leader>ff`       | Find files (Telescope)      |
+| `<leader>fg`       | Find grep (Telescope)       |
+| `<leader>fb`       | Find buffers (Telescope)    |
+| `<leader>/`        | Search in current file      |
+| `<leader>rn`       | LSP rename                  |
+| `<leader>g`        | Open Git interface (Neogit) |
+| `,`                | Flash jump to position      |
+| `gc` / `gcc`       | Comment toggle              |
+| `gt` / `gT`        | Next / previous buffer      |
+| `gz<motion><char>` | Add surroundings            |
+| `gzd<char>`        | Delete surroundings         |
+| `<C-t>`            | Toggle terminal             |
 
 ---
 
