@@ -20,8 +20,8 @@ return {
     end,
 
     layout = {
-      default_direction = "left",
-      max_width = 128,
+      default_direction = "right",
+      max_width = 88,
       min_width = 24,
       resize_to_content = true,
       preserve_equality = false,
