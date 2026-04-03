@@ -24,6 +24,12 @@ plugins=(z git extract web-search zsh-autosuggestions zsh-syntax-highlighting)
 
 source $ZSH/oh-my-zsh.sh
 
+# Set kitty user variable when inside tmux (for conditional keybindings)
+# Uses kitty remote control which is more reliable than DCS passthrough
+if [[ -n "$TMUX" && -n "$KITTY_WINDOW_ID" ]]; then
+    kitty @ set-user-vars in_tmux=yes 2>/dev/null
+fi
+
 # You may need to manually set your language environment
 # export LANG=en_US.UTF-8
 #

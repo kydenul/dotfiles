@@ -1,6 +1,6 @@
 require("custom.util")
 require("custom.keymaps")
-require("custom.floding")
+require("custom.folding")
 
 require("klazy")
 

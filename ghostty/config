@@ -43,11 +43,11 @@ scrollback-limit = 25000000
 # Key Binding
 # ============================================================================
 
-# cmd+backspace => delete from cursor to the beginning of the lne
+# cmd+backspace => delete from cursor to the beginning of the line
 keybind = super+backspace=text:\x15
 
 # ============================================================================
-# Tmux intergration
+# Tmux integration
 # NOTE：通过 Ghostty 快捷键发送 Tmux 前缀键序列，实现无缝操作
 #       Tmux 前缀键为 Ctrl+Space
 # ============================================================================
@@ -66,9 +66,9 @@ keybind = super+digit_9=text:\x00\x39
 # cmd+T: Create Tmux window (Tmux: prefix + c)
 keybind = super+t=text:\x00\x63
 
-# cmd+d: Split Tmux pane horizontally (Tmux: prefix + ")
+# cmd+d: Split Tmux pane horizontally (Tmux: prefix + %)
 keybind = super+d=text:\x00\x25
-# cmd+shift+d: Split Tmux pane vertically (Tmux: prefix + %)
+# cmd+shift+d: Split Tmux pane vertically (Tmux: prefix + ")
 keybind = super+shift+d=text:\x00\x22
 
 # cmd+W: Close current Tmux pane (Tmux: prefix + x)

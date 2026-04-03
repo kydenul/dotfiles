@@ -12,7 +12,8 @@ return {
     persist_size = true,
     close_on_exit = true,
     auto_scroll = true,
-    direction = "vertical",
+    -- Tmux 内用 float 避免与 Tmux 分屏冲突，非 Tmux 环境用 vertical
+    direction = vim.env.TMUX and "float" or "vertical",
     hide_numbers = true,
     shade_terminals = true,
 
@@ -45,7 +46,7 @@ return {
     },
 
     -- Callbacks
-    on_open = function(term)
+    on_open = function(_)
       vim.cmd("setlocal nonumber norelativenumber")
       vim.cmd("startinsert!")
     end,
