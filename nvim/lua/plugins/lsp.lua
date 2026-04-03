@@ -97,13 +97,6 @@ return {
     vim.keymap.del("n", "gri")
     vim.keymap.del("n", "grt")
 
-    -- NOTE: Highlight symbol under cursor
-    -- stylua: ignore
-    vim.api.nvim_set_hl(0, "LspReferenceText", { fg = "#20C997", bg = "#A04945" })
-    vim.api.nvim_set_hl(0, "LspReferenceRead", { link = "LspReferenceText" })
-    vim.api.nvim_set_hl(0, "LspReferenceWrite", { link = "LspReferenceText" })
-    vim.api.nvim_set_hl(0, "LspDocumentHighlight", { link = "LspReferenceText" })
-
     -- ============================================================================
     -- LSP Attach Autocmd
     -- ============================================================================
@@ -118,9 +111,7 @@ return {
 
         -- notification wrapper of original gd
         vim.keymap.set("n", "gd", function()
-          local clients = vim.lsp.get_clients({ bufnr = event.buf })
-          local offset_encoding = clients[1] and clients[1].offset_encoding or "utf-16"
-          local params = vim.lsp.util.make_position_params(0, offset_encoding)
+          local params = vim.lsp.util.make_position_params(0, "utf-8")
           vim.lsp.buf_request(0, "textDocument/definition", params, function(_, result, _, _)
             if not result or vim.tbl_isempty(result) then
               vim.notify("No definition found", vim.log.levels.INFO)
@@ -172,6 +163,53 @@ return {
         -- Code Actions and Formatting
         -- ------------------------------------------------------------------------
         vim.keymap.set({ "n", "v" }, "<space>ca", vim.lsp.buf.code_action, bufopts("LSP: Code Action"))
+        vim.keymap.set("n", "<leader>lf", vim.lsp.buf.format, bufopts("LSP: Format"))
+
+        -- ------------------------------------------------------------------------
+        -- Function Navigation ([f / ]f)
+        -- ------------------------------------------------------------------------
+        local function find_enclosing_symbol()
+          local params = { textDocument = vim.lsp.util.make_text_document_params(event.buf) }
+          local responses = vim.lsp.buf_request_sync(event.buf, "textDocument/documentSymbol", params, 1000)
+          if not responses then
+            return nil
+          end
+          local line = vim.api.nvim_win_get_cursor(0)[1] - 1
+          local function find(symbols)
+            for _, s in ipairs(symbols) do
+              local range = s.range or (s.location and s.location.range)
+              if range and line >= range.start.line and line <= range["end"].line then
+                if s.children then
+                  local child = find(s.children)
+                  if child then
+                    return child
+                  end
+                end
+                return s
+              end
+            end
+          end
+          for _, resp in pairs(responses) do
+            local sym = find(resp.result or {})
+            if sym then
+              return sym
+            end
+          end
+        end
+
+        vim.keymap.set("n", "[f", function()
+          local sym = find_enclosing_symbol()
+          if sym and sym.range then
+            vim.api.nvim_win_set_cursor(0, { sym.range.start.line + 1, 0 })
+          end
+        end, bufopts("LSP: Jump to function start"))
+
+        vim.keymap.set("n", "]f", function()
+          local sym = find_enclosing_symbol()
+          if sym and sym.range then
+            vim.api.nvim_win_set_cursor(0, { sym.range["end"].line + 1, 0 })
+          end
+        end, bufopts("LSP: Jump to function end"))
 
         -- ------------------------------------------------------------------------
         -- Toggle Features

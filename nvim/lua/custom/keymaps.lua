@@ -3,7 +3,8 @@ local opts = {
   silent = true, -- do not show message
 }
 
-vim.g.mapleader = " " -- Map leader key
+-- Map leader key
+vim.g.mapleader = " "
 
 ----------------------------------
 -- Insert mode --
@@ -14,8 +15,8 @@ vim.keymap.set("i", "jk", "<ESC>")
 -- Normal mode --
 ----------------------------------
 -- New windows
-vim.keymap.set("n", "<leader>sv", "<C-w>v") -- 水平新增窗口
-vim.keymap.set("n", "<leader>sh", "<C-w>s") -- 垂直新增窗口
+vim.keymap.set("n", "\\", "<CMD>:sp<CR>", { desc = "Split window horizontally" })
+vim.keymap.set("n", "|", "<CMD>:vsp<CR>", { desc = "Split window vertically" })
 
 -- Resize with arrows
 vim.keymap.set("n", "<leader>h", ":vertical resize +3<CR>", opts)
@@ -30,16 +31,16 @@ vim.keymap.set("n", "<leader>k", ":resize -3<CR>", opts)
 -- vim.keymap.set("n", "<C-l>", "<C-w>l", opts)
 -- NOTE: Use vim-tmux-navigator instead
 
--- 文件
+-- Save file
 vim.keymap.set("n", "<leader>w", ":w!<CR>", { desc = "[File] Save" }) -- Save file
 -- Quick save and quit
--- vim.keymap.set("n", "<leader>q", "<Cmd>q<CR>", { noremap = true, silent = true, desc = "Quit" })
+vim.keymap.set("n", "<leader>q", "<Cmd>q<CR>", { noremap = true, silent = true, desc = "Quit" })
 vim.keymap.set("n", "<leader>Q", "<Cmd>qa<CR>", { noremap = true, silent = true, desc = "Quit all" })
 
--- 取消高亮
+-- Clear highlight
 vim.keymap.set("n", "<leader>nh", ":nohl<CR>")
 
--- 光标快速移动
+-- Hint: use 'H L' to move to beginning or end of line
 vim.keymap.set({ "n", "v" }, "H", "^", { desc = "[Cursor] Move to start of line" })
 vim.keymap.set({ "n", "v" }, "L", "$", { desc = "[Cursor] Move to end of line" })
 
@@ -50,7 +51,7 @@ vim.keymap.set({ "n", "v" }, "L", "$", { desc = "[Cursor] Move to end of line" }
 vim.keymap.set("v", "<", "<gv", opts)
 vim.keymap.set("v", ">", ">gv", opts)
 
--- 单行或多行移动
+-- Up and down by visual line
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
 

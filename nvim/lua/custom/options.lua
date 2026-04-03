@@ -20,7 +20,6 @@ end
 
 -- if vim.fn.exists("$SSH_TTY") == 1 or vim.fn.exists("$SSH_CONNECTION") == 1 then
 --   util.log_info("SSH detected, enabling OSC 52 clipboard")
-
 --   local function osc52_copy(reg)
 --     return function(lines)
 --       local text = table.concat(lines, "\n")
@@ -37,7 +36,6 @@ end
 --       io.stderr:write(seq)
 --     end
 --   end
-
 --   vim.g.clipboard = {
 --     name = "OSC52",
 --     copy = {
@@ -51,7 +49,10 @@ end
 --     },
 --   }
 -- end
+
+-- Completion
 vim.opt.completeopt = { "menu", "menuone", "noselect" }
+vim.o.wildmenu = true
 vim.opt.mouse = "a" -- allow the mouse to be used in Nvim
 vim.opt.scrolloff = 5
 
@@ -101,8 +102,25 @@ vim.o.lazyredraw = false -- Don't redraw during macros (can cause issues with so
 vim.o.ttyfast = true -- Faster terminal connection
 vim.o.regexpengine = 0 -- Use automatic regexp engine selection
 
--- 补全增强
-vim.o.wildmenu = true
+-- Highlight yanked text briefly for visual feedback
+vim.api.nvim_create_autocmd("TextYankPost", {
+  desc = "Highlight yanked text",
+  group = vim.api.nvim_create_augroup("kyden-yank-highlight", { clear = true }),
+  callback = function()
+    vim.highlight.on_yank({ higroup = "CurSearch", timeout = 360 })
+  end,
+})
+
+-- Override mapping in quickfix window
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "qf",
+  callback = function()
+    -- Unmap <CR> in quickfix window (if needed)
+    vim.keymap.set("n", "<CR>", "<CR>", { buffer = true, desc = "Default Enter in quickfix" })
+    -- Enable cursorline only in quickfix window
+    vim.opt_local.cursorline = true
+  end,
+})
 
 -- setup must be called before loading
 -- vim.cmd.colorscheme("gruvbox-material")
