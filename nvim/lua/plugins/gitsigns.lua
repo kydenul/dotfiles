@@ -103,13 +103,5 @@ return {
   config = function(_, opts)
     -- Setup plugin with opts
     require("gitsigns").setup(opts)
-
-    -- Set highlight groups
-    vim.api.nvim_set_hl(0, "GitSignsAdd", { fg = "#4CAF50" })
-    vim.api.nvim_set_hl(0, "GitSignsChange", { fg = "#2196F3" })
-    vim.api.nvim_set_hl(0, "GitSignsDelete", { fg = "#F44336" })
-    vim.api.nvim_set_hl(0, "GitSignsTopdelete", { link = "GitSignsDelete" })
-    vim.api.nvim_set_hl(0, "GitSignsChangedelete", { link = "GitSignsChange" })
-    vim.api.nvim_set_hl(0, "GitSignsUntracked", { fg = "#9C27B0" })
   end,
 }

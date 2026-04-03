@@ -28,13 +28,15 @@ return {
   },
 
   config = function()
+    -- ts_context_commentstring setup (must be called before treesitter)
+    require("ts_context_commentstring").setup({
+      enable_autocmd = false, -- disable deprecated autocmd, use manual or integration instead
+    })
+
     -- Treesitter context setup
     local context = require("treesitter-context")
-    context.setup({
-      enable = true,
-      max_lines = 5, -- 0 表示不限制上下文窗口的高度
-      -- separator = "─",
-    })
+    -- 0 表示不限制上下文窗口的高度
+    context.setup({ enable = true, max_lines = 5 })
 
     -- Treesitter main setup
     local treesitter = require("nvim-treesitter.configs")

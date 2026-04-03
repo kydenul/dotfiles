@@ -8,7 +8,7 @@ return {
   dependencies = {
     "nvim-lua/plenary.nvim",
     "sindrets/diffview.nvim",
-    "nvim-telescope/telescope.nvim",
+    "folke/snacks.nvim",
 
     {
       "isakbm/gitgraph.nvim",
@@ -88,7 +88,7 @@ return {
     -- Shows a list of integrations and their status.
     integrations = {
       diffview = true, -- Diffview is a required integration for neogit but it can be disabled
-      telescope = true, -- Telescope integration
+      snacks = true, -- Snacks picker integration
     },
 
     -- The depth of the logs to fetch when showing the graph.

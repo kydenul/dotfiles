@@ -3,12 +3,7 @@
 return {
   "nvim-tree/nvim-tree.lua",
 
-  dependencies = {
-    {
-      "nvim-tree/nvim-web-devicons",
-      opts = { override = { copilot = { icon = "", color = "#cba6f7", name = "Copilot" } } },
-    },
-  },
+  dependencies = { "nvim-tree/nvim-web-devicons" },
 
   cmd = { "NvimTreeToggle", "NvimTreeFocus", "NvimTreeFindFile" },
 

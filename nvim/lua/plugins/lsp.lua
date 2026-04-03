@@ -9,27 +9,11 @@ return {
     "neovim/nvim-lspconfig",
     "WhoIsSethDaniel/mason-tool-installer.nvim",
 
-    -- ==============================================================
     -- LSP Kind Icons
-    -- ==============================================================
-    {
-      "onsails/lspkind.nvim",
-      event = { "VimEnter" },
-    },
-
-    -- ==============================================================
-    -- ==============================================================
+    { "onsails/lspkind.nvim", event = { "VimEnter" } },
     -- Commentary
-    -- gcc / gc / gcu
-    -- ==============================================================
-    -- ==============================================================
     "tpope/vim-commentary",
-
-    -- ==============================================================
-    -- ==============================================================
     -- Todo comments
-    -- ==============================================================
-    -- ==============================================================
     {
       "folke/todo-comments.nvim",
       event = { "BufReadPost", "BufNewFile" },
@@ -104,7 +88,6 @@ return {
       group = vim.api.nvim_create_augroup("lsp-attach", { clear = true }),
 
       callback = function(event)
-        local scopebi = require("telescope.builtin")
         local bufopts = function(desc)
           return { noremap = true, silent = true, buffer = event.buf, desc = desc }
         end
@@ -116,7 +99,7 @@ return {
             if not result or vim.tbl_isempty(result) then
               vim.notify("No definition found", vim.log.levels.INFO)
             else
-              require("telescope.builtin").lsp_definitions()
+              Snacks.picker.lsp_definitions()
             end
           end)
         end, bufopts("LSP: Goto Definition"))
@@ -138,11 +121,11 @@ return {
           vim.lsp.buf.definition()
         end, bufopts("LSP: Goto Definition (split)"))
 
-        -- 添加更多telescope LSP相关的keymap
+        -- LSP Pickers (via Snacks)
         -- stylua: ignore
-        vim.keymap.set("n", "gr", scopebi.lsp_references, bufopts("LSP: Goto References"))
+        vim.keymap.set("n", "gr", function() Snacks.picker.lsp_references() end, bufopts("LSP: Goto References"))
         -- stylua: ignore
-        vim.keymap.set("n", "gi", scopebi.lsp_implementations, bufopts("LSP: Goto Implementation"))
+        vim.keymap.set("n", "gi", function() Snacks.picker.lsp_implementations() end, bufopts("LSP: Goto Implementation"))
 
         -- ------------------------------------------------------------------------
         -- Documentation and Diagnostics

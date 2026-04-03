@@ -5,10 +5,7 @@ return {
   event = "VeryLazy",
 
   opts = {
-    label = {
-      rainbow = { enabled = true, shade = 1 },
-    },
-
+    label = { rainbow = { enabled = true, shade = 1 } },
     modes = { char = { enabled = false } },
   },
 
