@@ -235,6 +235,27 @@ if [ -d "$DOTFILES/ghostty" ]; then
     safe_link "$DOTFILES/ghostty" "$HOME/.config/ghostty"
 fi
 
+# --- Zed ---
+if [ -d "$DOTFILES/zed" ]; then
+    safe_link "$DOTFILES/zed" "$HOME/.config/zed"
+fi
+
+# --- VSCode (macOS) ---
+if [ -d "$DOTFILES/vscode" ]; then
+    safe_link "$DOTFILES/vscode/keybindings.json" "$HOME/Library/Application Support/Code/User/keybindings.json"
+    safe_link "$DOTFILES/vscode/settings.json" "$HOME/Library/Application Support/Code/User/settings.json"
+fi
+
+# --- Markdownlint ---
+safe_link "$DOTFILES/.markdownlint.json" "$HOME/.markdownlint.json"
+
+# --- Claude Code (agents, skills, commands) ---
+if [ -d "$DOTFILES/claude" ]; then
+    safe_link "$DOTFILES/claude/agents" "$HOME/.claude/agents"
+    safe_link "$DOTFILES/claude/skills" "$HOME/.claude/skills"
+    safe_link "$DOTFILES/claude/commands" "$HOME/.claude/commands"
+fi
+
 # ── 6. Git Config ───────────────────────────────────────────────────────────
 section "6/7  Git Config"
 

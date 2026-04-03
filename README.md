@@ -1,6 +1,6 @@
 # dotfiles
 
-Personal development environment configuration for macOS, featuring Neovim, VSCode, Kitty, Tmux, and Zsh with Oh My Zsh.
+Personal development environment configuration for macOS, featuring Neovim, VSCode, Kitty, Ghostty, Tmux, and Zsh with Oh My Zsh.
 
 ---
 
@@ -52,6 +52,9 @@ defaults delete -g NSWindowShouldDragOnGesture
 # Create symlinks
 ln -s ~/.dotfiles/nvim ~/.config/
 ln -s ~/.dotfiles/zed ~/.config/
+ln -s ~/.dotfiles/kitty ~/.config/kitty
+ln -s ~/.dotfiles/ghostty ~/.config/ghostty
+ln -s ~/.dotfiles/images ~/.config/images
 ln -s ~/.dotfiles/.zshrc ~/.zshrc
 ln -s ~/.dotfiles/.tmux.conf ~/.tmux.conf
 ln -s ~/.dotfiles/.markdownlint.json ~/.markdownlint.json
@@ -106,13 +109,22 @@ kicat, kssh, kdiff   # Kitty kittens
 
 ### Kitty Terminal
 
-- **Font**: Hack Nerd Font Mono (16pt)
+- **Font**: Maple Mono NF CN (18pt)
 - **Terminal Type**: `xterm-256color` (for SSH compatibility)
 - **Deep Tmux Integration**:
   - `Cmd+1-9` to switch Tmux windows
   - `Cmd+t` to create new Tmux window
   - `Cmd+w` to close current Tmux pane
   - `Cmd+z` to toggle zoom (fullscreen) pane
+  - `Cmd+d` / `Cmd+Shift+d` to split panes
+  - `Cmd+h` / `Cmd+l` to switch previous/next window
+
+### Ghostty Terminal
+
+- **Theme**: Catppuccin Mocha
+- **Font**: Maple Mono NF CN (18pt)
+- **Quick Terminal**: `Ctrl+`` (global hotkey, bottom position)
+- **Deep Tmux Integration**: Same keybindings as Kitty (Cmd+1-9, Cmd+t, Cmd+w, etc.)
 
 ## Neovim (Nvim)
 
@@ -133,7 +145,7 @@ nvim/
 ├── lua/
 │   ├── klazy.lua        # Lazy.nvim bootstrap
 │   ├── custom/          # Core config (options, keymaps, folding, utils)
-│   ├── plugins/         # 34 plugin configurations
+│   ├── plugins/         # 25 plugin configurations
 │   └── snippets/        # Custom snippets (cpp, go)
 └── lsp/                 # Language-specific LSP configs
 ```
@@ -145,19 +157,18 @@ nvim/
 **LSP & Intelligence**:
 
 - Mason-managed LSP servers (Go, TypeScript, C++, Python, Lua, Bash, Markdown, PHP)
-- Auto-completion (nvim-cmp) with LSP, buffer, path sources
-- GitHub Copilot integration
-- Advanced folding (nvim-ufo) with LSP/Treesitter
+- Auto-completion (blink-cmp) with LSP, buffer, path, and Codeium AI sources
+- Advanced folding with Treesitter and semantic tokens
 - Code formatting (conform.nvim) and debugging (nvim-dap)
 
 **Navigation & Search**:
 
-- File explorer (nvim-tree), fuzzy finder (telescope), outline (aerial)
-- Smart jump (flash.nvim), project-wide search (nvim-spectre)
+- File explorer (nvim-tree), fuzzy finder (snacks.nvim), outline (aerial)
+- Smart jump (flash.nvim), breadcrumbs (dropbar.nvim)
 
 **Git Integration**:
 
-- Sign indicators (gitsigns), full Git client (neogit), wrapper (vim-fugitive)
+- Sign indicators (gitsigns), full Git client (neogit)
 
 ```bash
 git config --global core.editor "nvim"
@@ -214,7 +225,6 @@ git config --global commit.template ~/.gitmessage
 :Lazy           " Plugin manager
 :Mason          " LSP/tools manager
 :checkhealth    " Health diagnostics
-:Copilot auth   " GitHub Copilot setup (optional)
 ```
 
 ### OSC 52 Clipboard (SSH Support)
