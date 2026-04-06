@@ -1,19 +1,48 @@
 # dotfiles
 
-Personal development environment configuration for macOS, featuring Neovim, VSCode, Kitty, Ghostty, Tmux, and Zsh with Oh My Zsh.
+Personal development environment configuration for macOS, featuring Neovim, Zed, VSCode, Kitty, Ghostty, Tmux, and Zsh with Oh My Zsh.
 
 ---
 
 ## Quick Start
 
-### Prerequisites
+### One-Click Install (Recommended)
 
 ```bash
-# macOS packages
-brew install zsh neovim fd im-select pngpaste latex2html latexdiff mercurial
+# Clone the repository
+git clone https://github.com/kydenul/dotfiles.git ~/.dotfiles
 
-# mmdc
-npm install -g @mermaid-js/mermaid-cli
+# Copy and customize Zsh configuration
+cd ~/.dotfiles
+cp .zshrc.example .zshrc
+# Edit .zshrc to add your personal settings
+
+# Run the install script
+bash ~/.dotfiles/script/install.sh
+```
+
+The install script will automatically:
+
+1. Install Homebrew (if not present)
+2. Install CLI tools, languages, fonts, and terminal emulators via Homebrew
+3. Set up Oh My Zsh with Powerlevel10k theme and plugins
+4. Install Tmux Plugin Manager (TPM)
+5. Create all necessary symlinks (with safe backup of existing files)
+6. Configure Git commit template
+7. Bootstrap Neovim plugins and Treesitter parsers
+
+### Manual Installation
+
+<details>
+<summary>Click to expand manual setup steps</summary>
+
+#### Prerequisites
+
+```bash
+# macOS
+brew install neovim fd ripgrep tmux zsh node go python@3 rustup \
+  gofumpt curl tree-sitter pngpaste imagemagick latexdiff mercurial im-select
+brew install --cask kitty ghostty font-hack-nerd-font font-maple-mono-nf-cn
 
 # Linux (Ubuntu/Debian)
 sudo apt install neovim fd-find xsel zsh
@@ -21,19 +50,43 @@ sudo apt install neovim fd-find xsel zsh
 # Linux (Arch)
 sudo pacman -S neovim xsel zsh
 
+# Oh My Zsh
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 ```
 
-### Installation
+#### Create Symlinks
 
 ```bash
-# Clone the repository
-git clone https://github.com/kydenul/dotfiles.git ~/.dotfiles
-cd ~/.dotfiles
+# Neovim
+ln -s ~/.dotfiles/nvim ~/.config/nvim
 
-# Copy and customize Zsh configuration
-cp .zshrc.example .zshrc
-# Edit .zshrc to add your personal settings
+# Shell & Terminal
+ln -s ~/.dotfiles/.zshrc ~/.zshrc
+ln -s ~/.dotfiles/.tmux.conf ~/.tmux.conf
+ln -s ~/.dotfiles/.gitmessage ~/.gitmessage
+ln -s ~/.dotfiles/.markdownlint.json ~/.markdownlint.json
+
+# Kitty
+ln -s ~/.dotfiles/kitty ~/.config/kitty
+ln -s ~/.dotfiles/images ~/.config/images
+
+# Ghostty
+ln -s ~/.dotfiles/ghostty ~/.config/ghostty
+
+# Zed
+ln -s ~/.dotfiles/zed ~/.config/zed
+
+# VSCode (macOS)
+ln -s ~/.dotfiles/vscode/keybindings.json ~/Library/Application\ Support/Code/User/keybindings.json
+ln -s ~/.dotfiles/vscode/settings.json ~/Library/Application\ Support/Code/User/settings.json
+
+# Claude Code (agents, skills, commands)
+ln -s ~/.dotfiles/claude/agents ~/.claude/agents
+ln -s ~/.dotfiles/claude/skills ~/.claude/skills
+ln -s ~/.dotfiles/claude/commands ~/.claude/commands
+ln -s ~/.dotfiles/claude/agents ~/.claude-internal/agents
+ln -s ~/.dotfiles/claude/skills ~/.claude-internal/skills
+ln -s ~/.dotfiles/claude/commands ~/.claude-internal/commands
 
 # (Optional) Create secrets file for API keys
 cat > ~/.zsh_secrets << 'EOF'
@@ -42,40 +95,19 @@ export MOONSHOT="your-key-here"
 export GLMKey="your-key-here"
 EOF
 chmod 600 ~/.zsh_secrets
+```
 
-# (Optional) Enable window with ctrl+command+click
-# Set
-defaults write -g NSWindowShouldDragOnGesture -bool true
-# UnSet
-defaults delete -g NSWindowShouldDragOnGesture
+#### Post-Install
 
-# Create symlinks
-ln -s ~/.dotfiles/nvim ~/.config/
-ln -s ~/.dotfiles/zed ~/.config/
-ln -s ~/.dotfiles/kitty ~/.config/kitty
-ln -s ~/.dotfiles/ghostty ~/.config/ghostty
-ln -s ~/.dotfiles/images ~/.config/images
-ln -s ~/.dotfiles/.zshrc ~/.zshrc
-ln -s ~/.dotfiles/.tmux.conf ~/.tmux.conf
-ln -s ~/.dotfiles/.markdownlint.json ~/.markdownlint.json
-
-# VSCode (macOS)
-ln -s ~/.dotfiles/vscode/keybindings.json ~/Library/Application\ Support/Code/User/keybindings.json
-ln -s ~/.dotfiles/vscode/settings.json ~/Library/Application\ Support/Code/User/settings.json
-
-# Claude SubAgents
-ln -s ~/.dotfiles/claude/agents ~/.claude/agents
-ln -s ~/.dotfiles/claude/agents ~/.claude-internal/agents
-ln -s ~/.dotfiles/claude/skills ~/.claude/skills
-ln -s ~/.dotfiles/claude/skills ~/.claude-internal/skills
-
-ln -s ~/.dotfiles/claude/commands ~/.claude/commands
-ln -s ~/.dotfiles/claude/commands ~/.claude-internal/commands
-
-# Reload configurations
+```bash
 source ~/.zshrc
 tmux source-file ~/.tmux.conf  # in tmux session
+
+# (Optional) Enable window drag with Ctrl+Cmd+Click
+defaults write -g NSWindowShouldDragOnGesture -bool true
 ```
+
+</details>
 
 ---
 
@@ -95,6 +127,9 @@ la, ll, c            # Navigation shortcuts
 gs, gp, gm, ga       # Git shortcuts
 gor, gob             # Go shortcuts (go run, go build)
 kicat, kssh, kdiff   # Kitty kittens
+sshc, sshk           # SSH shortcuts (DevCloud, K-Claw)
+tsbz, tsz            # Translate to Chinese
+tsbe, tse            # Translate to English
 ```
 
 ### Tmux Configuration
@@ -105,7 +140,7 @@ kicat, kssh, kdiff   # Kitty kittens
 - **Pane Navigation**: `Ctrl-h/j/k/l` to switch between Tmux panes and Neovim splits
 - **Copy Mode**: `Escape` to enter, `v` to select, `y` to yank (Vi-style)
 - **Mouse Support**: Enabled
-- **Status Bar**: Top position with custom colors
+- **Status Bar**: Top position with custom Catppuccin-style colors
 
 ### Kitty Terminal
 
@@ -118,15 +153,27 @@ kicat, kssh, kdiff   # Kitty kittens
   - `Cmd+z` to toggle zoom (fullscreen) pane
   - `Cmd+d` / `Cmd+Shift+d` to split panes
   - `Cmd+h` / `Cmd+l` to switch previous/next window
+  - `Cmd+;` to switch to previous pane
 
 ### Ghostty Terminal
 
 - **Theme**: Catppuccin Mocha
 - **Font**: Maple Mono NF CN (18pt)
-- **Quick Terminal**: `Ctrl+`` (global hotkey, bottom position)
-- **Deep Tmux Integration**: Same keybindings as Kitty (Cmd+1-9, Cmd+t, Cmd+w, etc.)
+- **Quick Terminal**: `` Ctrl+` `` (global hotkey, bottom position)
+- **Deep Tmux Integration**: Same keybindings as Kitty (`Cmd+1-9`, `Cmd+t`, `Cmd+w`, etc.)
 
-## Neovim (Nvim)
+### Zed Editor
+
+- **Font**: Maple Mono NF CN (primary), Hack Nerd Font Mono (fallback)
+- **Theme**: Gruvbox (Dark Hard / Light, follows system mode)
+- **Vim Mode**: Enabled with system clipboard
+- **Base Keymap**: VSCode
+- **Features**: Relative line numbers, bar cursor (no blink), soft wrap at editor width
+- **SSH**: DevCloud remote development support
+
+---
+
+## Neovim
 
 ### Overview
 
@@ -148,6 +195,15 @@ nvim/
 │   ├── plugins/         # 25 plugin configurations
 │   └── snippets/        # Custom snippets (cpp, go)
 └── lsp/                 # Language-specific LSP configs
+    ├── gopls.lua        # Go
+    ├── ts_ls.lua        # TypeScript/JavaScript
+    ├── clangd.lua       # C/C++
+    ├── lua_ls.lua       # Lua
+    ├── pylsp.lua        # Python
+    ├── bashls.lua       # Bash
+    ├── marksman.lua     # Markdown
+    ├── intelephense.lua # PHP
+    └── cmake.lua        # CMake
 ```
 
 ### Key Features
@@ -156,7 +212,7 @@ nvim/
 
 **LSP & Intelligence**:
 
-- Mason-managed LSP servers (Go, TypeScript, C++, Python, Lua, Bash, Markdown, PHP)
+- Mason-managed LSP servers (Go, TypeScript, C++, Python, Lua, Bash, Markdown, PHP, CMake)
 - Auto-completion (blink-cmp) with LSP, buffer, path, and Codeium AI sources
 - Advanced folding with Treesitter and semantic tokens
 - Code formatting (conform.nvim) and debugging (nvim-dap)
@@ -170,54 +226,18 @@ nvim/
 
 - Sign indicators (gitsigns), full Git client (neogit)
 
-```bash
-git config --global core.editor "nvim"
-git config --global commit.template
-nvim ~/.gitmessage
-git config --global commit.template ~/.gitmessage
-```
-
-> [!TIP] **Commit Message Template**
->
-> ```text
-> # <type>: <subject>
-> # |<----  Try to limit to 50 characters  ---->|
->
-> # Explain why this change is being made (optional, wrap at 72 characters)
-> # |<----   Try to limit each line to 72 characters   ---->|
->
->
-> # --- COMMIT END ---
-> # Type can be:
-> #   feat:     A new feature
-> #   fix:      A bug fix
-> #   docs:     Documentation changes
-> #   style:    Code style changes (formatting, missing semi colons, etc)
-> #   refactor: Code refactoring
-> #   perf:     Performance improvements
-> #   test:     Adding or updating tests
-> #   chore:    Build process or auxiliary tool changes
-> #   revert:   Revert a previous commit
-> #
-> # Examples:
-> #   feat: add user authentication
-> #   fix: resolve cart calculation error
-> #   docs: update installation guide in README
-> #
-> # Remember:
-> # - Use imperative mood: "add" not "added" or "adds"
-> # - Don't capitalize first letter
-> # - No period at the end of subject line
-> # - Separate subject from body with a blank line
-> # - Body explains what and why, not how
-> ```
-
 **UI Enhancements**:
 
 - Colorscheme: Catppuccin
-- Statusline (lualine), buffer tabs (bufferline)
-- Enhanced UI (noice.nvim), diagnostics (trouble.nvim)
+- Statusline (lualine), notifications (noice.nvim)
+- Dashboard (dashboard-nvim), key hints (which-key)
 - Markdown rendering (render-markdown.nvim)
+
+**Editing**:
+
+- Surround (nvim-surround), autopairs (nvim-autopairs)
+- Terminal (toggleterm.nvim), AI assistant (sidekick.nvim)
+- Custom snippets with LuaSnip (C++, Go)
 
 **Essential Commands**:
 
@@ -233,6 +253,48 @@ Automatically enabled when working over SSH (`$SSH_TTY` detected). Allows seamle
 
 Configuration in `nvim/lua/custom/options.lua` - up to ~75KB per operation.
 
+> [!TIP] **Commit Message Template**
+>
+> A structured commit message template is provided in `.gitmessage`. Set it up with:
+>
+> ```bash
+> git config --global commit.template ~/.gitmessage
+> ```
+
+---
+
+## Claude Code
+
+This repository includes custom configurations for [Claude Code](https://claude.ai/code):
+
+### Agents (11)
+
+Specialized agents for different development tasks:
+
+`api-designer`, `code-reviewer`, `database-optimizer`, `debugger`, `git-workflow-manager`, `golang-pro`, `microservices-architect`, `performance-engineer`, `refactoring-specialist`, `sql-pro`, `test-automator`
+
+### Commands (2)
+
+- `commit` - Structured git commit workflow
+- `code-review` - Code review command
+
+### Skills (2)
+
+- `drawio` - Generate draw.io diagrams from descriptions
+- `ifbook-automation` - Auto-generate test cases for ifbook API platform
+
+### Setup
+
+```bash
+# Symlink to both .claude and .claude-internal
+ln -s ~/.dotfiles/claude/agents ~/.claude/agents
+ln -s ~/.dotfiles/claude/skills ~/.claude/skills
+ln -s ~/.dotfiles/claude/commands ~/.claude/commands
+ln -s ~/.dotfiles/claude/agents ~/.claude-internal/agents
+ln -s ~/.dotfiles/claude/skills ~/.claude-internal/skills
+ln -s ~/.dotfiles/claude/commands ~/.claude-internal/commands
+```
+
 ---
 
 ## Key Mappings
@@ -241,21 +303,21 @@ Configuration in `nvim/lua/custom/options.lua` - up to ~75KB per operation.
 
 ### Window & File Management
 
-| Key                         | Action                                    |
-| --------------------------- | ----------------------------------------- |
-| `<leader>sv` / `<leader>sh` | Split window vertically / horizontally    |
-| `<C-h/j/k/l>`               | Navigate between windows (and Tmux panes) |
-| `<leader>h/j/k/l`           | Resize windows                            |
-| `<leader>w`                 | Save file                                 |
-| `<leader>q` / `<leader>Q`   | Quit window / Quit all                    |
-| `<leader>e`                 | Toggle file explorer                      |
+| Key                    | Action                                    |
+| ---------------------- | ----------------------------------------- |
+| `\` / `\|`            | Split window horizontally / vertically    |
+| `<C-h/j/k/l>`         | Navigate between windows (and Tmux panes) |
+| `<leader>h/j/k/l`     | Resize windows                            |
+| `<leader>w`            | Save file                                 |
+| `<leader>q` / `<leader>Q` | Quit window / Quit all                |
+| `<leader>e`            | Toggle file explorer                      |
 
 ### Navigation & Editing
 
 | Key          | Action                         |
 | ------------ | ------------------------------ |
 | `jk`         | Exit insert mode               |
-| `H` / `L`    | Move to start / end of line    |
+| `H` / `L`   | Move to start / end of line    |
 | `{` / `}`    | Move to prev / next paragraph  |
 | `%`          | Jump between matching brackets |
 | `*` / `#`    | Search word forward / backward |
@@ -271,20 +333,20 @@ Configuration in `nvim/lua/custom/options.lua` - up to ~75KB per operation.
 
 ### Plugin Shortcuts
 
-| Key                | Action                      |
-| ------------------ | --------------------------- |
-| `<leader>ff`       | Find files (Telescope)      |
-| `<leader>fg`       | Find grep (Telescope)       |
-| `<leader>fb`       | Find buffers (Telescope)    |
-| `<leader>/`        | Search in current file      |
-| `<leader>rn`       | LSP rename                  |
-| `<leader>g`        | Open Git interface (Neogit) |
-| `,`                | Flash jump to position      |
-| `gc` / `gcc`       | Comment toggle              |
-| `gt` / `gT`        | Next / previous buffer      |
-| `gz<motion><char>` | Add surroundings            |
-| `gzd<char>`        | Delete surroundings         |
-| `<C-t>`            | Toggle terminal             |
+| Key                | Action                       |
+| ------------------ | ---------------------------- |
+| `<leader>ff`       | Find files (snacks.nvim)     |
+| `<leader>fg`       | Find grep (snacks.nvim)      |
+| `<leader>fb`       | Find buffers (snacks.nvim)   |
+| `<leader>/`        | Search in current file       |
+| `<leader>rn`       | LSP rename (IncRename)       |
+| `<leader>g`        | Open Git interface (Neogit)  |
+| `,`                | Flash jump to position       |
+| `gc` / `gcc`       | Comment toggle               |
+| `gt` / `gT`        | Next / previous buffer       |
+| `gz<motion><char>` | Add surroundings             |
+| `gzd<char>`        | Delete surroundings          |
+| `<C-t>`            | Toggle terminal              |
 
 ---
 
@@ -341,3 +403,6 @@ MIT License - Feel free to use and modify for your own setup.
 - [Oh My Zsh](https://ohmyz.sh/)
 - [Powerlevel10k](https://github.com/romkatv/powerlevel10k)
 - [Kitty Terminal](https://sw.kovidgoyal.net/kitty/)
+- [Ghostty](https://ghostty.org/)
+- [Zed](https://zed.dev/)
+- [Claude Code](https://claude.ai/code)

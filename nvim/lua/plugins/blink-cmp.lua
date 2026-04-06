@@ -7,9 +7,9 @@ return {
   version = "1.*",
 
   dependencies = {
+    "onsails/lspkind.nvim",
     "rafamadriz/friendly-snippets",
     { "L3MON4D3/LuaSnip", version = "v2.*" },
-    { "onsails/lspkind.nvim" },
 
     -- Codeium
     {
@@ -17,19 +17,13 @@ return {
       config = function()
         vim.g.codeium_no_map_tab = 1
 
-        -- Ctrl+Enter to accept AI suggestion
-        vim.keymap.set("i", "<C-CR>", function()
-          return vim.fn["codeium#Accept"]()
-        end, { expr = true, silent = true })
-        vim.keymap.set("i", "<C-;>", function()
-          return vim.fn["codeium#CycleCompletions"](1)
-        end, { expr = true, silent = true })
-        vim.keymap.set("i", "<C-,>", function()
-          return vim.fn["codeium#CycleCompletions"](-1)
-        end, { expr = true, silent = true })
-        vim.keymap.set("i", "<C-x>", function()
-          return vim.fn["codeium#Clear"]()
-        end, { expr = true, silent = true })
+        --stylua: ignore start
+        vim.keymap.set("i", "<C-CR>", function() return vim.fn["codeium#Accept"]() end, { expr = true, silent = true })
+        vim.keymap.set("i", "<M-CR>", function() return vim.fn["codeium#Accept"]() end, { expr = true, silent = true })
+        vim.keymap.set("i", "<C-;>", function() return vim.fn["codeium#CycleCompletions"](1) end, { expr = true, silent = true })
+        vim.keymap.set("i", "<C-,>", function() return vim.fn["codeium#CycleCompletions"](-1) end, { expr = true, silent = true })
+        vim.keymap.set("i", "<C-x>", function() return vim.fn["codeium#Clear"]() end, { expr = true, silent = true })
+        -- stylua: ignore end
       end,
     },
   },
@@ -38,7 +32,7 @@ return {
     -- Snippet engine configuration
     snippets = { preset = "luasnip" },
 
-    -- Keymap configuration (similar to nvim-cmp behavior)
+    -- Keymap configuration
     keymap = {
       preset = "none",
 
@@ -86,10 +80,7 @@ return {
     },
 
     -- Appearance configuration
-    appearance = {
-      nerd_font_variant = "mono",
-      -- kind_icons will be set dynamically in config function
-    },
+    appearance = { nerd_font_variant = "mono" },
 
     -- Completion settings
     completion = {
@@ -98,10 +89,8 @@ return {
 
       -- Menu configuration
       menu = {
-        max_height = 36,
         auto_show = true,
         border = "rounded",
-        winhighlight = "Normal:Normal,FloatBorder:FloatBorder,CursorLine:Visual,Search:None",
         draw = {
           -- Use treesitter highlighting for LSP items
           treesitter = { "lsp" },
@@ -119,11 +108,7 @@ return {
       -- Documentation window
       documentation = {
         auto_show = true,
-        auto_show_delay_ms = 200,
-        window = {
-          border = "rounded",
-          winhighlight = "Normal:Normal,FloatBorder:FloatBorder,CursorLine:Visual,Search:None",
-        },
+        window = { border = "rounded" },
       },
 
       -- Ghost text preview
@@ -131,10 +116,7 @@ return {
     },
 
     -- Signature help
-    signature = {
-      enabled = true,
-      window = { border = "rounded", winhighlight = "Normal:Normal,FloatBorder:FloatBorder" },
-    },
+    signature = { enabled = true, window = { border = "rounded" } },
 
     -- Sources configuration
     sources = {

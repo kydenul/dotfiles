@@ -130,6 +130,9 @@ BREW_FORMULAS=(
     # Go formatters (used by conform.nvim)
     gofumpt
 
+    # Input method
+    im-select # input method auto-switching (Neovim)
+
     # Other tools
     curl
     tree-sitter # treesitter CLI (auto_install parsers)
@@ -137,8 +140,9 @@ BREW_FORMULAS=(
 
 BREW_CASKS=(
     kitty                 # Terminal emulator
+    ghostty               # Alternative terminal emulator
     font-hack-nerd-font   # Nerd Font for icons
-    font-maple-mono-nf-cn # Maple Mono font (Kitty & Zed)
+    font-maple-mono-nf-cn # Maple Mono font (Kitty, Ghostty & Zed)
 )
 
 info "Installing formulae..."
@@ -254,6 +258,9 @@ if [ -d "$DOTFILES/claude" ]; then
     safe_link "$DOTFILES/claude/agents" "$HOME/.claude/agents"
     safe_link "$DOTFILES/claude/skills" "$HOME/.claude/skills"
     safe_link "$DOTFILES/claude/commands" "$HOME/.claude/commands"
+    safe_link "$DOTFILES/claude/agents" "$HOME/.claude-internal/agents"
+    safe_link "$DOTFILES/claude/skills" "$HOME/.claude-internal/skills"
+    safe_link "$DOTFILES/claude/commands" "$HOME/.claude-internal/commands"
 fi
 
 # ── 6. Git Config ───────────────────────────────────────────────────────────

@@ -21,7 +21,7 @@ return {
         },
         ignore_focus = { "NvimTree", "neo-tree", "Outline" },
         always_divide_middle = true,
-        globalstatus = true,
+        globalstatus = false,
         refresh = { statusline = 100, tabline = 100, winbar = 100 },
       },
 

@@ -2,6 +2,7 @@
 
 return {
   "nvim-treesitter/nvim-treesitter",
+  branch = "main",
   build = ":TSUpdate",
   event = { "BufReadPost", "BufNewFile" },
 
@@ -36,13 +37,10 @@ return {
     -- Treesitter context setup
     local context = require("treesitter-context")
     -- 0 表示不限制上下文窗口的高度
-    context.setup({ enable = true, max_lines = 5 })
+    context.setup({ enable = true, max_lines = 8 })
 
-    -- Treesitter main setup
-    local treesitter = require("nvim-treesitter.configs")
-
-    treesitter.setup({
-      -- A list of parser names, or "all" (these parsers should always be installed)
+    -- Treesitter main setup (new main branch API)
+    require("nvim-treesitter").setup({
       ensure_installed = {
         "c",
         "cmake",
@@ -89,69 +87,36 @@ return {
       auto_install = true,
       -- List of parsers to ignore installing (for "all")
       ignore_install = {},
-
-      highlight = {
-        -- Should we enable this module for all supported languages?
-        enable = true,
-
-        -- NOTE: these are the names of the parsers and not the filetype. (for example, if you want to
-        -- disable highlighting for the `tex` filetype, you need to include `latex` in this list as this is
-        -- the name of the parser)
-        -- If you want to disable the module for some languages you can pass a list to the `disable` option.
-        -- Or use a function for more flexibility, e.g. to disable slow tree-sitter highlight for large files
-        disable = function(lang, buf)
-          local max_filesize = 20000 * 1024 -- 20000 KB
-          local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(buf))
-          if ok and stats and stats.size > max_filesize then
-            return true
-          end
-          return false
-        end,
-
-        -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
-        -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
-        -- Using this option may slow down your editor, and you may see some duplicate highlights.
-        -- Instead of true it can also be a list of languages
-        additional_vim_regex_highlighting = false,
-      },
-
-      -- Enable tree-sitter based text objects
-      textobjects = {
-        enable = true,
-
-        select = {
-          enable = true,
-          -- Automatically jump forward to textobj, similar to targets.vim
-          lookahead = true,
-          keymaps = {
-            -- You can use the capture groups defined in textobjects.scm
-            ["af"] = "@function.outer",
-            ["if"] = "@function.inner",
-            ["ac"] = "@class.outer",
-            ["ic"] = "@class.inner",
-            ["ab"] = "@block.outer",
-            ["ib"] = "@block.inner",
-          },
-        },
-
-        move = {
-          enable = true,
-          set_jumps = true, -- whether to set jumps in the jumplist
-          goto_next_start = { ["]f"] = "@function.outer" },
-          goto_next_end = { ["]F"] = "@function.outer" },
-          goto_previous_start = { ["[f"] = "@function.outer" },
-          goto_previous_end = { ["[F"] = "@function.outer" },
-        },
-      },
     })
 
-    -- Add commands to help with treesitter
-    vim.api.nvim_create_user_command("TSInstallInfo", function()
-      vim.cmd("TSInstallInfo")
-    end, { desc = "Show installed treesitter parsers" })
+    -- Highlight is now built into Neovim (vim.treesitter), enabled by default.
+    -- Disable treesitter highlight for large files.
+    vim.api.nvim_create_autocmd("BufReadPost", {
+      callback = function(args)
+        local max_filesize = 20000 * 1024 -- 20000 KB
+        local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(args.buf))
+        if ok and stats and stats.size > max_filesize then
+          vim.treesitter.stop(args.buf)
+        end
+      end,
+    })
 
-    vim.api.nvim_create_user_command("TSModuleInfo", function()
-      vim.cmd("TSModuleInfo")
-    end, { desc = "Show treesitter module information" })
+    -- Textobjects configuration (new main branch API: setup + manual keymaps)
+    require("nvim-treesitter-textobjects").setup({
+      select = { lookahead = true },
+      move = { set_jumps = true },
+    })
+
+    -- Move textobject keymaps
+    local move = require("nvim-treesitter-textobjects.move")
+    local function opts(desc)
+      return { desc = "[Textobjects] " .. desc, noremap = true, silent = true, nowait = true }
+    end
+    --stylua: ignore start
+    vim.keymap.set({ "n", "x", "o" }, "]f", function() move.goto_next_start("@function.outer", "textobjects") end, opts("Next Function Start"))
+    vim.keymap.set({ "n", "x", "o" }, "]F", function() move.goto_next_end("@function.outer", "textobjects") end, opts("Next Function End"))
+    vim.keymap.set({ "n", "x", "o" }, "[f", function() move.goto_previous_start("@function.outer", "textobjects") end, opts("Previous Function Start"))
+    vim.keymap.set({ "n", "x", "o" }, "[F", function() move.goto_previous_end("@function.outer", "textobjects") end, opts("Previous Function End"))
+    --stylua: ignore end
   end,
 }

@@ -30,11 +30,7 @@ return {
 
   opts = {
     ui = {
-      icons = {
-        package_installed = "✓",
-        package_pending = "➜",
-        package_uninstalled = "✗",
-      },
+      icons = { package_installed = "✓", package_pending = "➜", package_uninstalled = "✗" },
       border = "rounded",
     },
     max_concurrent_installers = 4,
@@ -92,61 +88,32 @@ return {
           return { noremap = true, silent = true, buffer = event.buf, desc = desc }
         end
 
-        -- notification wrapper of original gd
-        vim.keymap.set("n", "gd", function()
-          local params = vim.lsp.util.make_position_params(0, "utf-8")
-          vim.lsp.buf_request(0, "textDocument/definition", params, function(_, result, _, _)
-            if not result or vim.tbl_isempty(result) then
-              vim.notify("No definition found", vim.log.levels.INFO)
-            else
-              Snacks.picker.lsp_definitions()
-            end
-          end)
-        end, bufopts("LSP: Goto Definition"))
-
-        -- open gd in new split
-        vim.keymap.set("n", "gD", function()
-          local win = vim.api.nvim_get_current_win()
-          local width = vim.api.nvim_win_get_width(win)
-          local height = vim.api.nvim_win_get_height(win)
-
-          -- Mimic tmux formula: 8 * width - 20 * height
-          local value = 8 * width - 20 * height
-          if value < 0 then
-            vim.cmd("split") -- vertical space is more: horizontal split
-          else
-            vim.cmd("vsplit") -- horizontal space is more: vertical split
-          end
-
-          vim.lsp.buf.definition()
-        end, bufopts("LSP: Goto Definition (split)"))
-
-        -- LSP Pickers (via Snacks)
-        -- stylua: ignore
+        -- LSP Pickers
+        --stylua: ignore start
+        vim.keymap.set("n", "gd", function() Snacks.picker.lsp_definitions() end, bufopts("LSP: Goto Definition"))
+        vim.keymap.set("n", "gD", function() Snacks.picker.lsp_declarations() end, bufopts("LSP: Goto Declaration"))
         vim.keymap.set("n", "gr", function() Snacks.picker.lsp_references() end, bufopts("LSP: Goto References"))
-        -- stylua: ignore
         vim.keymap.set("n", "gi", function() Snacks.picker.lsp_implementations() end, bufopts("LSP: Goto Implementation"))
-
-        -- ------------------------------------------------------------------------
-        -- Documentation and Diagnostics
-        -- ------------------------------------------------------------------------
         vim.keymap.set("n", "gK", vim.lsp.buf.hover, bufopts("LSP: Hover"))
+        vim.keymap.set("n", "gI", function() Snacks.picker.lsp_incoming_calls() end, bufopts("LSP:Find incoming calls"))
+        vim.keymap.set("n", "gO", function() Snacks.picker.lsp_outgoing_calls({tree = true}) end, bufopts("LSP:Find incoming calls"))
 
         -- Smart K: show diagnostics if available, otherwise hover
         vim.keymap.set("n", "K", function()
-          local line_diagnostics = vim.diagnostic.get(0, { lnum = vim.fn.line(".") - 1 })
-          if next(line_diagnostics) then
+          if next(vim.diagnostic.get(0, { lnum = vim.fn.line(".") - 1 })) then
             vim.diagnostic.open_float()
           else
             vim.lsp.buf.hover()
           end
         end, bufopts("LSP: Diagnostic or Hover"))
 
+
         -- ------------------------------------------------------------------------
         -- Code Actions and Formatting
         -- ------------------------------------------------------------------------
         vim.keymap.set({ "n", "v" }, "<space>ca", vim.lsp.buf.code_action, bufopts("LSP: Code Action"))
         vim.keymap.set("n", "<leader>lf", vim.lsp.buf.format, bufopts("LSP: Format"))
+        --stylua: ignore end
 
         -- ------------------------------------------------------------------------
         -- Function Navigation ([f / ]f)
@@ -315,9 +282,9 @@ return {
     -- NOTE: Diagnostics
     -- See `:help vim.diagnostic.*` for documentation on any of the below functions.
     -- stylua: ignore
-    vim.keymap.set("n", "[d", function() vim.diagnostic.goto_prev() end, { noremap = true, silent = true })
+    vim.keymap.set("n", "[d", function() vim.diagnostic.goto_prev() end, { noremap = true, silent = true, desc = "[Diagnostics] Prev" })
     -- stylua: ignore
-    vim.keymap.set("n", "]d", function() vim.diagnostic.goto_next() end, { noremap = true, silent = true })
+    vim.keymap.set("n", "]d", function() vim.diagnostic.goto_next() end, { noremap = true, silent = true, desc = "[Diagnostics] Next" })
 
     local signs_handler = {
       text = {

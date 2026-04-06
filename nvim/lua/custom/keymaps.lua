@@ -32,7 +32,7 @@ vim.keymap.set("n", "<leader>k", ":resize -3<CR>", opts)
 -- NOTE: Use vim-tmux-navigator instead
 
 -- Save file
-vim.keymap.set("n", "<leader>w", ":w!<CR>", { desc = "[File] Save" }) -- Save file
+vim.keymap.set("n", "<leader>w", ":w!<CR>", { noremap = true, silent = true, desc = "[File] Save" }) -- Save file
 -- Quick save and quit
 vim.keymap.set("n", "<leader>q", "<Cmd>q<CR>", { noremap = true, silent = true, desc = "Quit" })
 vim.keymap.set("n", "<leader>Q", "<Cmd>qa<CR>", { noremap = true, silent = true, desc = "Quit all" })
