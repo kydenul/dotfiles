@@ -102,7 +102,6 @@ return {
       "ini",
       "javascript",
       "json",
-      "latex",
       "lua",
       "luadoc", -- Added for better Lua documentation support
       "make",
