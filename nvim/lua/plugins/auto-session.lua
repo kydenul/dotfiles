@@ -44,6 +44,21 @@ return {
   config = function(_, opts)
     vim.o.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
 
+    -- HACK: Neovim 0.12.0 diagnostic.lua bug workaround
+    -- When auto-session wipes buffers during session switch, LSP detach triggers
+    -- diagnostic.hide() -> cleanup_show_autocmd -> nvim_del_autocmd on an already
+    -- deleted autocmd, causing an error. Wrap with pcall to degrade to a warning.
+    -- Remove this once Neovim fixes the issue upstream.
+    if vim.fn.has("nvim-0.12") == 1 and vim.fn.has("nvim-0.13") == 0 then
+      local orig_del_autocmd = vim.api.nvim_del_autocmd
+      vim.api.nvim_del_autocmd = function(id)
+        local ok, err = pcall(orig_del_autocmd, id)
+        if not ok then
+          vim.notify("[nvim 0.12 compat] nvim_del_autocmd: " .. tostring(err), vim.log.levels.WARN)
+        end
+      end
+    end
+
     require("auto-session").setup(opts)
 
     -- Check and clean up invalid sessions on startup

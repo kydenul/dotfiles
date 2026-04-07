@@ -71,9 +71,8 @@ return {
   cmd = "Neogit",
   keys = {
     { "<leader>g", "<cmd>Neogit<cr>", desc = "[Neogit] TUI Toggle" },
-
-    { "gho", "<cmd>DiffviewOpen<cr>", desc = "[Diffview] Open" },
-    { "ghc", "<cmd>DiffviewClose<cr>", desc = "[Diffview] Close" },
+    { "gho", "<cmd>DiffviewOpen<cr>", desc = "[GitDiffview] Open" },
+    { "ghc", "<cmd>DiffviewClose<cr>", desc = "[GitDiffview] Close" },
     -- stylua: ignore
     { "ghg", function() require("gitgraph").draw({}, { all = true, max_count = 5000 }) end, desc = "[GitGraph] Draw" },
   },

@@ -12,9 +12,9 @@ window-theme = auto
 keybind = global:ctrl+grave_accent=toggle_quick_terminal
 quick-terminal-position = bottom
 
-background-image = ~/.config/images/alone.jpg
-background-image-opacity = 0.2
-background-image-fit = cover 
+# background-image = ~/.config/images/alone.jpg
+# background-image-opacity = 0.2
+# background-image-fit = cover 
 
 font-family = "Maple Mono NF CN"
 font-size = 18
