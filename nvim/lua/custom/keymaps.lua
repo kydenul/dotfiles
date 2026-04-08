@@ -17,6 +17,7 @@ vim.keymap.set("i", "jk", "<ESC>")
 -- New windows
 vim.keymap.set("n", "\\", "<CMD>:sp<CR>", { desc = "Split window horizontally" })
 vim.keymap.set("n", "|", "<CMD>:vsp<CR>", { desc = "Split window vertically" })
+vim.keymap.set("n", "<leader>wd", "<CMD>:close<CR>", { desc = "Close window" })
 
 -- Resize with arrows
 vim.keymap.set("n", "<leader>h", ":vertical resize +3<CR>", opts)
@@ -36,6 +37,9 @@ vim.keymap.set("n", "<leader>w", ":w!<CR>", { noremap = true, silent = true, des
 -- Quick save and quit
 vim.keymap.set("n", "<leader>q", "<Cmd>q<CR>", { noremap = true, silent = true, desc = "Quit" })
 vim.keymap.set("n", "<leader>Q", "<Cmd>qa<CR>", { noremap = true, silent = true, desc = "Quit all" })
+
+-- Close current tab
+vim.keymap.set("n", "<leader>tc", "<Cmd>tabclose<CR>", { noremap = true, silent = true, desc = "[Tab] Close current" })
 
 -- Clear highlight
 vim.keymap.set("n", "<leader>nh", ":nohl<CR>")
