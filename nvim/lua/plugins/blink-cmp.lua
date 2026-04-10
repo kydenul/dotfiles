@@ -90,7 +90,7 @@ return {
       -- Menu configuration
       menu = {
         auto_show = true,
-        max_height = 12,
+        max_height = 24,
         border = "rounded",
         draw = {
           -- Use treesitter highlighting for LSP items
