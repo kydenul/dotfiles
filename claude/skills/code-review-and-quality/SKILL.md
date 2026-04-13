@@ -152,9 +152,11 @@ For each file changed:
 5. Performance: Any bottlenecks?
 ```
 
-### Step 4: Categorize Findings
+### Step 4: Categorize and Number Findings
 
-Label every comment with its severity so the author knows what's required vs optional:
+**Every finding gets a sequential number.** This makes it easy to reference specific issues in follow-up discussions (e.g., "fix #3 and #7, skip #5").
+
+Number findings sequentially across all axes using the format `#N`. Label every comment with its severity so the author knows what's required vs optional:
 
 | Prefix                        | Meaning            | Author Action                                           |
 | ----------------------------- | ------------------ | ------------------------------------------------------- |
@@ -164,7 +166,17 @@ Label every comment with its severity so the author knows what's required vs opt
 | **Optional:** / **Consider:** | Suggestion         | Worth considering but not required                      |
 | **FYI**                       | Informational only | No action needed — context for future reference         |
 
-This prevents authors from treating all feedback as mandatory and wasting time on optional suggestions.
+**Example output format:**
+
+```
+#1 [Critical] src/auth.ts:42 — SQL query uses string concatenation instead of parameterized query. This is a SQL injection vulnerability.
+#2 src/api/users.ts:15 — Missing null check on `user.email` before calling `.toLowerCase()`. Will throw on null input.
+#3 [Nit] src/utils/format.ts:8 — `formatData` is a vague name. Consider `formatUserDisplayName`.
+#4 [Optional] src/api/users.ts:30-45 — This could be simplified with `Array.filter` instead of the manual loop.
+#5 [FYI] src/config.ts:12 — `MAX_RETRIES` was previously 3; now set to 5. Just noting the change.
+```
+
+This prevents authors from treating all feedback as mandatory and wasting time on optional suggestions. Numbered findings allow the author to respond with "fix #1 #2, ignore #3" for efficient follow-up.
 
 ### Step 5: Verify the Verification
 
@@ -315,10 +327,22 @@ Part of code review is dependency review:
 - [ ] Build succeeds
 - [ ] Manual verification done (if applicable)
 
-### Verdict
+### Findings
 
-- [ ] **Approve** — Ready to merge
-- [ ] **Request changes** — Issues must be addressed
+List all findings with sequential numbers, severity, location, and description:
+
+#1 [severity] file:line — description
+#2 [severity] file:line — description
+...
+
+### Summary
+
+Total: N findings (X critical, Y required, Z optional/nit)
+Verdict: Approve / Request Changes
+
+To fix specific issues: "fix #1 #3 #5"
+To fix all required: "fix all required"
+To fix everything: "fix all"
 ```
 
 ## Common Rationalizations
