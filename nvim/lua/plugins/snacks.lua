@@ -3,7 +3,24 @@ return {
   priority = 1000,
   lazy = false,
   opts = {
-    image = { enabled = true },
+    image = {
+      enabled = true,
+      doc = {
+        -- Only when I hover over them render the image inline in the buffer.
+        -- If your env doesn't support unicode placeholders, this will be disabled
+        inline = vim.g.neovim_mode == "skitty" and true or false,
+
+        -- only_render_image_at_cursor = vim.g.neovim_mode == "skitty" and false or true,
+        -- render the image in a floating window only used if `opts.inline` is disabled
+        float = true,
+
+        -- Sets the size of the image
+        max_width = vim.g.neovim_mode == "skitty" and 5 or 60,
+        max_height = vim.g.neovim_mode == "skitty" and 2.5 or 30,
+
+        conceal = true,
+      },
+    },
     input = { enabled = false },
     picker = {
       matcher = { frecency = true, cwd_bonus = true, history_bonus = true },
@@ -30,6 +47,9 @@ return {
     scroll = { enabled = true, animate = { duration = { step = 10, total = 200 }, easing = "linear" } },
     bufdelete = { enabled = true },
     indent = { enabled = true },
+    quickfile = { enabled = true },
+    words = { enabled = true },
+    toggle = { enabled = true },
   },
 
   keys = {
@@ -45,8 +65,9 @@ return {
 
     -- Find
     { "<leader>/", function() Snacks.picker.lines() end, desc = "Fuzzy find in buffer" },
-    { "<leader>ff", function() Snacks.picker.files() end, desc = "Find files" },
+    { "<leader>ff", function() Snacks.picker.files({ args = { "--no-ignore", "--hidden" } }) end, desc = "Find ALL files" },
     { "<leader>fg", function() Snacks.picker.grep() end, desc = "Live grep" },
+    { "<leader>fG", function() Snacks.picker.grep({ args = { "--no-ignore", "--hidden" } }) end, desc = "Live grep (all files)" },
     { "<leader>fs", function() Snacks.picker.grep_word() end, desc = "Find string under cursor" },
 
     { "<leader>fb", function() Snacks.picker.buffers({ sort_lastused = true }) end, desc = "Find buffers" },
@@ -72,6 +93,10 @@ return {
 
     -- Todo-Comment
     { "<leader>ftd", function() Snacks.picker.todo_comments() end, desc = "Todo comments" },
+
+    -- Words (LSP references)
+    { "]]", function() Snacks.words.jump(vim.v.count1, true) end, desc = "Next Reference", mode = { "n", "t" } },
+    { "[[", function() Snacks.words.jump(-vim.v.count1, true) end, desc = "Prev Reference", mode = { "n", "t" } },
     --stylua: ignore end
   },
 }
