@@ -48,7 +48,7 @@ return {
     bufdelete = { enabled = true },
     indent = { enabled = true },
     quickfile = { enabled = true },
-    words = { enabled = true },
+    words = { enabled = true, debounce = 50 },
     toggle = { enabled = true },
   },
 
