@@ -42,7 +42,7 @@ return {
         },
       },
     },
-    bigfile = { enabled = true, size = 10 * 1024 * 1024 },
+    bigfile = { enabled = true, size = 10 * 1024 * 1024, line_length = math.huge },
     notifier = { enabled = true, timeout = 2400, style = "compact", top_down = false },
     scroll = { enabled = true, animate = { duration = { step = 10, total = 200 }, easing = "linear" } },
     bufdelete = { enabled = true },
