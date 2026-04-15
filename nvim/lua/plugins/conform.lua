@@ -49,7 +49,7 @@ return {
           require("conform").format({ lsp_fallback = true, async = false, timeout_ms = 3000 })
         end,
         mode = { "n", "v" },
-        desc = "[Conform] Format file or range(in visual mode)",
+        desc = "[Conform] Format file or range",
       },
     },
 
@@ -87,6 +87,18 @@ return {
 
       -- 自定义格式化器配置
       formatters = {
+        prettier = { prepend_args = { "--ignore-path", "/dev/null" } },
+        eslint_d = { prepend_args = { "--no-ignore" } },
+        stylua = {
+          prepend_args = {
+            "--no-ignore-vcs",
+            "--indent-type",
+            "Spaces",
+            "--indent-width",
+            "2",
+          },
+        },
+
         black = {
           prepend_args = {
             "--target-version",
@@ -96,21 +108,9 @@ return {
           },
         },
 
-        stylua = {
-          prepend_args = {
-            "--indent-type",
-            "Spaces",
-            "--indent-width",
-            "2",
-          },
-        },
-
-        gofumpt = {
-          prepend_args = { "-extra" },
-        },
+        gofumpt = { prepend_args = { "-extra" } },
       },
 
-      -- 保存时自动格式化
       format_on_save = {
         timeout_ms = 3000,
         lsp_fallback = true,
