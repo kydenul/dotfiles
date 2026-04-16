@@ -7,20 +7,33 @@ if vim.fn.exists("$SSH_TTY") == 1 or vim.fn.exists("$SSH_CONNECTION") == 1 then
 
   local in_tmux = vim.env.TMUX ~= nil
 
+  -- 分块写入 stderr，避免大文本超出 TTY 缓冲区（macOS ~64KB）导致静默失败
+  local function write_chunked(str)
+    local chunk_size = 4096
+    for i = 1, #str, chunk_size do
+      local ok, err = pcall(io.stderr.write, io.stderr, str:sub(i, i + chunk_size - 1))
+      if not ok then
+        util.log_info("OSC52 write failed at byte " .. i .. ": " .. tostring(err))
+        return false
+      end
+    end
+    return true
+  end
+
   local function osc52_copy(reg)
     return function(lines)
       local text = table.concat(lines, "\n")
       local base64 = vim.base64.encode(text)
-      local seq
       if in_tmux then
-        -- DCS passthrough: 绕过 tmux 直接发送到外层终端（同步到本地剪贴板）
-        seq = string.format("\x1bPtmux;\x1b\x1b]52;%s;%s\x07\x1b\\", reg, base64)
-        -- 异步写入 tmux buffer，使跨 window/pane 粘贴可用
+        -- 异步写入 tmux buffer，使跨 window/pane 粘贴可用（无大小限制）
         vim.system({ "tmux", "load-buffer", "-" }, { stdin = text })
+        -- DCS passthrough: 绕过 tmux 直接发送到外层终端（同步到本地剪贴板）
+        local seq = string.format("\x1bPtmux;\x1b\x1b]52;%s;%s\x07\x1b\\", reg, base64)
+        write_chunked(seq)
       else
-        seq = string.format("\x1b]52;%s;%s\x1b\\", reg, base64)
+        local seq = string.format("\x1b]52;%s;%s\x1b\\", reg, base64)
+        write_chunked(seq)
       end
-      pcall(io.stderr.write, io.stderr, seq)
     end
   end
 
