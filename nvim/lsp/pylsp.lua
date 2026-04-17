@@ -9,4 +9,14 @@ return {
     "Pipfile",
     ".git",
   },
+
+  settings = {
+    pylsp = {
+      plugins = {
+        pycodestyle = {
+          maxLineLength = 120,
+        },
+      },
+    },
+  },
 }
