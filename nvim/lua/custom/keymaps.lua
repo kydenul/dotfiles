@@ -20,10 +20,10 @@ vim.keymap.set("n", "|", "<CMD>:vsp<CR>", { desc = "Split window vertically" })
 vim.keymap.set("n", "<leader>wd", "<CMD>:close<CR>", { desc = "Close window" })
 
 -- Resize with arrows
-vim.keymap.set("n", "<leader>h", ":vertical resize +3<CR>", opts)
-vim.keymap.set("n", "<leader>l", ":vertical resize -3<CR>", opts)
-vim.keymap.set("n", "<leader>j", ":resize +3<CR>", opts)
-vim.keymap.set("n", "<leader>k", ":resize -3<CR>", opts)
+vim.keymap.set("n", "<C-Up>", ":resize +3<CR>", opts)
+vim.keymap.set("n", "<C-Down>", ":resize -3<CR>", opts)
+vim.keymap.set("n", "<C-Left>", ":vertical resize +3<CR>", opts)
+vim.keymap.set("n", "<C-Right>", ":vertical resize -3<CR>", opts)
 
 -- -- leader + hjkl 在窗口之间跳转
 -- vim.keymap.set("n", "<C-j>", "<C-w>j", opts)
@@ -35,7 +35,6 @@ vim.keymap.set("n", "<leader>k", ":resize -3<CR>", opts)
 -- Save file
 vim.keymap.set("n", "<leader>w", ":w!<CR>", { noremap = true, silent = true, desc = "[File] Save" }) -- Save file
 -- Quick save and quit
-vim.keymap.set("n", "<leader>q", "<Cmd>q<CR>", { noremap = true, silent = true, desc = "Quit" })
 vim.keymap.set("n", "<leader>Q", "<Cmd>qa<CR>", { noremap = true, silent = true, desc = "Quit all" })
 
 -- Close current tab

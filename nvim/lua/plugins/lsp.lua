@@ -97,7 +97,7 @@ return {
         vim.keymap.set("n", "gi", function() Snacks.picker.lsp_implementations() end, bufopts("LSP: Goto Implementation"))
         vim.keymap.set("n", "gK", vim.lsp.buf.hover, bufopts("LSP: Hover"))
         vim.keymap.set("n", "gI", function() Snacks.picker.lsp_incoming_calls() end, bufopts("LSP:Find incoming calls"))
-        vim.keymap.set("n", "gO", function() Snacks.picker.lsp_outgoing_calls({tree = true}) end, bufopts("LSP:Find incoming calls"))
+        vim.keymap.set("n", "gO", function() Snacks.picker.lsp_outgoing_calls({tree = true}) end, bufopts("LSP: Find outgoing calls"))
 
         -- Smart K: show diagnostics if available, otherwise hover
         vim.keymap.set("n", "K", function()
@@ -113,87 +113,8 @@ return {
         -- Code Actions and Formatting
         -- ------------------------------------------------------------------------
         vim.keymap.set({ "n", "v" }, "<space>ca", vim.lsp.buf.code_action, bufopts("LSP: Code Action"))
-        vim.keymap.set("n", "<leader>lf", vim.lsp.buf.format, bufopts("LSP: Format"))
+        -- vim.keymap.set("n", "<leader>lf", vim.lsp.buf.format, bufopts("LSP: Format"))
         --stylua: ignore end
-
-        -- ------------------------------------------------------------------------
-        -- Function Navigation ([f / ]f)
-        -- ------------------------------------------------------------------------
-        local function find_enclosing_symbol()
-          local params = { textDocument = vim.lsp.util.make_text_document_params(event.buf) }
-          local responses = vim.lsp.buf_request_sync(event.buf, "textDocument/documentSymbol", params, 1000)
-          if not responses then
-            return nil
-          end
-          local line = vim.api.nvim_win_get_cursor(0)[1] - 1
-          local function find(symbols)
-            for _, s in ipairs(symbols) do
-              local range = s.range or (s.location and s.location.range)
-              if range and line >= range.start.line and line <= range["end"].line then
-                if s.children then
-                  local child = find(s.children)
-                  if child then
-                    return child
-                  end
-                end
-                return s
-              end
-            end
-          end
-          for _, resp in pairs(responses) do
-            local sym = find(resp.result or {})
-            if sym then
-              return sym
-            end
-          end
-        end
-
-        vim.keymap.set("n", "[f", function()
-          local sym = find_enclosing_symbol()
-          if sym and sym.range then
-            vim.api.nvim_win_set_cursor(0, { sym.range.start.line + 1, 0 })
-          end
-        end, bufopts("LSP: Jump to function start"))
-
-        vim.keymap.set("n", "]f", function()
-          local sym = find_enclosing_symbol()
-          if sym and sym.range then
-            vim.api.nvim_win_set_cursor(0, { sym.range["end"].line + 1, 0 })
-          end
-        end, bufopts("LSP: Jump to function end"))
-
-        -- ------------------------------------------------------------------------
-        -- Toggle Features
-        -- ------------------------------------------------------------------------
-
-        -- toggle diagnostics
-        vim.keymap.set(
-          "n",
-          "<leader>td",
-          (function()
-            local diag_status = 1 -- 1 is show; 0 is hide
-            return function()
-              if diag_status == 1 then
-                diag_status = 0
-                vim.diagnostic.config({
-                  underline = false,
-                  virtual_text = false,
-                  signs = false,
-                  update_in_insert = false,
-                })
-              else
-                diag_status = 1
-                vim.diagnostic.config({
-                  underline = true,
-                  virtual_text = true,
-                  signs = true,
-                  update_in_insert = true,
-                })
-              end
-            end
-          end)(),
-          bufopts("LSP: Toggle diagnostics display")
-        )
 
         -- folding
         local client = vim.lsp.get_client_by_id(event.data.client_id)

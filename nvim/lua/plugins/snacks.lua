@@ -97,6 +97,9 @@ return {
     -- Words (LSP references)
     { "]]", function() Snacks.words.jump(vim.v.count1, true) end, desc = "Next Reference", mode = { "n", "t" } },
     { "[[", function() Snacks.words.jump(-vim.v.count1, true) end, desc = "Prev Reference", mode = { "n", "t" } },
+
+    -- Toggle
+    { "<leader>td", function() Snacks.toggle.diagnostics():toggle() end, desc = "Toggle Diagnostics" },
     --stylua: ignore end
   },
 }
