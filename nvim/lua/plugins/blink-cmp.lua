@@ -8,6 +8,7 @@ return {
 
   dependencies = {
     "onsails/lspkind.nvim",
+    "brenoprata10/nvim-highlight-colors",
     "rafamadriz/friendly-snippets",
     { "L3MON4D3/LuaSnip", version = "v2.*" },
 
@@ -102,6 +103,35 @@ return {
             { "kind_icon" },
             { "label", "label_description", gap = 1 },
             -- { "source_name" },
+          },
+
+          -- Integrate nvim-highlight-colors: show color swatches in completion
+          components = {
+            kind_icon = {
+              text = function(ctx)
+                local icon = ctx.kind_icon
+                if ctx.item.source_name == "LSP" then
+                  local color_item =
+                    require("nvim-highlight-colors").format(ctx.item.documentation, { kind = ctx.kind })
+                  if color_item and color_item.abbr ~= "" then
+                    icon = color_item.abbr
+                  end
+                end
+                return icon .. ctx.icon_gap
+              end,
+
+              highlight = function(ctx)
+                local hl = "BlinkCmpKind" .. ctx.kind
+                if ctx.item.source_name == "LSP" then
+                  local color_item =
+                    require("nvim-highlight-colors").format(ctx.item.documentation, { kind = ctx.kind })
+                  if color_item and color_item.abbr_hl_group then
+                    hl = color_item.abbr_hl_group
+                  end
+                end
+                return hl
+              end,
+            },
           },
         },
       },
