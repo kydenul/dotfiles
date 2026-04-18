@@ -366,4 +366,5 @@
         "markdown": true,
     },
     "diffEditor.hideUnchangedRegions.enabled": true,
+    "workbench.sideBar.location": "right",
 }
