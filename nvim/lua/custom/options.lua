@@ -105,7 +105,6 @@ vim.o.timeoutlen = 300
 
 -- Better performance
 vim.o.lazyredraw = false
-vim.o.ttyfast = true -- Faster terminal connection
 vim.o.regexpengine = 0 -- Use automatic regexp engine selection
 
 -- Highlight yanked text briefly for visual feedback
@@ -113,7 +112,7 @@ vim.api.nvim_create_autocmd("TextYankPost", {
   desc = "Highlight yanked text",
   group = vim.api.nvim_create_augroup("kyden-yank-highlight", { clear = true }),
   callback = function()
-    vim.highlight.on_yank({ higroup = "CurSearch", timeout = 360 })
+    vim.hl.on_yank({ higroup = "CurSearch", timeout = 360 })
   end,
 })
 
@@ -127,8 +126,3 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.opt_local.cursorline = true
   end,
 })
-
--- setup must be called before loading
--- vim.cmd.colorscheme("gruvbox-material")
-vim.cmd.colorscheme("catppuccin")
--- vim.cmd.colorscheme("tokyonight")

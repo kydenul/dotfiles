@@ -13,7 +13,6 @@ return {
     {
       "isakbm/gitgraph.nvim",
       dependencies = { "sindrets/diffview.nvim" },
-      ---@type I.GGConfig
       opts = {
         git_cmd = "git",
 

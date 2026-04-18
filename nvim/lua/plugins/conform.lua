@@ -18,7 +18,6 @@ return {
         -- Python
         "isort",
         "black",
-        "pylint",
 
         -- Lua
         "stylua",
@@ -56,7 +55,7 @@ return {
     opts = {
       formatters_by_ft = {
         -- Python
-        python = { "isort", "black", "pylint" },
+        python = { "isort", "black" },
 
         -- Lua
         lua = { "stylua" },
