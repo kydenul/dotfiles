@@ -3,14 +3,18 @@ return {
   -- Colorschemes
   -- ==============================================================
   {
-    "sainnhe/gruvbox-material",
+    "ellisonleao/gruvbox.nvim",
     lazy = false,
     priority = 1000,
     config = function()
-      vim.g.gruvbox_material_background = "hard" -- 'hard', 'medium', 'soft'
-      vim.g.gruvbox_material_foreground = "material" -- 'material', 'mix', 'original'
-      vim.g.gruvbox_material_float_style = "blend"
-      vim.g.gruvbox_material_transparent_background = 2 -- 0, 1, 2
+      require("gruvbox").setup({
+        terminal_colors = true,
+        transparent_mode = true,
+        contrast = "hard", -- "hard" | "soft" | ""
+        italic = { strings = true, comments = true, operators = false, folds = true },
+      })
+      -- vim.cmd.colorscheme("gruvbox")
+      -- vim.cmd.hi("Comment gui=none")
     end,
   },
 
@@ -57,13 +61,6 @@ return {
         },
       })
     end,
-  },
-
-  {
-    "folke/tokyonight.nvim",
-    lazy = false,
-    priority = 1000,
-    opts = {},
   },
 
   -- ==============================================================
