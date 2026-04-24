@@ -15,7 +15,7 @@ return {
         enable = function(buf, win, _)
           local ft = vim.bo[buf].filetype
           -- Disable winbar for NvimTree and other non-code windows
-          local excluded = { NvimTree = true, dashboard = true, alpha = true }
+          local excluded = { NvimTree = true, alpha = true }
           if excluded[ft] then
             return false
           end

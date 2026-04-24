@@ -2,29 +2,20 @@ return {
   -- ==============================================================
   -- Colorschemes
   -- ==============================================================
+
   {
-    "ellisonleao/gruvbox.nvim",
-    lazy = false,
-    priority = 1000,
+    "Mofiqul/dracula.nvim",
     config = function()
-      require("gruvbox").setup({
-        terminal_colors = true,
-        transparent_mode = true,
-        contrast = "hard", -- "hard" | "soft" | ""
-        italic = { strings = true, comments = true, operators = false, folds = true },
+      require("dracula").setup({
+        transparent_bg = true,
+        italic_comment = true,
       })
-      -- vim.cmd.colorscheme("gruvbox")
-      -- vim.cmd.hi("Comment gui=none")
     end,
   },
 
   {
     "catppuccin/nvim",
-    priority = 1000,
-    init = function()
-      vim.cmd.colorscheme("catppuccin-mocha")
-      vim.cmd.hi("Comment gui=none")
-    end,
+
     config = function()
       require("catppuccin").setup({
         transparent_background = true,
