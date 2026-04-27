@@ -4,13 +4,22 @@ return {
   -- ==============================================================
 
   {
-    "Mofiqul/dracula.nvim",
-    config = function()
-      require("dracula").setup({
-        transparent_bg = true,
-        italic_comment = true,
-      })
-    end,
+    "scottmckendry/cyberdream.nvim",
+    opts = {
+      transparent = true,
+      italic_comments = true,
+      -- borderless_pickers = true,
+
+      highlights = {
+        LspReferenceText = { bg = "#264f78", fg = "#ffffff", bold = true },
+        LspReferenceRead = { link = "LspReferenceText" },
+        LspReferenceWrite = { link = "LspReferenceText" },
+
+        IlluminatedWordText = { bg = "#264f78" },
+        IlluminatedWordRead = { bg = "#264f78" },
+        IlluminatedWordWrite = { bg = "#264f78" },
+      },
+    },
   },
 
   {

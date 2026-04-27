@@ -127,5 +127,5 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
-vim.cmd.colorscheme("catppuccin-mocha")
--- vim.cmd.colorscheme("dracula")
+-- vim.cmd.colorscheme("catppuccin-mocha")
+vim.cmd.colorscheme("cyberdream")
