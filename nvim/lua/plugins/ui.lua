@@ -3,6 +3,8 @@ return {
   -- Colorschemes
   -- ==============================================================
 
+  { "miikanissi/modus-themes.nvim", priority = 1000 },
+
   {
     "scottmckendry/cyberdream.nvim",
     opts = {
