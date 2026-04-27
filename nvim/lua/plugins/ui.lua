@@ -3,24 +3,36 @@ return {
   -- Colorschemes
   -- ==============================================================
 
-  { "miikanissi/modus-themes.nvim", priority = 1000 },
-
   {
-    "scottmckendry/cyberdream.nvim",
+    "miikanissi/modus-themes.nvim",
     opts = {
       transparent = true,
       italic_comments = true,
-      -- borderless_pickers = true,
+      line_nr_column_background = false,
+      sign_column_background = false,
 
-      highlights = {
-        LspReferenceText = { bg = "#264f78", fg = "#ffffff", bold = true },
-        LspReferenceRead = { link = "LspReferenceText" },
-        LspReferenceWrite = { link = "LspReferenceText" },
+      on_highlights = function(hl, c)
+        hl.NeoTreeNormal = { bg = "NONE" }
+        hl.NeoTreeNormalNC = { bg = "NONE" }
+        hl.NeoTreeEndOfBuffer = { bg = "NONE" }
+        hl.NeoTreeWinSeparator = { bg = "NONE" }
+        hl.NvimTreeNormal = { bg = "NONE" }
+        hl.NvimTreeNormalNC = { bg = "NONE" }
+        hl.NormalFloat = { bg = "NONE" }
+        hl.FloatBorder = { bg = "NONE" }
 
-        IlluminatedWordText = { bg = "#264f78" },
-        IlluminatedWordRead = { bg = "#264f78" },
-        IlluminatedWordWrite = { bg = "#264f78" },
-      },
+        -- bg_blue_nuanced
+        hl.Pmenu = { bg = "NONE" }
+        hl.PmenuSel = { fg = "NONE", bg = "#647295", bold = true }
+
+        hl.LineNr = { bg = "NONE", fg = c.fg_dim }
+        hl.LineNrAbove = { bg = "NONE", fg = c.fg_dim }
+        hl.LineNrBelow = { bg = "NONE", fg = c.fg_dim }
+        hl.CursorLineNr = { bg = "NONE", fg = c.fg_active, bold = true }
+        hl.SignColumn = { bg = "NONE", fg = c.fg_dim }
+        hl.FoldColumn = { bg = "NONE", fg = c.fg_inactive }
+        hl.CursorLine = { bg = c.bg_hl_line }
+      end,
     },
   },
 
