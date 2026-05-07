@@ -240,9 +240,18 @@
     // Golang
     "gopls": {  "ui.semanticTokens": true },
     "go.formatTool": "gofumpt",
+    "go.formatFlags": [ "-extra" ],
     "go.inlayHints.parameterNames": false,
     "go.lintTool": "golangci-lint",
     "go.lintFlags": [ "--fast" ],
+    "go.alternateTools": { "gofumpt": "gofumpt" },
+    "[go]": {
+        "editor.defaultFormatter": "golang.go",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit"
+        }
+    },
     
     // -----------------------------------------------------------------
     // Clangd
@@ -365,6 +374,7 @@
         "plaintext": false,
         "markdown": true,
     },
-    "diffEditor.hideUnchangedRegions.enabled": true,
     "workbench.sideBar.location": "right",
+    "markdown-preview-enhanced.previewTheme": "atom-dark.css",
+    "markdown-preview-enhanced.enablePreviewZenMode": true,
 }
