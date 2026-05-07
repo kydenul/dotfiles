@@ -4,11 +4,39 @@ return {
   -- ==============================================================
 
   {
+    "EdenEast/nightfox.nvim",
+    name = "nightfox",
+    priority = 1000,
+    config = function()
+      require("nightfox").setup({
+        options = {
+          transparent = true,
+          terminal_colors = false,
+
+          styles = {
+            comments = "italic",
+            keywords = "bold",
+            types = "italic,bold",
+          },
+        },
+
+        groups = {
+          all = {
+            LspReferenceText = { bg = "palette.sel0", style = "bold,underline" },
+            LspReferenceRead = { bg = "palette.sel0", style = "bold,underline" },
+            LspReferenceWrite = { bg = "palette.sel1", style = "bold,underline" },
+          },
+        },
+      })
+    end,
+  },
+
+  {
     "catppuccin/nvim",
 
     config = function()
       require("catppuccin").setup({
-        transparent_background = true,
+        transparent_background = false,
         term_colors = false,
         integrations = {
           aerial = true,
