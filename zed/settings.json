@@ -1,5 +1,9 @@
 // Zed settings
 //
+// 与 ~/.dotfiles/nvim 的 options.lua 保持一致：
+// - leader = Space
+// - relative number、cursorline、wrap_guides=120、smartcase 等
+//
 // For information on how to configure Zed, see the Zed
 // documentation: https://zed.dev/docs/configuring-zed
 //
@@ -7,62 +11,111 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
-  // Shows line numbers relative to cursor position
-  "relative_line_numbers": "enabled",
-
-  "gutter": {
-    "line_numbers": true,
+  // -------------------- Panel / Layout --------------------
+  "diff_view_style": "unified",
+  "project_panel": {
+    "dock": "left"
+  },
+  "agent": {
+    "default_profile": "write",
+    "default_model": {
+      "provider": "google",
+      "model": "gemini-3.1-pro-preview",
+      "enable_thinking": true
+    },
+    "dock": "right",
+    "favorite_models": [],
+    "model_parameters": []
+  },
+  "git_panel": {
+    "dock": "left"
+  },
+  "outline_panel": {
+    "button": true,
+    "dock": "right"
+  },
+  "collaboration_panel": {
+    "dock": "left",
+    "button": false
   },
 
-  // Hides the minimap (code overview sidebar)
+  // -------------------- Line numbers / Gutter --------------------
+  // 对应 nvim: vim.opt.number / relativenumber = true
+  "relative_line_numbers": "enabled",
+  "gutter": {
+    "line_numbers": true
+  },
+
+  // -------------------- UI --------------------
+  // 隐藏 minimap（nvim 没有 minimap 概念）
   "minimap": { "show": "never" },
 
-  // Only shows vertical scrollbar, hides horizontal one
+  // 仅保留垂直滚动条
   "scrollbar": {
     "axes": {
       "horizontal": false,
-      "vertical": true,
-    },
+      "vertical": true
+    }
   },
 
+  // 光标
   "cursor_shape": "bar",
   "cursor_blink": false,
+
+  // 滚动 padding（nvim: scrolloff = 5）
+  "vertical_scroll_margin": 5,
+
+  // 自动保存：默认关闭，配合 <leader>w 手动保存
   "autosave": "off",
+
+  // 自动重载磁盘上的修改（nvim: autoread + FocusGained checktime）
+  "auto_update": true,
+
   "show_edit_predictions": true,
 
-  // Primary
+  // -------------------- Font / Theme --------------------
   "buffer_font_family": "Maple Mono NF CN",
-  // Fallbacks
   "buffer_font_fallbacks": ["Hack Nerd Font Mono"],
-  // UI elements font size
   "ui_font_size": 16,
-  // Code editor font size
   "buffer_font_size": 18,
   "theme": {
     "mode": "system",
     "light": "Gruvbox Light",
-    "dark": "Gruvbox Dark Hard",
+    "dark": "Gruvbox Dark Hard"
   },
 
-  // Code Formatting
+  // -------------------- Code Formatting --------------------
+  // nvim: vim.wo.colorcolumn = "120"
   "show_whitespaces": "boundary",
   "wrap_guides": [120],
   "soft_wrap": "editor_width",
 
+  // nvim: tabstop=4, shiftwidth=4, softtabstop=4, expandtab
+  "tab_size": 4,
+  "hard_tabs": false,
+  "ensure_final_newline_on_save": true,
+  "remove_trailing_whitespace_on_save": true,
+
+  // -------------------- Vim --------------------
   "base_keymap": "VSCode",
   "vim_mode": true,
   "vim": {
-    "use_system_clipboard": "always",
-    "highlight_on_yank_duration": 500,
-    "toggle_relative_line_numbers": true,
+    "use_system_clipboard": "always",      // nvim: clipboard = unnamedplus
+    "highlight_on_yank_duration": 360,     // nvim: vim.hl.on_yank timeout = 360
+    "use_smartcase_find": true,            // nvim: smartcase = true
+    "toggle_relative_line_numbers": true
   },
-  "telemetry": { "diagnostics": false, "metrics": false },
 
-  // Close Collaboration panel
-  "collaboration_panel": { "button": false },
-
-  "outline_panel": {
-    "button": true,
-    "dock": "right",
+  // -------------------- Search --------------------
+  "search": {
+    "case_sensitive": false,        // nvim: ignorecase = true
+    "whole_word": false,
+    "regex": false
   },
+
+  // -------------------- Telemetry --------------------
+  "telemetry": {
+    "diagnostics": false,
+    "metrics": false
+  }
 }

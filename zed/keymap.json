@@ -1,60 +1,170 @@
 // Zed keymap
 //
-// For information on binding keys, see the Zed
-// documentation: https://zed.dev/docs/key-bindings
-//
-// To see the default key bindings run `zed: open default keymap`
-// from the command palette.
+// 基于 ~/.dotfiles/nvim 的配置同步而来，尽量在 Zed 中复刻 Neovim 的常用 vim keymap。
+// For information on binding keys, see the Zed documentation: https://zed.dev/docs/key-bindings
+// To see the default key bindings run `zed: open default keymap` from the command palette.
 [
-  {
-    "context": "Workspace",
-    "bindings": {
-      "space o": "command_palette::Toggle",
-      "space w": "workspace::Save",
-      "space g": "git_panel::ToggleFocus",
-      "space e": "project_panel::ToggleFocus",
-      "space q": "pane::CloseActiveItem",
+    // ---------------------------------------------------------------
+    // Workspace 级别（相当于 nvim 中的 leader 全局 mapping）
+    // ---------------------------------------------------------------
+    {
+        "context": "Workspace",
+        "bindings": {
+            // 文件 / 工程
+            "space w": "workspace::Save", // <leader>w  保存
+            "space q": "pane::CloseActiveItem", // <leader>q  关闭当前 buffer/tab
+            "space Q": "zed::Quit", // <leader>Q  退出全部
+            "space e": "project_panel::ToggleFocus", // <leader>e  文件树
+            "space g": "git_panel::ToggleFocus", // <leader>g  Git 面板（对应 Neogit）
+            "space o": "command_palette::Toggle", // <leader>o  命令面板
 
-      "space f f": "file_finder::Toggle",
-      "space a t": ["workspace::SendKeystrokes", "cmd-r"],
-    },
-  },
+            // Tab 操作
+            "space t c": "pane::CloseActiveItem", // <leader>tc 关闭当前 tab
 
-  {
-    "context": "Editor && vim_mode == insert",
-    "bindings": {
-      "j k": "vim::NormalBefore",
-    },
-  },
+            // Find / Picker（对应 snacks.picker）
+            "space f f": "file_finder::Toggle", // <leader>ff 查找文件
+            "space f g": "pane::DeploySearch", // <leader>fg live grep
+            "space f b": "tab_switcher::Toggle", // <leader>fb buffer 列表
+            "space f d": "diagnostics::Deploy", // <leader>fd 工程诊断
+            "space f c": "command_palette::Toggle", // <leader>fc 命令
+            "space f k": [
+                "command_palette::Toggle",
+                { "query": "open keymap" },
+            ], // <leader>fk
+            "space f r": "projects::OpenRecent", // <leader>fr 最近项目
+            "space f o": "projects::OpenRecent", // <leader>fo oldfiles
+            "space /": "buffer_search::Deploy", // <leader>/  当前 buffer 模糊查找
 
-  {
-    "context": "VimControl && !menu",
-    "bindings": {
-      // Put key bindings here if you want them to work in normal & visual mode.
-    },
-  },
-  {
-    "context": "vim_mode == normal && !menu",
-    "bindings": {
-      // Use neovim's yank behavior: yank to end of line.
-      "shift-y": ["workspace::SendKeystrokes", "y $"],
+            // Buffer
+            "space b d": "pane::CloseActiveItem", // <leader>bd 删除当前 buffer
+            "space b o": "pane::CloseOtherItems", // <leader>bo 关闭其它 buffer
 
-      "H": "vim::StartOfLineDownward",
-      "L": "vim::EndOfLineDownward",
+            // 切换/Toggle
+            "space z": "workspace::ToggleCenteredLayout", // <leader>z  Zen mode
+            "space n h": "search::ToggleSelection", // <leader>nh 清除高亮（占位，下面会再处理 :nohl）
+
+            // AI / Terminal
+            "space a t": ["workspace::SendKeystrokes", "cmd-r"],
+        },
     },
-  },
-  {
-    "context": "vim_mode == insert",
-    "bindings": {
-      // "j k": "vim::NormalBefore" // In insert mode, make jk escape to normal mode.
+
+    // ---------------------------------------------------------------
+    // 编辑器（含 vim）共有按键
+    // ---------------------------------------------------------------
+    {
+        "context": "Editor && vim_mode == insert",
+        "bindings": {
+            // <ESC> 替代键，nvim 中 keymaps.lua: vim.keymap.set("i", "jk", "<ESC>")
+            "j k": "vim::NormalBefore",
+        },
     },
-  },
-  {
-    "context": "EmptyPane || SharedScreen",
-    "bindings": {
-      // Put key bindings here (in addition to the context above) if you want them to
-      // work when no editor exists.
-      // "space f": "file_finder::Toggle"
+
+    // ---------------------------------------------------------------
+    // VimControl（normal & visual 共享）
+    // ---------------------------------------------------------------
+    {
+        "context": "VimControl && !menu",
+        "bindings": {
+            // 行首 / 行尾（nvim: H -> ^, L -> $）
+            "H": "vim::StartOfLine",
+            "L": "vim::EndOfLine",
+
+            // 窗口/面板间跳转（对应 vim-tmux-navigator 在 zed 内仅做 pane 切换）
+            "ctrl-h": "workspace::ActivatePaneLeft",
+            "ctrl-j": "workspace::ActivatePaneDown",
+            "ctrl-k": "workspace::ActivatePaneUp",
+            "ctrl-l": "workspace::ActivatePaneRight",
+        },
     },
-  },
+
+    // ---------------------------------------------------------------
+    // Normal 模式
+    // ---------------------------------------------------------------
+    {
+        "context": "vim_mode == normal && !menu",
+        "bindings": {
+            // Y -> y$（nvim: shift-y 复制到行尾）
+            "shift-y": ["workspace::SendKeystrokes", "y $"],
+
+            // 取消搜索高亮（nvim: <leader>nh -> :nohl）
+            "space n h": "vim::ClearOperators",
+
+            // Splits（nvim: \\ 水平、| 垂直、<leader>wd 关闭）
+            "\\": "pane::SplitDown",
+            "|": "pane::SplitRight",
+            "space w d": "pane::CloseActiveItem",
+
+            // 调整窗口大小（nvim: <C-Up/Down/Left/Right>）—— Zed 暂未提供 resize 接口，留空
+            // "ctrl-up":    ...,
+            // "ctrl-down":  ...,
+            // "ctrl-left":  ...,
+            // "ctrl-right": ...,
+
+            // 文件树（nvim: <leader>e -> NvimTreeToggle）
+            "space e": "project_panel::ToggleFocus",
+
+            // 重命名（nvim: <leader>rn -> IncRename）
+            "space r n": "editor::Rename",
+
+            // LSP 跳转（与 nvim/lua/plugins/lsp.lua 对应）
+            "g d": "editor::GoToDefinition",
+            "g D": "editor::GoToDeclaration",
+            "g r": "editor::FindAllReferences",
+            "g i": "editor::GoToImplementation",
+            "g K": "editor::Hover",
+            "g I": "editor::FindAllReferences", // incoming calls 近似
+            "g O": "outline::Toggle", // outgoing/symbol 概览近似
+
+            // 诊断
+            "[ d": "editor::GoToPreviousDiagnostic",
+            "] d": "editor::GoToDiagnostic",
+
+            // Code Action / Format
+            "space c a": "editor::ToggleCodeActions",
+            "space =": "editor::Format",
+
+            // Inlay hints（nvim: <leader>th）
+            "space t h": "editor::ToggleInlayHints",
+
+            // Git hunk 导航（gitsigns: ]c / [c）
+            "] c": "editor::GoToHunk",
+            "[ c": "editor::GoToPreviousHunk",
+            "g h p": "git::ToggleStaged", // Preview hunk 近似
+            "g h r": "git::Restore", // Reset hunk
+            "g h b": "git::Blame", // Blame line
+            "g h o": "git::Diff", // Diff/Open
+
+            // Flash jump（nvim: , -> flash.jump，Zed 用 easy_motion）
+            // ",": "vim::PushOperator"
+        },
+    },
+
+    // ---------------------------------------------------------------
+    // Visual 模式
+    // ---------------------------------------------------------------
+    {
+        "context": "vim_mode == visual",
+        "bindings": {
+            // 缩进保持选区（nvim: < >）—— Zed Vim 已默认保持，这里显式声明
+            "<": "editor::Outdent",
+            ">": "editor::Indent",
+
+            // 上下移动选中行（nvim: J/K）
+            "J": "editor::MoveLineDown",
+            "K": "editor::MoveLineUp",
+
+            // 行首/行尾
+            "H": "vim::StartOfLine",
+            "L": "vim::EndOfLine",
+        },
+    },
+
+    {
+        "context": "EmptyPane || SharedScreen",
+        "bindings": {
+            "space f f": "file_finder::Toggle",
+            "space e": "project_panel::ToggleFocus",
+            "space o": "command_palette::Toggle",
+        },
+    },
 ]

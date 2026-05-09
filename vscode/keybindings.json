@@ -3,11 +3,17 @@
     { "key": "cmd+i", "command": "composerMode.agent"},
 
     {  /* Outline */ "key": "F12", "command": "outline.focus" },
-    { // Toggle File Explorer Sidebar
+    {  // File Explorer Sidebar
         "key": "space e",
         "command": "workbench.action.toggleSidebarVisibility",
         "when": "filesExplorerFocus && !inputFocus"
     },
+    {
+        "key": "q",
+        "command": "workbench.action.focusFirstEditorGroup",
+        "when": "filesExplorerFocus && !inputFocus"
+    },
+
     { // Refresh File Explorer
         "key": "R",
         "command": "workbench.files.action.refreshFilesExplorer",
