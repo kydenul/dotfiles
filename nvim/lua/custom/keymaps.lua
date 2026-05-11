@@ -14,6 +14,10 @@ vim.keymap.set("i", "jk", "<ESC>")
 ----------------------------------
 -- Normal mode --
 ----------------------------------
+
+-- Quick open CMD input
+vim.keymap.set("n", "<leader>o", ":", { noremap = true, desc = "[CMD] Open command input" })
+
 -- New windows
 vim.keymap.set("n", "\\", "<CMD>:sp<CR>", { desc = "Split window horizontally" })
 vim.keymap.set("n", "|", "<CMD>:vsp<CR>", { desc = "Split window vertically" })
