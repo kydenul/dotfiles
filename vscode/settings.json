@@ -1,6 +1,6 @@
 {
   // -----------------------------------------------------------------
-  "editor.fontSize": 17,
+  "editor.fontSize": 16,
   "editor.inlineSuggest.enabled": true,
   "editor.smoothScrolling": true,
   "editor.cursorStyle": "line",
@@ -22,6 +22,7 @@
   "window.titleBarStyle": "custom",
   "window.commandCenter": false,
   "window.title": "${dirty}${activeEditorShort}${separator}${rootName}${separator}${profileName}",
+  "window.zoomLevel": 0.8,
 
   "workbench.panel.showLabels": false,
   "workbench.activityBar.location": "hidden",
@@ -29,7 +30,6 @@
   "workbench.layoutControl.enabled": false,
   "workbench.iconTheme": "material-icon-theme",
   "workbench.list.smoothScrolling": true,
-  "workbench.sideBar.location": "right",
   "workbench.colorCustomizations": {
     "statusBar.background": "#005f5f",
     "statusBar.foreground": "#e6e7e8",
@@ -71,7 +71,7 @@
   "vim.autoSwitchInputMethod.switchIMCmd": "/opt/homebrew/bin/im-select {im}",
 
   // 是否由vim接管ctrl+any的按键，而不是vscode
-  "vim.useCtrlKeys": true, 
+  "vim.useCtrlKeys": true,
   // 由vscode进行处理，而不是vscode-vim插件
   "vim.handleKeys": {
     "<C-s>": true,
@@ -80,49 +80,115 @@
   },
 
   "vim.normalModeKeyBindingsNonRecursive": [
-    { "before": ["\\"], "commands": [{ "command": "workbench.action.splitEditorDown" }] },
-    { "before": ["|"], "commands": [{ "command": "workbench.action.splitEditorRight" }] },
+    {
+      "before": ["\\"],
+      "commands": [{ "command": "workbench.action.splitEditorDown" }]
+    },
+    {
+      "before": ["|"],
+      "commands": [{ "command": "workbench.action.splitEditorRight" }]
+    },
 
     // Resize window
-    { "before": ["<C-Up>"], "commands": [{ "command": "workbench.action.increaseViewHeight" }] },
-    { "before": ["<C-Down>"], "commands": [{ "command": "workbench.action.decreaseViewHeight" }] },
-    { "before": ["<C-Left>"], "commands": [{ "command": "workbench.action.increaseViewWidth" }] },
-    { "before": ["<C-Right>"], "commands": [{ "command": "workbench.action.decreaseViewWidth" }] },
+    {
+      "before": ["<C-Up>"],
+      "commands": [{ "command": "workbench.action.increaseViewHeight" }]
+    },
+    {
+      "before": ["<C-Down>"],
+      "commands": [{ "command": "workbench.action.decreaseViewHeight" }]
+    },
+    {
+      "before": ["<C-Left>"],
+      "commands": [{ "command": "workbench.action.increaseViewWidth" }]
+    },
+    {
+      "before": ["<C-Right>"],
+      "commands": [{ "command": "workbench.action.decreaseViewWidth" }]
+    },
 
     // Window navigation => Ctrl-h/j/k/l 在 group 之间跳转
-    { "before": ["<C-h>"], "commands": [{ "command": "workbench.action.focusLeftGroup" }] },
-    { "before": ["<C-j>"], "commands": [{ "command": "workbench.action.focusBelowGroup" }] },
-    { "before": ["<C-k>"], "commands": [{ "command": "workbench.action.focusAboveGroup" }] },
-    { "before": ["<C-l>"], "commands": [{ "command": "workbench.action.focusRightGroup" }] },
+    {
+      "before": ["<C-h>"],
+      "commands": [{ "command": "workbench.action.focusLeftGroup" }]
+    },
+    {
+      "before": ["<C-j>"],
+      "commands": [{ "command": "workbench.action.focusBelowGroup" }]
+    },
+    {
+      "before": ["<C-k>"],
+      "commands": [{ "command": "workbench.action.focusAboveGroup" }]
+    },
+    {
+      "before": ["<C-l>"],
+      "commands": [{ "command": "workbench.action.focusRightGroup" }]
+    },
 
     // Terminal focus
-    { "before": ["<C-t>"], "commands": [{ "command": "workbench.action.terminal.focus" }] },
+    {
+      "before": ["<C-t>"],
+      "commands": [{ "command": "workbench.action.terminal.focus" }]
+    },
 
     // Undo and Redo
     { "before": ["u"], "commands": [{ "command": "undo" }] },
     { "before": ["<C-r>"], "commands": [{ "command": "redo" }] },
 
     // ---------------------------------------------------------------
-    // LSP 
+    // LSP
     // ---------------------------------------------------------------
-    { "before": ["g", "d"], "commands": [{ "command": "editor.action.revealDefinition" }] },
-    { "before": ["g", "D"], "commands": [{ "command": "editor.action.revealDeclaration" }] },
-    { "before": ["g", "r"], "commands": [{ "command": "editor.action.goToReferences" }] },
-    { "before": ["g", "i"], "commands": [{ "command": "editor.action.goToImplementation" }] },
-    { "before": ["g", "K"], "commands": [{ "command": "editor.action.showHover" }] },
-    { "before": ["g", "I"], "commands": [{ "command": "references-view.findReferences" }] },
-    { "before": ["g", "O"], "commands": [{ "command": "editor.showCallHierarchy" }] },
+    {
+      "before": ["g", "d"],
+      "commands": [{ "command": "editor.action.revealDefinition" }]
+    },
+    {
+      "before": ["g", "D"],
+      "commands": [{ "command": "editor.action.revealDeclaration" }]
+    },
+    {
+      "before": ["g", "r"],
+      "commands": [{ "command": "editor.action.goToReferences" }]
+    },
+    {
+      "before": ["g", "i"],
+      "commands": [{ "command": "editor.action.goToImplementation" }]
+    },
+    {
+      "before": ["g", "K"],
+      "commands": [{ "command": "editor.action.showHover" }]
+    },
+    {
+      "before": ["g", "I"],
+      "commands": [{ "command": "references-view.findReferences" }]
+    },
+    {
+      "before": ["g", "O"],
+      "commands": [{ "command": "editor.showCallHierarchy" }]
+    },
 
     // // K: 优先显示诊断，否则 hover
     // { "before": ["K"], "commands": [{ "command": "editor.action.marker.next" }] },
 
     // Code action / Rename / Format
-    { "before": ["leader", "c", "a"], "commands": [{ "command": "editor.action.quickFix" }] },
-    { "before": ["leader", "r", "n"], "commands": [{ "command": "editor.action.rename" }] },
-    { "before": ["leader", "="], "commands": [{ "command": "editor.action.formatDocument" }] },
+    {
+      "before": ["leader", "c", "a"],
+      "commands": [{ "command": "editor.action.quickFix" }]
+    },
+    {
+      "before": ["leader", "r", "n"],
+      "commands": [{ "command": "editor.action.rename" }]
+    },
+    {
+      "before": ["leader", "="],
+      "commands": [{ "command": "editor.action.formatDocument" }]
+    },
 
     // Inlay hints toggle
-    { "before": ["leader", "t", "h"], "commands": [{ "command": "editor.action.toggleInlayHints" }] },
+    {
+      "before": ["leader", "t", "h"],
+      "commands": [{ "command": "editor.action.toggleInlayHints" }]
+    },
 
     // ---------------------------------------------------------------
     // Line Home / End => H ^, L $
@@ -134,24 +200,53 @@
     // File / Buffer / Tab
     // ---------------------------------------------------------------
     // { "before": ["leader", "e"], "commands": [{ "command": "workbench.action.toggleSidebarVisibility" }] },
-    { "before": ["leader", "e"], "commands": [{"command": "workbench.explorer.fileView.focus"}] },
+    {
+      "before": ["leader", "e"],
+      "commands": [{ "command": "workbench.explorer.fileView.focus" }]
+    },
 
     // Zen mode
-    { "before": ["leader", "z"], "commands": [{ "command": "workbench.action.toggleZenMode", "when": "!isAuxiliaryWindowFocusedContext" }] },
+    {
+      "before": ["leader", "z"],
+      "commands": [
+        {
+          "command": "workbench.action.toggleZenMode",
+          "when": "!isAuxiliaryWindowFocusedContext"
+        }
+      ]
+    },
 
     // Save / Quit
     { "before": ["leader", "w"], "commands": [":w!"] },
     { "before": ["leader", "Q"], "commands": [":qa"] },
-    { "before": ["leader", "q"], "commands": [{ "command": "workbench.action.closeActiveEditor" }] },
+    {
+      "before": ["leader", "q"],
+      "commands": [{ "command": "workbench.action.closeActiveEditor" }]
+    },
 
-    // Tab 切换 / 关闭 
-    { "before": ["g", "t"], "commands": [{ "command": "workbench.action.nextEditor" }] },
-    { "before": ["g", "T"], "commands": [{ "command": "workbench.action.previousEditor" }] },
-    { "before": ["leader", "t", "c"], "commands": [{ "command": "workbench.action.closeActiveEditor" }]},
+    // Tab 切换 / 关闭
+    {
+      "before": ["g", "t"],
+      "commands": [{ "command": "workbench.action.nextEditor" }]
+    },
+    {
+      "before": ["g", "T"],
+      "commands": [{ "command": "workbench.action.previousEditor" }]
+    },
+    {
+      "before": ["leader", "t", "c"],
+      "commands": [{ "command": "workbench.action.closeActiveEditor" }]
+    },
 
-    // Buffer 操作 
-    { "before": ["leader", "b", "d"], "commands": [{ "command": "workbench.action.closeActiveEditor" }] },
-    { "before": ["leader", "b", "o"], "commands": [{ "command": "workbench.action.closeOtherEditors" }] },
+    // Buffer 操作
+    {
+      "before": ["leader", "b", "d"],
+      "commands": [{ "command": "workbench.action.closeActiveEditor" }]
+    },
+    {
+      "before": ["leader", "b", "o"],
+      "commands": [{ "command": "workbench.action.closeOtherEditors" }]
+    },
 
     // ---------------------------------------------------------------
     // No highlight
@@ -159,46 +254,109 @@
     { "before": ["leader", "n", "h"], "commands": [":nohl"] },
 
     // ---------------------------------------------------------------
-    // Pickers / Find 
+    // Pickers / Find
     // ---------------------------------------------------------------
     { "before": ["leader", "/"], "commands": [{ "command": "actions.find" }] },
-    { "before": ["leader", "p"], "commands": [{ "command": "workbench.action.quickOpen" }] },
-    { "before": ["leader", "s", "f"], "commands": [{ "command": "workbench.action.openRecent" }] },
-    { "before": ["leader", "f", "g"], "commands": [{ "command": "workbench.action.findInFiles" }] },
-    { "before": ["leader", "f", "b"], "commands": [{ "command": "workbench.action.showAllEditors" }] },
+    {
+      "before": ["leader", "p"],
+      "commands": [{ "command": "workbench.action.quickOpen" }]
+    },
+    {
+      "before": ["leader", "s", "f"],
+      "commands": [{ "command": "workbench.action.openRecent" }]
+    },
+    {
+      "before": ["leader", "f", "g"],
+      "commands": [{ "command": "workbench.action.findInFiles" }]
+    },
+    {
+      "before": ["leader", "f", "b"],
+      "commands": [{ "command": "workbench.action.showAllEditors" }]
+    },
     // { "before": ["leader", "f", "d"], "commands": [{ "command": "workbench.actions.view.problems" }] },
-    { "before": ["leader", "f", "m"], "commands": [{ "command": "workbench.action.gotoSymbol" }] },
-    { "before": ["leader", "f", "n"], "commands": [{ "command": "notifications.showList" }] },
-    // Todo 
-    { "before": ["leader", "f", "t", "d"], "commands": [{ "command": "todo-tree-view.focus" }] },
+    {
+      "before": ["leader", "f", "m"],
+      "commands": [{ "command": "workbench.action.gotoSymbol" }]
+    },
+    {
+      "before": ["leader", "f", "n"],
+      "commands": [{ "command": "notifications.showList" }]
+    },
+    // Todo
+    {
+      "before": ["leader", "f", "t", "d"],
+      "commands": [{ "command": "todo-tree-view.focus" }]
+    },
 
     // Diagnostics
-    { "before": ["[", "d"], "commands": [{ "command": "editor.action.marker.prevInFiles" }] },
-    { "before": ["]", "d"], "commands": [{ "command": "editor.action.marker.nextInFiles" }] },
+    {
+      "before": ["[", "d"],
+      "commands": [{ "command": "editor.action.marker.prevInFiles" }]
+    },
+    {
+      "before": ["]", "d"],
+      "commands": [{ "command": "editor.action.marker.nextInFiles" }]
+    },
 
-    // Git 
-    { "before": ["leader", "g"], "commands": [{ "command": "workbench.scm.focus" }] },
+    // Git
+    {
+      "before": ["leader", "g"],
+      "commands": [{ "command": "workbench.scm.focus" }]
+    },
 
     // Debug
-    { "before": ["leader", "d", "u"], "commands": [{ "command": "workbench.view.debug" }] },
-    { "before": ["leader", "d", "c"], "commands": [{ "command": "workbench.action.debug.continue" }] },
-    { "before": ["leader", "d", "b"], "commands": [{ "command": "editor.debug.action.toggleBreakpoint" }] },
-    { "before": ["leader", "d", "s"], "commands": [{ "command": "workbench.action.debug.stepOver" }] },
-    { "before": ["leader", "d", "i"], "commands": [{ "command": "workbench.action.debug.stepInto" }] },
-    { "before": ["leader", "d", "o"], "commands": [{ "command": "workbench.action.debug.stepOut" }] },
-    { "before": ["leader", "d", "t"], "commands": [{ "command": "workbench.action.debug.stop" }] },
-    { "before": ["leader", "d", "r"], "commands": [{ "command": "workbench.action.debug.restart" }] },
-    { "before": ["leader", "d", "l"], "commands": [{ "command": "workbench.action.debug.start" }] },
-    { "before": ["leader", "c", "c"], "commands": [{ "command": "go.debug.cursor" }] },
+    {
+      "before": ["leader", "d", "u"],
+      "commands": [{ "command": "workbench.view.debug" }]
+    },
+    {
+      "before": ["leader", "d", "c"],
+      "commands": [{ "command": "workbench.action.debug.continue" }]
+    },
+    {
+      "before": ["leader", "d", "b"],
+      "commands": [{ "command": "editor.debug.action.toggleBreakpoint" }]
+    },
+    {
+      "before": ["leader", "d", "s"],
+      "commands": [{ "command": "workbench.action.debug.stepOver" }]
+    },
+    {
+      "before": ["leader", "d", "i"],
+      "commands": [{ "command": "workbench.action.debug.stepInto" }]
+    },
+    {
+      "before": ["leader", "d", "o"],
+      "commands": [{ "command": "workbench.action.debug.stepOut" }]
+    },
+    {
+      "before": ["leader", "d", "t"],
+      "commands": [{ "command": "workbench.action.debug.stop" }]
+    },
+    {
+      "before": ["leader", "d", "r"],
+      "commands": [{ "command": "workbench.action.debug.restart" }]
+    },
+    {
+      "before": ["leader", "d", "l"],
+      "commands": [{ "command": "workbench.action.debug.start" }]
+    },
+    {
+      "before": ["leader", "c", "c"],
+      "commands": [{ "command": "go.debug.cursor" }]
+    },
 
     // Terminal
-    { "before": ["leader", "t"], "commands": [":terminal"] }, 
+    { "before": ["leader", "t"], "commands": [":terminal"] },
 
     // EasyMotion
     { "before": [","], "after": ["leader", "leader", "s"] },
 
-    // AI Sidekick / Copilot Chat 
-    { "before": ["leader", "c", "k"], "commands": [{ "command": "workbench.action.chat.toggle" }] }
+    // AI Sidekick / Copilot Chat
+    {
+      "before": ["leader", "c", "k"],
+      "commands": [{ "command": "workbench.action.chat.toggle" }]
+    }
   ],
 
   "vim.insertModeKeyBindings": [
@@ -222,11 +380,20 @@
     { "before": ["L"], "after": ["$"] },
 
     // 上下移动选中行 (J/K 移动并 reindent)
-    { "before": ["J"], "commands": [{ "command": "editor.action.moveLinesDownAction" }] },
-    { "before": ["K"], "commands": [{ "command": "editor.action.moveLinesUpAction" }] },
+    {
+      "before": ["J"],
+      "commands": [{ "command": "editor.action.moveLinesDownAction" }]
+    },
+    {
+      "before": ["K"],
+      "commands": [{ "command": "editor.action.moveLinesUpAction" }]
+    },
 
     // Code action
-    { "before": ["leader", "c", "a"], "commands": [{ "command": "editor.action.quickFix" }] },
+    {
+      "before": ["leader", "c", "a"],
+      "commands": [{ "command": "editor.action.quickFix" }]
+    },
 
     // EasyMotion
     { "before": [","], "after": ["leader", "leader", "s"] }
@@ -433,6 +600,17 @@
     "*.devcloud.woa.com": "linux",
     "DevCloud": "linux",
     "kydenlu-any1.devcloud.woa.com": "linux"
-  }
+  },
+  "codingcopilot.enableInlineChat": true,
+  "codingcopilot.enableInlineChatIDEShortcutsTip": false,
+  "codingcopilot.commitMessageStyle": "Auto",
+  "codingcopilot.commitMessageLanguage": "en",
+  "codingcopilot.toolbarOnSelection": false,
+  "codingcopilot.enableAutoCompletions": true,
+  "codingcopilot.enableNextEditSuggestions": true,
+  "codingcopilot.generationPreference": "intelligentMode",
+  "codingcopilot.selectedCompletionModel": "",
+  "codingcopilot.enableCompletionLanguage": [],
+  "codingcopilot.enableFloatShortcut": true,
+  "codingcopilot.enableIDENotification": true
 }
-
