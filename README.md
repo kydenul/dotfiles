@@ -80,11 +80,9 @@ ln -s ~/.dotfiles/zed ~/.config/zed
 ln -s ~/.dotfiles/vscode/keybindings.json ~/Library/Application\ Support/Code/User/keybindings.json
 ln -s ~/.dotfiles/vscode/settings.json ~/Library/Application\ Support/Code/User/settings.json
 
-# Claude Code (agents, skills, commands)
-ln -s ~/.dotfiles/claude/agents ~/.claude/agents
+# Claude Code (skills, commands)
 ln -s ~/.dotfiles/claude/skills ~/.claude/skills
 ln -s ~/.dotfiles/claude/commands ~/.claude/commands
-ln -s ~/.dotfiles/claude/agents ~/.claude-internal/agents
 ln -s ~/.dotfiles/claude/skills ~/.claude-internal/skills
 ln -s ~/.dotfiles/claude/commands ~/.claude-internal/commands
 
@@ -267,16 +265,10 @@ Configuration in `nvim/lua/custom/options.lua` - up to ~75KB per operation.
 
 This repository includes custom configurations for [Claude Code](https://claude.ai/code):
 
-### Agents (11)
-
-Specialized agents for different development tasks:
-
-`api-designer`, `code-reviewer`, `database-optimizer`, `debugger`, `git-workflow-manager`, `golang-pro`, `microservices-architect`, `performance-engineer`, `refactoring-specialist`, `sql-pro`, `test-automator`
-
 ### Commands (2)
 
-- `commit` - Structured git commit workflow
-- `code-review` - Code review command
+- `commit` - Structured git commit workflow with conventional commit format and emoji
+- `code-review` - Five-axis code review (correctness, readability, architecture, security, performance)
 
 ### Skills (2)
 
@@ -287,10 +279,8 @@ Specialized agents for different development tasks:
 
 ```bash
 # Symlink to both .claude and .claude-internal
-ln -s ~/.dotfiles/claude/agents ~/.claude/agents
 ln -s ~/.dotfiles/claude/skills ~/.claude/skills
 ln -s ~/.dotfiles/claude/commands ~/.claude/commands
-ln -s ~/.dotfiles/claude/agents ~/.claude-internal/agents
 ln -s ~/.dotfiles/claude/skills ~/.claude-internal/skills
 ln -s ~/.dotfiles/claude/commands ~/.claude-internal/commands
 ```
@@ -317,6 +307,7 @@ ln -s ~/.dotfiles/claude/commands ~/.claude-internal/commands
 | Key          | Action                         |
 | ------------ | ------------------------------ |
 | `jk`         | Exit insert mode               |
+| `<leader>o`  | Open command input (`:`)       |
 | `H` / `L`   | Move to start / end of line    |
 | `{` / `}`    | Move to prev / next paragraph  |
 | `%`          | Jump between matching brackets |

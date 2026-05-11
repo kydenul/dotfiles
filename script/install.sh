@@ -253,12 +253,10 @@ fi
 # --- Markdownlint ---
 safe_link "$DOTFILES/.markdownlint.json" "$HOME/.markdownlint.json"
 
-# --- Claude Code (agents, skills, commands) ---
+# --- Claude Code (skills, commands) ---
 if [ -d "$DOTFILES/claude" ]; then
-    safe_link "$DOTFILES/claude/agents" "$HOME/.claude/agents"
     safe_link "$DOTFILES/claude/skills" "$HOME/.claude/skills"
     safe_link "$DOTFILES/claude/commands" "$HOME/.claude/commands"
-    safe_link "$DOTFILES/claude/agents" "$HOME/.claude-internal/agents"
     safe_link "$DOTFILES/claude/skills" "$HOME/.claude-internal/skills"
     safe_link "$DOTFILES/claude/commands" "$HOME/.claude-internal/commands"
 fi
