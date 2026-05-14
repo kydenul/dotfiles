@@ -22,7 +22,7 @@
   "window.titleBarStyle": "custom",
   "window.commandCenter": false,
   "window.title": "${dirty}${activeEditorShort}${separator}${rootName}${separator}${profileName}",
-  "window.zoomLevel": 0.8,
+  "window.zoomLevel": 0.6,
 
   "workbench.panel.showLabels": false,
   "workbench.activityBar.location": "hidden",
@@ -612,5 +612,8 @@
   "codingcopilot.selectedCompletionModel": "",
   "codingcopilot.enableCompletionLanguage": [],
   "codingcopilot.enableFloatShortcut": true,
-  "codingcopilot.enableIDENotification": true
+  "codingcopilot.enableIDENotification": true,
+  "go.toolsManagement.autoUpdate": true,
+  "update.mode": "none",
+  "diffEditor.hideUnchangedRegions.enabled": true
 }
