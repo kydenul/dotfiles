@@ -20,6 +20,53 @@ console.log({});
     )
   ),
 
+  -- Console dir
+  s(
+    "cd",
+    fmt(
+      [[
+console.dir({});
+]],
+      { i(1, "value") }
+    )
+  ),
+
+  -- Console error
+  s(
+    "ce",
+    fmt(
+      [[
+console.error({});
+]],
+      { i(1, "error") }
+    )
+  ),
+
+  -- Console info
+  s(
+    "ci",
+    fmt(
+      [[
+console.info({});
+]],
+      { i(1, "value") }
+    )
+  ),
+
+  -- Console warn
+  s(
+    "cw",
+    fmt(
+      [[
+console.warn({});
+]],
+      { i(1, "value") }
+    )
+  ),
+
+  -- Debugger
+  s("de", t("debugger;")),
+
   -- Console log with label
   s(
     "cll",
@@ -123,6 +170,147 @@ try {{
 }}
 ]],
       { i(1, "// code"), i(2, "error"), i(3, "console.error(error);"), i(4, "// cleanup") }
+    )
+  ),
+
+  -- If statement
+  s(
+    "if",
+    fmt(
+      [[
+if ({}) {{
+  {}
+}}
+]],
+      { i(1, "condition"), i(2, "// body") }
+    )
+  ),
+
+  -- If-else statement
+  s(
+    "ife",
+    fmt(
+      [[
+if ({}) {{
+  {}
+}} else {{
+  {}
+}}
+]],
+      { i(1, "condition"), i(2, "// body"), i(3, "// else body") }
+    )
+  ),
+
+  -- If-else if statement
+  s(
+    "ifei",
+    fmt(
+      [[
+if ({}) {{
+  {}
+}} else if ({}) {{
+  {}
+}}
+]],
+      { i(1, "condition"), i(2, "// body"), i(3, "condition"), i(4, "// body") }
+    )
+  ),
+
+  -- Try-finally
+  s(
+    "tf",
+    fmt(
+      [[
+try {{
+  {}
+}} finally {{
+  {}
+}}
+]],
+      { i(1, "// code"), i(2, "// cleanup") }
+    )
+  ),
+
+  -- Const declaration
+  s(
+    "co",
+    fmt(
+      [[
+const {} = {};
+]],
+      { i(1, "name"), i(2, "value") }
+    )
+  ),
+
+  -- Let declaration
+  s(
+    "lt",
+    fmt(
+      [[
+let {} = {};
+]],
+      { i(1, "name"), i(2, "value") }
+    )
+  ),
+
+  -- JSON.parse
+  s(
+    "jp",
+    fmt(
+      [[
+JSON.parse({});
+]],
+      { i(1, "str") }
+    )
+  ),
+
+  -- JSON.stringify
+  s(
+    "js",
+    fmt(
+      [[
+JSON.stringify({});
+]],
+      { i(1, "obj") }
+    )
+  ),
+
+  -- For loop
+  s(
+    "for",
+    fmt(
+      [[
+for (let {} = {}; {} < {}; {}++) {{
+  {}
+}}
+]],
+      { i(1, "i"), i(2, "0"), rep(1), i(3, "length"), rep(1), i(4, "// body") }
+    )
+  ),
+
+  -- While loop
+  s(
+    "while",
+    fmt(
+      [[
+while ({}) {{
+  {}
+}}
+]],
+      { i(1, "condition"), i(2, "// body") }
+    )
+  ),
+
+  -- Anonymous function
+  s(
+    "anon",
+    fmt(
+      [[
+function({}) {{
+  {}
+}}
+]],
+      { i(1, ""), i(2, "// body") }
     )
   ),
 
