@@ -130,6 +130,15 @@ return {
       enable_autocmd = false, -- disable deprecated autocmd, use manual or integration instead
     })
 
+    -- Auto tag setup (auto close/rename HTML/JSX tags)
+    require("nvim-ts-autotag").setup({
+      opts = {
+        enable_close = true, -- Auto close tags
+        enable_rename = true, -- Auto rename pairs of tags
+        enable_close_on_slash = false, -- Auto close on trailing </
+      },
+    })
+
     -- Treesitter context setup
     -- 0 表示不限制上下文窗口的高度
     require("treesitter-context").setup({ enable = true, max_lines = 8 })

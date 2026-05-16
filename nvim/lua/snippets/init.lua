@@ -476,3 +476,4 @@ ls.add_snippets("all", {
 -- Load Adanvance Snippet
 require("snippets.go")
 require("snippets.cpp")
+require("snippets.javascript")
