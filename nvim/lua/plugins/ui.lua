@@ -22,6 +22,7 @@ return {
 
         groups = {
           all = {
+            CursorLine = { bg = "#44475a" }, --
             LspReferenceText = { bg = "palette.sel0", style = "bold,underline" },
             LspReferenceRead = { bg = "palette.sel0", style = "bold,underline" },
             LspReferenceWrite = { bg = "palette.sel1", style = "bold,underline" },
@@ -36,7 +37,7 @@ return {
 
     config = function()
       require("catppuccin").setup({
-        transparent_background = false,
+        transparent_background = true,
         term_colors = false,
         integrations = {
           aerial = true,
@@ -54,6 +55,7 @@ return {
         highlight_overrides = {
           mocha = function(mocha)
             return {
+              CursorLine = { bg = "#44475a" }, -- mocha.surface1
               CursorLineNr = { fg = mocha.yellow },
               FlashCurrent = { bg = mocha.peach, fg = mocha.base },
               FlashMatch = { bg = mocha.red, fg = mocha.base },
