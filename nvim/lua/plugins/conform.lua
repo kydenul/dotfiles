@@ -64,10 +64,8 @@ return {
         go = { "gofumpt", "goimports-reviser", "golangci-lint" },
 
         -- Web languages => Prettier
-        javascript = { "prettier" },
-        typescript = { "prettier" },
-        javascriptreact = { "prettier" },
-        typescriptreact = { "prettier" },
+        javascript = { "eslint_d", "prettier" },
+        typescript = { "eslint_d", "prettier" },
         json = { "prettier" },
         jsonc = { "prettier" },
         yaml = { "prettier" },
