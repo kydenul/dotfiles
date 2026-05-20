@@ -50,6 +50,18 @@ return {
         mode = { "n", "v" },
         desc = "[Conform] Format file or range",
       },
+      {
+        "<leader>tf",
+        function()
+          vim.g.format_on_save_enabled = not vim.g.format_on_save_enabled
+          if vim.g.format_on_save_enabled then
+            vim.notify("Format on save: ON", vim.log.levels.INFO)
+          else
+            vim.notify("Format on save: OFF", vim.log.levels.INFO)
+          end
+        end,
+        desc = "[Conform] Toggle format on save",
+      },
     },
 
     opts = {
@@ -108,10 +120,16 @@ return {
         gofumpt = { prepend_args = { "-extra" } },
       },
 
-      format_on_save = {
-        timeout_ms = 3000,
-        lsp_fallback = true,
-      },
+      format_on_save = function()
+        if not vim.g.format_on_save_enabled then
+          return
+        end
+
+        return {
+          timeout_ms = 3000,
+          lsp_fallback = true,
+        }
+      end,
     },
   },
 }
