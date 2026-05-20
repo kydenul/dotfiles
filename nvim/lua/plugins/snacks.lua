@@ -8,7 +8,8 @@ return {
       doc = {
         -- Only when I hover over them render the image inline in the buffer.
         -- If your env doesn't support unicode placeholders, this will be disabled
-        inline = vim.g.neovim_mode == "skitty" and true or false,
+        -- inline = vim.g.neovim_mode == "skitty" and true or false,
+        inline = false,
 
         -- only_render_image_at_cursor = vim.g.neovim_mode == "skitty" and false or true,
         -- render the image in a floating window only used if `opts.inline` is disabled
@@ -100,6 +101,12 @@ return {
 
     -- Toggle
     { "<leader>td", function() Snacks.toggle.diagnostics():toggle() end, desc = "Toggle Diagnostics" },
+    { "<leader>ti", function()
+      local img = Snacks.config.image.doc
+      img.inline = not img.inline
+      local state = img.inline and "enabled" or "disabled"
+      Snacks.notify("Image inline: " .. state)
+    end, desc = "Toggle Image Inline" },
     --stylua: ignore end
   },
 }
