@@ -6,7 +6,7 @@ return {
       mux = { enabled = true, backend = "tmux" },
 
       tools = {
-        ["Claude-Internal"] = { cmd = { "claude-internal" } },
+        ["TClaude"] = { cmd = { "tclaude" } },
       },
     },
 
@@ -32,6 +32,6 @@ return {
     -- stylua: ignore
     { "<leader>cc", function() require("sidekick.cli").toggle({ name = "claude", focus = true }) end, desc = "Sidekick: Toggle Claude" },
     -- stylua: ignore
-    { "<leader>ci", function() require("sidekick.cli").toggle({ name = "Claude-Internal", focus = true }) end, desc = "Sidekick: Toggle Claude-Internal" },
+    { "<leader>ci", function() require("sidekick.cli").toggle({ name = "TClaude", focus = true }) end, desc = "Sidekick: Toggle TClaude" },
   },
 }
