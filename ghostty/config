@@ -33,7 +33,11 @@ quit-after-last-window-closed = true
 copy-on-select = true
 mouse-hide-while-typing = true
 macos-option-as-alt = true
-macos-titlebar-style = hidden
+# macos-titlebar-style = hidden
 
-# Buffer size in bytes: 25 MB
-scrollback-limit = 25000000
+# Buffer size in bytes: 256 MB
+scrollback-limit = 256000000
+
+# Clipboard
+clipboard-write = allow
+clipboard-read = ask
