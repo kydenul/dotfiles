@@ -22,10 +22,10 @@
   "window.titleBarStyle": "custom",
   "window.commandCenter": false,
   "window.title": "${dirty}${activeEditorShort}${separator}${rootName}${separator}${profileName}",
-  "window.zoomLevel": 0.6,
+  // "window.zoomLevel": 0.6,
 
   "workbench.panel.showLabels": false,
-  "workbench.activityBar.location": "hidden",
+  // "workbench.activityBar.location": "hidden",
   "workbench.colorTheme": "Gruvbox Dark Hard",
   "workbench.layoutControl.enabled": false,
   "workbench.iconTheme": "material-icon-theme",
@@ -44,9 +44,10 @@
   "terminal.integrated.inheritEnv": false,
 
   "files.autoSave": "off",
-  "chat.commandCenter.enabled": false,
+  "diffEditor.ignoreTrimWhitespace": false,
 
-  "diffEditor.ignoreTrimWhitespace": true,
+  "chat.disableAIFeatures": true,
+  "chat.commandCenter.enabled": false,
 
   // -----------------------------------------------------------------
   // Vim
@@ -63,12 +64,12 @@
   "vim.highlightedyank.color": "#a9dc7680",
   "vim.highlightedyank.duration": 500,
 
-  // Input Method
-  // `brew tap daipeihust/tap && brew install im-select`
-  "vim.autoSwitchInputMethod.enable": true,
-  "vim.autoSwitchInputMethod.defaultIM": "com.apple.keylayout.ABC",
-  "vim.autoSwitchInputMethod.obtainIMCmd": "/opt/homebrew/bin/im-select",
-  "vim.autoSwitchInputMethod.switchIMCmd": "/opt/homebrew/bin/im-select {im}",
+  // // Input Method
+  // // `brew tap daipeihust/tap && brew install im-select`
+  // "vim.autoSwitchInputMethod.enable": true,
+  // "vim.autoSwitchInputMethod.defaultIM": "com.apple.keylayout.ABC",
+  // "vim.autoSwitchInputMethod.obtainIMCmd": "/opt/homebrew/bin/im-select",
+  // "vim.autoSwitchInputMethod.switchIMCmd": "/opt/homebrew/bin/im-select {im}",
 
   // 是否由vim接管ctrl+any的按键，而不是vscode
   "vim.useCtrlKeys": true,
@@ -424,6 +425,7 @@
 
   // -----------------------------------------------------------------
   // todo-tree settings
+  "todo-tree.ripgrep.ripgrep": "/usr/bin/rg",
   "todo-tree.regex.regex": "((%|#|\"\"\"|'''|//|<!--|^\\s*\\*)\\s*($TAGS)|^\\s*- \\[( |x|X)\\])",
   "todo-tree.regex.regexCaseSensitive": true,
   "todo-tree.tree.showCountsInTree": true,
@@ -455,7 +457,7 @@
   // Markdownlint
   // 关闭 preview 滚动的时候, Markdown 文件跟着滚动
   "markdown.preview.scrollEditorWithPreview": false,
-  "markdown-preview-enhanced.previewTheme": "atom-dark.css",
+  "markdown-preview-enhanced.previewTheme": "vue.css",
   "markdown-preview-enhanced.enablePreviewZenMode": true,
   "markdownlint.config": {
     "MD010": false,
@@ -466,6 +468,7 @@
   // -----------------------------------------------------------------
   // Golang
   "gopls": { "ui.semanticTokens": true },
+  "go.toolsManagement.autoUpdate": true,
   "go.formatTool": "gofumpt",
   "go.formatFlags": ["-extra"],
   "go.inlayHints.parameterNames": false,
@@ -601,7 +604,34 @@
     "DevCloud": "linux",
     "kydenlu-any1.devcloud.woa.com": "linux"
   },
-  "codingcopilot.enableInlineChat": true,
+  "update.mode": "default",
+  "gongfeng.copilot.commitMessageLanguage": "English",
+  "pixide.selectedLocalIP": "30.31.47.46",
+  "gongfeng.copilot.generationPreference": "Moderate",
+  "gongfeng.copilot.featureConfig": {
+    "terminal": {
+      "autorun": true,
+      "whiteList": [],
+      "blackList": [
+        "kill",
+        "rm",
+        "chmod"
+      ],
+      "shellSelection": "auto"
+    },
+    "chat": {
+      "autofix": false,
+      "autoweb": true,
+      "chattoask": true,
+      "newChatTab": true,
+      "todoListEnable": true,
+      "allowExternalFileAccess": false,
+      "backspaceDeleteReference": true,
+      "autoOpenDiffAfterEdit": false
+    }
+  },
+
+  "codingcopilot.enableInlineChat": false,
   "codingcopilot.enableInlineChatIDEShortcutsTip": false,
   "codingcopilot.commitMessageStyle": "Auto",
   "codingcopilot.commitMessageLanguage": "en",
@@ -611,9 +641,27 @@
   "codingcopilot.generationPreference": "intelligentMode",
   "codingcopilot.selectedCompletionModel": "",
   "codingcopilot.enableCompletionLanguage": [],
-  "codingcopilot.enableFloatShortcut": true,
+  "codingcopilot.enableFloatShortcut": false,
   "codingcopilot.enableIDENotification": true,
-  "go.toolsManagement.autoUpdate": true,
-  "update.mode": "none",
-  "diffEditor.hideUnchangedRegions.enabled": true
+  "gongfeng.copilot.floatShortcut": false,
+  "gongfeng.copilot.enableCodelensForComments": false,
+  "gongfeng.copilot.enableCompletionLanguage": {
+    "scminput": false,
+    "markdown": true
+  },
+  "workbench.editorAssociations": {
+    "*.html": "codebuddy.html.previewEditor",
+    "*.htm": "codebuddy.html.previewEditor"
+  },
+  "workbench.activityBar.location": "top",
+  "gongfeng.copilot.memoriesConfig": {
+    "enabled": false
+  },
+  "workbench.sideBar.location": "right",
+  "codingcopilot.enableCodelens": false,
+  "workbench.notifications.position": "bottom-left",
+  "[markdown]": {
+    "diffEditor.ignoreTrimWhitespace": true
+  },
+  "diffEditor.renderSideBySide": false,
 }
