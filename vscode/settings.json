@@ -664,4 +664,5 @@
     "diffEditor.ignoreTrimWhitespace": true
   },
   "diffEditor.renderSideBySide": false,
+  "codingcopilot.autoRun": true,
 }
