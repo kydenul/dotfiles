@@ -163,11 +163,6 @@ return {
           resize_window = true, -- Resize the window when opening a file
         },
       },
-
-      -- System
-      system_open = {
-        cmd = nil, -- Use system default program to open files
-      },
     })
   end,
 }
