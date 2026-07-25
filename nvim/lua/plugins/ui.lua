@@ -22,7 +22,8 @@ return {
 
         groups = {
           all = {
-            CursorLine = { bg = "#44475a" }, --
+            CursorLine = { bg = "#2a2d3e" }, -- subtle, so selection stands out
+            Visual = { bg = "#44475a" }, -- clearly lighter than the cursor line
             LspReferenceText = { bg = "palette.sel0", style = "bold,underline" },
             LspReferenceRead = { bg = "palette.sel0", style = "bold,underline" },
             LspReferenceWrite = { bg = "palette.sel1", style = "bold,underline" },

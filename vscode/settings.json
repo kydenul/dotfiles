@@ -22,11 +22,10 @@
   "window.titleBarStyle": "custom",
   "window.commandCenter": false,
   "window.title": "${dirty}${activeEditorShort}${separator}${rootName}${separator}${profileName}",
-  // "window.zoomLevel": 0.6,
 
   "workbench.panel.showLabels": false,
   // "workbench.activityBar.location": "hidden",
-  "workbench.colorTheme": "Gruvbox Dark Hard",
+  "workbench.colorTheme": "Vim Dark Hard",
   "workbench.layoutControl.enabled": false,
   "workbench.iconTheme": "material-icon-theme",
   "workbench.list.smoothScrolling": true,
