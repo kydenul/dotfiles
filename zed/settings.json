@@ -14,7 +14,7 @@
   // -------------------- Panel / Layout --------------------
   "diff_view_style": "unified",
   "project_panel": {
-    "dock": "left"
+    "dock": "right"
   },
   "agent": {
     "default_profile": "write",
@@ -23,19 +23,19 @@
       "model": "gemini-3.1-pro-preview",
       "enable_thinking": true
     },
-    "dock": "right",
+    "dock": "left",
     "favorite_models": [],
     "model_parameters": []
   },
   "git_panel": {
-    "dock": "left"
+    "dock": "right"
   },
   "outline_panel": {
     "button": true,
     "dock": "right"
   },
   "collaboration_panel": {
-    "dock": "left",
+    "dock": "right",
     "button": false
   },
 
