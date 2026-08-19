@@ -1,9 +1,11 @@
 return {
   "folke/sidekick.nvim",
   opts = {
+    nes = { enabled = false },
+
     -- add any options here
     cli = {
-      mux = { enabled = true, backend = "tmux", create = "split" },
+      mux = { enabled = true, backend = "tmux", create = "terminal" },
       tools = { ["TClaude"] = { cmd = { "tclaude" } } },
       prompts = {
         -- refactor = "Please refactor {this} to be more maintainable",
@@ -13,8 +15,6 @@ return {
         -- end,
       },
     },
-
-    nes = { enabled = false },
   },
 
   keys = {
@@ -36,7 +36,5 @@ return {
     -- open CLI directly
     -- stylua: ignore
     { "<leader>cc", function() require("sidekick.cli").toggle({ name = "claude", focus = true }) end, desc = "Sidekick: Toggle Claude" },
-    -- stylua: ignore
-    { "<leader>ci", function() require("sidekick.cli").toggle({ name = "TClaude", focus = true }) end, desc = "Sidekick: Toggle TClaude" },
   },
 }
