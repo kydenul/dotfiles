@@ -3,10 +3,14 @@ return {
   opts = {
     -- add any options here
     cli = {
-      mux = { enabled = true, backend = "tmux" },
-
-      tools = {
-        ["TClaude"] = { cmd = { "tclaude" } },
+      mux = { enabled = true, backend = "tmux", create = "split" },
+      tools = { ["TClaude"] = { cmd = { "tclaude" } } },
+      prompts = {
+        -- refactor = "Please refactor {this} to be more maintainable",
+        -- security = "Review {file} for security vulnerabilities",
+        -- custom = function(ctx)
+        --   return "Current file: " .. ctx.buf .. " at line " .. ctx.row
+        -- end,
       },
     },
 
@@ -28,7 +32,8 @@ return {
     { "<leader>cv", function() require("sidekick.cli").send({ msg = "{selection}" }) end, mode = { "x" }, desc = "Sidekick: Send Visual Selection" },
     -- stylua: ignore
     { "<leader>cp", function() require("sidekick.cli").prompt() end, mode = { "n", "x" }, desc = "Sidekick: Sidekick Select Prompt" },
-    -- open Gemini CLI directly
+
+    -- open CLI directly
     -- stylua: ignore
     { "<leader>cc", function() require("sidekick.cli").toggle({ name = "claude", focus = true }) end, desc = "Sidekick: Toggle Claude" },
     -- stylua: ignore
