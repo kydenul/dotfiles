@@ -1,0 +1,431 @@
+#!/usr/bin/env bash
+# ============================================================================
+# tclaude-proxy — 复用 tclaude 本地网关给原生 Claude Code / cc-switch
+# Docs: ~/.dotfiles/docs/tclaude-proxy.md
+#
+# Usage:
+#   tclaude-proxy status           查看 daemon 状态
+#   tclaude-proxy port             仅输出端口（供脚本消费）
+#   tclaude-proxy url              仅输出 URL
+#   tclaude-proxy env              输出 export 语句，配合 eval 使用
+#   tclaude-proxy ensure           确保 daemon 运行（守护进程调用此命令）
+#   tclaude-proxy doctor           完整体检
+#   tclaude-proxy sync-ccswitch    预览端口同步改动（只读）
+#   tclaude-proxy sync-ccswitch --apply
+#                                  真正写入 ~/.claude/settings.json
+# ============================================================================
+
+set -euo pipefail
+
+# ── Colors & helpers ────────────────────────────────────────────────────────
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+BOLD='\033[1m'
+NC='\033[0m' # No Color
+
+info() { echo -e "${BLUE}[INFO]${NC} $*"; }
+success() { echo -e "${GREEN}[OK]${NC}   $*"; }
+warn() { echo -e "${YELLOW}[WARN]${NC} $*" >&2; }
+error() { echo -e "${RED}[ERR]${NC}  $*" >&2; }
+
+section() {
+    echo ""
+    echo -e "${CYAN}${BOLD}━━━ $* ━━━${NC}"
+    echo ""
+}
+
+# ── Constants (extracted from tclaude bundle module 50092) ───────────────────
+TCLAUDE_DIR="$HOME/.tclaude"
+DAEMON_META="$TCLAUDE_DIR/daemon.json"
+HEALTH_PATH="/__tclaude/health"
+CCSWITCH_DB="$HOME/.cc-switch/cc-switch.db"
+CLAUDE_SETTINGS="$HOME/.claude/settings.json"
+
+# The literal token tclaude injects — auth happens inside the daemon, so any
+# value works. Kept as a constant to document that this is not a secret.
+PLACEHOLDER_TOKEN="placeholder"
+
+need() {
+    command -v "$1" >/dev/null 2>&1 || {
+        error "Required command not found: $1"
+        exit 1
+    }
+}
+
+# ── Daemon introspection ────────────────────────────────────────────────────
+
+# Read a key out of daemon.json. Returns empty string when absent/unparseable.
+daemon_meta() {
+    local key="$1"
+    [ -f "$DAEMON_META" ] || return 0
+    python3 - "$DAEMON_META" "$key" <<'PY' 2>/dev/null || true
+import json, sys
+try:
+    with open(sys.argv[1]) as f:
+        print(json.load(f).get(sys.argv[2], ""))
+except Exception:
+    pass
+PY
+}
+
+daemon_url() { daemon_meta url; }
+daemon_port() { daemon_meta port; }
+daemon_pid() { daemon_meta pid; }
+
+# Probe /__tclaude/health. Success only when the daemon answers {"ok":true}.
+daemon_healthy() {
+    local url
+    url="$(daemon_url)"
+    [ -n "$url" ] || return 1
+    curl -fsS --max-time 5 "${url}${HEALTH_PATH}" 2>/dev/null |
+        grep -q '"ok":[[:space:]]*true'
+}
+
+# ── Commands ────────────────────────────────────────────────────────────────
+
+cmd_port() {
+    local port
+    port="$(daemon_port)"
+    [ -n "$port" ] || {
+        error "Daemon not running (no $DAEMON_META). Run: tclaude-proxy ensure"
+        exit 1
+    }
+    echo "$port"
+}
+
+cmd_url() {
+    local url
+    url="$(daemon_url)"
+    [ -n "$url" ] || {
+        error "Daemon not running (no $DAEMON_META). Run: tclaude-proxy ensure"
+        exit 1
+    }
+    echo "$url"
+}
+
+cmd_env() {
+    local url
+    url="$(cmd_url)"
+    cat <<EOF
+export ANTHROPIC_BASE_URL="$url"
+export ANTHROPIC_AUTH_TOKEN="$PLACEHOLDER_TOKEN"
+EOF
+}
+
+cmd_status() {
+    if [ ! -f "$DAEMON_META" ]; then
+        warn "Daemon not running — $DAEMON_META absent"
+        return 1
+    fi
+
+    local url pid port
+    url="$(daemon_url)"
+    pid="$(daemon_pid)"
+    port="$(daemon_port)"
+
+    # An unparseable/truncated daemon.json is a realistic crash artifact.
+    if [ -z "$url" ]; then
+        error "$DAEMON_META unreadable or missing 'url' — corrupt metadata"
+        warn "recover with: tclaude-proxy ensure"
+        return 1
+    fi
+
+    echo -e "${BOLD}url${NC}      $url"
+    echo -e "${BOLD}pid${NC}      $pid"
+    echo -e "${BOLD}port${NC}     $port"
+
+    if daemon_healthy; then
+        success "healthy"
+        return 0
+    fi
+
+    # Distinguish a stale metadata file from a hung process.
+    if [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null; then
+        error "process alive but $HEALTH_PATH not responding — daemon hung"
+    else
+        error "process dead — stale metadata"
+    fi
+    return 1
+}
+
+# Bring the daemon up if it is not already healthy.
+#
+# We deliberately do NOT spawn `node tclaude __tclaude_daemon` ourselves.
+# tclaude's own ensureRunning() takes a start lock (~/.tclaude/locks/daemon.lock),
+# probes/persists the port, and waits for a readiness handshake on stdout.
+# Reimplementing that invites double-start races. `tclaude -v` is the cheapest
+# entry point that triggers the wrapper's own daemon bootstrap.
+cmd_ensure() {
+    if daemon_healthy; then
+        success "daemon already healthy at $(daemon_url)"
+        return 0
+    fi
+
+    need tclaude
+    info "daemon not healthy — bootstrapping via tclaude"
+    tclaude -v >/dev/null 2>&1 || true
+
+    if daemon_healthy; then
+        success "daemon up at $(daemon_url)"
+        return 0
+    fi
+
+    error "failed to bring up daemon"
+    warn "if you were logged out, run: tclaude login"
+    warn "daemon logs: $TCLAUDE_DIR/logs/\$(date +%F)/"
+    return 1
+}
+
+cmd_doctor() {
+    local rc=0
+
+    section "1. tclaude CLI"
+    if command -v tclaude >/dev/null 2>&1; then
+        success "$(command -v tclaude) — $(tclaude -v 2>&1 | head -1)"
+    else
+        error "tclaude not installed"
+        rc=1
+    fi
+
+    section "2. Daemon"
+    cmd_status || rc=1
+
+    section "3. Local /v1/models"
+    local url
+    url="$(daemon_url)"
+    if [ -n "$url" ]; then
+        local models
+        models="$(curl -fsS --max-time 8 \
+            -H "Authorization: Bearer $PLACEHOLDER_TOKEN" \
+            "$url/v1/models" 2>/dev/null || true)"
+        if [ -n "$models" ]; then
+            success "reachable"
+            echo "$models" | python3 -c '
+import json, sys
+try:
+    for m in json.load(sys.stdin).get("data", []):
+        print("         -", m.get("id"))
+except Exception:
+    print("         (unparseable response)")
+' 2>/dev/null || true
+        else
+            error "/v1/models unreachable"
+            rc=1
+        fi
+    else
+        warn "skipped — no daemon url"
+        rc=1
+    fi
+
+    section "4. Upstream reachability"
+    local code
+    code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 \
+        https://copilot.tencent.com/ 2>/dev/null || echo 000)"
+    if [ "$code" = "000" ]; then
+        error "copilot.tencent.com unreachable — check VPN / iOA"
+        rc=1
+    else
+        success "copilot.tencent.com → HTTP $code"
+    fi
+
+    section "5. End-to-end /v1/messages"
+    if [ -n "$url" ]; then
+        local out
+        # X-Claude-Code-Session-Id is mandatory; without it the gateway returns
+        # a misleading "Failed to reach upstream gateway".
+        out="$(curl -fsS --max-time 60 -X POST "$url/v1/messages" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $PLACEHOLDER_TOKEN" \
+            -H "anthropic-version: 2023-06-01" \
+            -H "X-Claude-Code-Session-Id: $(uuidgen 2>/dev/null || echo 11111111-2222-3333-4444-555555555555)" \
+            -d '{"model":"claude-haiku-4-5","max_tokens":32,"messages":[{"role":"user","content":"Reply with exactly: PROXY_OK"}]}' \
+            2>/dev/null || true)"
+        if echo "$out" | grep -q "PROXY_OK"; then
+            success "round-trip OK"
+        elif echo "$out" | grep -q "upstream_error"; then
+            error "upstream rejected the request"
+            warn "most likely logged out — run: tclaude login"
+            warn "real reason in: $TCLAUDE_DIR/logs/\$(date +%F)/"
+            rc=1
+        else
+            error "unexpected response:"
+            echo "         ${out:0:200}"
+            rc=1
+        fi
+    else
+        warn "skipped — no daemon url"
+        rc=1
+    fi
+
+    section "6. cc-switch wiring"
+    if [ -f "$CLAUDE_SETTINGS" ] && [ -n "$url" ]; then
+        local configured
+        configured="$(python3 - "$CLAUDE_SETTINGS" <<'PY' 2>/dev/null || true
+import json, sys
+try:
+    with open(sys.argv[1]) as f:
+        print(json.load(f).get("env", {}).get("ANTHROPIC_BASE_URL", ""))
+except Exception:
+    pass
+PY
+)"
+        if [ -z "$configured" ]; then
+            warn "$CLAUDE_SETTINGS has no ANTHROPIC_BASE_URL (using official API)"
+        elif [ "$configured" = "$url" ]; then
+            success "settings.json points at $url"
+        else
+            warn "settings.json points at $configured but daemon is at $url"
+            warn "run: tclaude-proxy sync-ccswitch"
+            rc=1
+        fi
+    else
+        warn "skipped"
+    fi
+
+    echo ""
+    if [ "$rc" -eq 0 ]; then
+        success "${BOLD}all checks passed${NC}"
+    else
+        error "${BOLD}some checks failed${NC} — see above"
+    fi
+    return "$rc"
+}
+
+# Rewrite the proxy provider's port in ~/.claude/settings.json, and report on
+# cc-switch's DB.
+#
+# Dry-run by default: pointing settings.json at the internal gateway changes
+# which backend every `claude` invocation talks to, so it requires --apply.
+# Only touches entries that are unset or already a 127.0.0.1 tclaude URL, so it
+# will never clobber an official-API or third-party provider.
+cmd_sync_ccswitch() {
+    need python3
+    local apply=0
+    [ "${1:-}" = "--apply" ] && apply=1
+
+    local url
+    url="$(cmd_url)"
+
+    info "daemon url: $url"
+    [ "$apply" -eq 1 ] || warn "dry run — re-run with --apply to write changes"
+
+    # ── ~/.claude/settings.json ─────────────────────────────────────────────
+    if [ -f "$CLAUDE_SETTINGS" ]; then
+        python3 - "$CLAUDE_SETTINGS" "$url" "$PLACEHOLDER_TOKEN" "$apply" <<'PY'
+import json, sys, shutil
+
+path, url, token, apply = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4] == "1"
+with open(path) as f:
+    data = json.load(f)
+
+env = data.setdefault("env", {})
+current = env.get("ANTHROPIC_BASE_URL", "")
+
+# Only rewrite when it is absent or already a local tclaude proxy.
+if current and "127.0.0.1" not in current and "localhost" not in current:
+    print(f"         SKIP  third-party endpoint left alone: {current}")
+    sys.exit(0)
+
+if current == url:
+    print("         NOOP  already correct")
+    sys.exit(0)
+
+if not apply:
+    print(f"         WOULD SET  {current or '(unset)'} -> {url}")
+    sys.exit(0)
+
+shutil.copy2(path, path + ".bak")
+env["ANTHROPIC_BASE_URL"] = url
+env.setdefault("ANTHROPIC_AUTH_TOKEN", token)
+with open(path, "w") as f:
+    json.dump(data, f, indent=2)
+    f.write("\n")
+print(f"         UPDATED  {current or '(unset)'} -> {url}  (backup: {path}.bak)")
+PY
+    else
+        warn "$CLAUDE_SETTINGS not found — skipping"
+    fi
+
+    # ── cc-switch DB ────────────────────────────────────────────────────────
+    if [ ! -f "$CCSWITCH_DB" ]; then
+        warn "cc-switch db not found — skipping"
+        return 0
+    fi
+
+    if ! command -v sqlite3 >/dev/null 2>&1; then
+        warn "sqlite3 not available — skipping cc-switch db"
+        return 0
+    fi
+
+    # cc-switch may hold the DB open; a copy-modify-restore would risk losing
+    # its concurrent writes. Report instead of mutating, and let the user apply
+    # it through the UI.
+    local matches
+    matches="$(sqlite3 "$CCSWITCH_DB" \
+        "select id from providers where app_type='claude' and settings_config like '%127.0.0.1%';" \
+        2>/dev/null || true)"
+
+    if [ -z "$matches" ]; then
+        info "no local-proxy provider in cc-switch yet"
+        echo ""
+        echo "  Add a Claude provider in CC Switch with this config:"
+        echo ""
+        cat <<EOF
+  {
+    "env": {
+      "ANTHROPIC_BASE_URL": "$url",
+      "ANTHROPIC_AUTH_TOKEN": "$PLACEHOLDER_TOKEN",
+      "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-4-8[1m]",
+      "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-4-6[1m]",
+      "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-haiku-4-5"
+    }
+  }
+EOF
+        return 0
+    fi
+
+    echo "$matches" | while read -r pid; do
+        [ -n "$pid" ] || continue
+        local stored
+        stored="$(sqlite3 "$CCSWITCH_DB" \
+            "select settings_config from providers where id='$pid' and app_type='claude';")"
+        if echo "$stored" | grep -q "$url"; then
+            success "cc-switch provider '$pid' already at $url"
+        else
+            warn "cc-switch provider '$pid' has a stale port"
+            warn "update it in the CC Switch UI to: $url"
+            warn "(not edited automatically — the app may have the DB open)"
+        fi
+    done
+}
+
+usage() {
+    sed -n '3,15p' "$0" | sed 's/^# \{0,1\}//'
+}
+
+main() {
+    need curl
+    need python3
+
+    case "${1:-status}" in
+    status) cmd_status ;;
+    port) cmd_port ;;
+    url) cmd_url ;;
+    env) cmd_env ;;
+    ensure) cmd_ensure ;;
+    doctor) cmd_doctor ;;
+    sync-ccswitch) cmd_sync_ccswitch "${2:-}" ;;
+    -h | --help | help) usage ;;
+    *)
+        error "Unknown command: $1"
+        echo ""
+        usage
+        exit 1
+        ;;
+    esac
+}
+
+main "$@"

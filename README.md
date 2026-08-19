@@ -265,15 +265,14 @@ Configuration in `nvim/lua/custom/options.lua` - up to ~75KB per operation.
 
 This repository includes custom configurations for [Claude Code](https://claude.ai/code):
 
-### Commands (2)
+### Commands (1)
 
 - `commit` - Structured git commit workflow with conventional commit format and emoji
-- `code-review` - Five-axis code review (correctness, readability, architecture, security, performance)
 
 ### Skills (2)
 
 - `drawio` - Generate draw.io diagrams from descriptions
-- `ifbook-automation` - Auto-generate test cases for ifbook API platform
+- `tencent-ppt` - Generate web-based presentation slides following the Tencent PPT template design system
 
 ### Setup
 
@@ -287,20 +286,44 @@ ln -s ~/.dotfiles/claude/commands ~/.claude-internal/commands
 
 ---
 
+## tclaude-proxy (Internal Claude Gateway)
+
+Reuses the local gateway that Tencent's `tclaude` CLI spawns, so native
+[Claude Code](https://claude.ai/code) and cc-switch can talk to the internal
+`copilot.tencent.com` endpoint without any credentials — auth is handled inside
+the tclaude daemon, and the client only needs `ANTHROPIC_AUTH_TOKEN=placeholder`.
+
+```bash
+tclaude-proxy status                  # daemon health
+tclaude-proxy url                     # → http://127.0.0.1:<port>
+tclaude-proxy doctor                  # 6-step full check
+tclaude-proxy sync-ccswitch --apply   # fix port drift in ~/.claude/settings.json
+tclaude-proxy-agent.sh install        # launchd: keep the daemon alive (every 5 min)
+```
+
+Full write-up (原理 / daemon 契约 / 接入 cc-switch / 坑与限制):
+[docs/tclaude-proxy.md](docs/tclaude-proxy.md).
+
+> ⚠️ Routes internal AI quota (`copilot.tencent.com`, iOA SSO, credit-billed)
+> to a general-purpose client. Technically works and is verified, but confirm it
+> complies with internal usage policy before relying on it.
+
+---
+
 ## Key Mappings
 
 **Leader Key**: `<Space>`
 
 ### Window & File Management
 
-| Key                    | Action                                    |
-| ---------------------- | ----------------------------------------- |
-| `\` / `\|`            | Split window horizontally / vertically    |
-| `<C-h/j/k/l>`         | Navigate between windows (and Tmux panes) |
-| `<leader>h/j/k/l`     | Resize windows                            |
-| `<leader>w`            | Save file                                 |
-| `<leader>q` / `<leader>Q` | Quit window / Quit all                |
-| `<leader>e`            | Toggle file explorer                      |
+| Key                       | Action                                    |
+| ------------------------- | ----------------------------------------- |
+| `\` / `\|`                | Split window horizontally / vertically    |
+| `<C-h/j/k/l>`             | Navigate between windows (and Tmux panes) |
+| `<leader>h/j/k/l`         | Resize windows                            |
+| `<leader>w`               | Save file                                 |
+| `<leader>q` / `<leader>Q` | Quit window / Quit all                    |
+| `<leader>e`               | Toggle file explorer                      |
 
 ### Navigation & Editing
 
@@ -308,7 +331,7 @@ ln -s ~/.dotfiles/claude/commands ~/.claude-internal/commands
 | ------------ | ------------------------------ |
 | `jk`         | Exit insert mode               |
 | `<leader>o`  | Open command input (`:`)       |
-| `H` / `L`   | Move to start / end of line    |
+| `H` / `L`    | Move to start / end of line    |
 | `{` / `}`    | Move to prev / next paragraph  |
 | `%`          | Jump between matching brackets |
 | `*` / `#`    | Search word forward / backward |
@@ -324,20 +347,20 @@ ln -s ~/.dotfiles/claude/commands ~/.claude-internal/commands
 
 ### Plugin Shortcuts
 
-| Key                | Action                       |
-| ------------------ | ---------------------------- |
-| `<leader>ff`       | Find files (snacks.nvim)     |
-| `<leader>fg`       | Find grep (snacks.nvim)      |
-| `<leader>fb`       | Find buffers (snacks.nvim)   |
-| `<leader>/`        | Search in current file       |
-| `<leader>rn`       | LSP rename (IncRename)       |
-| `<leader>g`        | Open Git interface (Neogit)  |
-| `,`                | Flash jump to position       |
-| `gc` / `gcc`       | Comment toggle               |
-| `gt` / `gT`        | Next / previous buffer       |
-| `gz<motion><char>` | Add surroundings             |
-| `gzd<char>`        | Delete surroundings          |
-| `<C-t>`            | Toggle terminal              |
+| Key                | Action                      |
+| ------------------ | --------------------------- |
+| `<leader>ff`       | Find files (snacks.nvim)    |
+| `<leader>fg`       | Find grep (snacks.nvim)     |
+| `<leader>fb`       | Find buffers (snacks.nvim)  |
+| `<leader>/`        | Search in current file      |
+| `<leader>rn`       | LSP rename (IncRename)      |
+| `<leader>g`        | Open Git interface (Neogit) |
+| `,`                | Flash jump to position      |
+| `gc` / `gcc`       | Comment toggle              |
+| `gt` / `gT`        | Next / previous buffer      |
+| `gz<motion><char>` | Add surroundings            |
+| `gzd<char>`        | Delete surroundings         |
+| `<C-t>`            | Toggle terminal             |
 
 ---
 

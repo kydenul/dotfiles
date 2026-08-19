@@ -264,6 +264,29 @@ Same Tmux integration pattern as Kitty:
 - Collaboration panel disabled
 - Telemetry disabled
 
+## tclaude-proxy (Internal Claude Gateway)
+
+`script/tclaude-proxy` re-exports the local gateway spawned by Tencent's
+`tclaude` CLI, so native `claude` / cc-switch can use the internal
+`copilot.tencent.com` endpoint. Auth happens inside the tclaude daemon; the
+client only needs `ANTHROPIC_AUTH_TOKEN=placeholder`.
+
+- `script/tclaude-proxy` — CLI: `status`, `port`, `url`, `env`, `ensure`,
+  `doctor`, `sync-ccswitch [--apply]`
+- `script/tclaude-proxy-agent.sh` — installs a launchd agent
+  (`com.kyden.tclaude-proxy`) that runs `tclaude-proxy ensure` every 5 min to
+  keep the daemon alive
+- `.zshrc` already adds `~/.dotfiles/script` to `$PATH`
+
+Key facts:
+- Read the daemon port from `~/.tclaude/daemon.json` (`url`); never hardcode it.
+- `X-Claude-Code-Session-Id` is mandatory upstream. Native `claude` sends it; raw
+  curl / SDK calls must add it or get a misleading "Failed to reach upstream
+  gateway" error.
+- A 401 upstream forces a logout (`tclaude login` to recover) — the launchd agent
+  can't fix that; `doctor` distinguishes it from a crashed daemon.
+- Full write-up: `docs/tclaude-proxy.md` (Chinese).
+
 ## Working with This Repository
 
 ### Making Configuration Changes
