@@ -20,15 +20,16 @@
 
   "window.customTitleBarVisibility": "windowed",
   "window.titleBarStyle": "custom",
-  "window.commandCenter": false,
   "window.title": "${dirty}${activeEditorShort}${separator}${rootName}${separator}${profileName}",
 
   "workbench.panel.showLabels": false,
+  "workbench.browser.showInTitleBar": false,
+  "window.commandCenter": false,
   // "workbench.activityBar.location": "hidden",
-  "workbench.colorTheme": "Vim Dark Hard",
-  "workbench.layoutControl.enabled": false,
+  "workbench.colorTheme": "Gruvbox Dark Hard",
   "workbench.iconTheme": "material-icon-theme",
   "workbench.list.smoothScrolling": true,
+  "workbench.experimental.modernUI": false,
   "workbench.colorCustomizations": {
     "statusBar.background": "#005f5f",
     "statusBar.foreground": "#e6e7e8",
@@ -44,6 +45,7 @@
 
   "files.autoSave": "off",
   "diffEditor.ignoreTrimWhitespace": false,
+  "diffEditor.renderSideBySide": false,
 
   "chat.disableAIFeatures": true,
   "chat.commandCenter.enabled": false,
@@ -456,7 +458,7 @@
   // Markdownlint
   // 关闭 preview 滚动的时候, Markdown 文件跟着滚动
   "markdown.preview.scrollEditorWithPreview": false,
-  "markdown-preview-enhanced.previewTheme": "vue.css",
+  "markdown-preview-enhanced.previewTheme": "vscode.css",
   "markdown-preview-enhanced.enablePreviewZenMode": true,
   "markdownlint.config": {
     "MD010": false,
@@ -639,7 +641,7 @@
   "codingcopilot.enableNextEditSuggestions": true,
   "codingcopilot.generationPreference": "intelligentMode",
   "codingcopilot.selectedCompletionModel": "",
-  "codingcopilot.enableCompletionLanguage": [],
+  "codingcopilot.enableCompletionLanguage": {},
   "codingcopilot.enableFloatShortcut": false,
   "codingcopilot.enableIDENotification": true,
   "gongfeng.copilot.floatShortcut": false,
@@ -658,10 +660,16 @@
   },
   "workbench.sideBar.location": "right",
   "codingcopilot.enableCodelens": false,
-  "workbench.notifications.position": "bottom-left",
+  "codingcopilot.autoRun": true,
   "[markdown]": {
     "diffEditor.ignoreTrimWhitespace": true
   },
-  "diffEditor.renderSideBySide": false,
-  "codingcopilot.autoRun": true,
+  "git.diagnosticsCommitHook.enabled": true,
+  "workbench.layoutControl.enabled": false,
+  "markdown-preview-enhanced.codeBlockTheme": "darcula.css",
+  "markdown-preview-enhanced.revealjsTheme": "moon.css",
+  "codingcopilot.disabledSecurityCategories": [
+    "powershell"
+  ],
+  "git.confirmSync": false,
 }
