@@ -2,6 +2,18 @@ return {
   -- ==============================================================
   -- Colorschemes
   -- ==============================================================
+  {
+    "HoNamDuong/hybrid.nvim",
+    lazy = false,
+    priority = 1000,
+    opts = {
+      terminal_colors = false,
+      undercurl = true,
+      underline = true,
+      bold = true,
+      transparent = true,
+    },
+  },
 
   {
     "EdenEast/nightfox.nvim",
