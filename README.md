@@ -17,8 +17,12 @@ cd ~/.dotfiles
 cp .zshrc.example .zshrc
 # Edit .zshrc to add your personal settings
 
-# Run the install script
+# Run the install script (auto-detects macOS / Linux)
 bash ~/.dotfiles/script/install.sh
+
+# Or run the platform script directly:
+#   macOS: bash ~/.dotfiles/script/install-macos.sh
+#   Linux: bash ~/.dotfiles/script/install-linux.sh
 ```
 
 The install script will automatically:
@@ -81,10 +85,10 @@ ln -s ~/.dotfiles/vscode/keybindings.json ~/Library/Application\ Support/Code/Us
 ln -s ~/.dotfiles/vscode/settings.json ~/Library/Application\ Support/Code/User/settings.json
 
 # Claude Code (skills, commands)
-ln -s ~/.dotfiles/claude/skills ~/.claude/skills
-ln -s ~/.dotfiles/claude/commands ~/.claude/commands
-ln -s ~/.dotfiles/claude/skills ~/.claude-internal/skills
-ln -s ~/.dotfiles/claude/commands ~/.claude-internal/commands
+ln -s ~/.dotfiles/agents/skills ~/.claude/skills
+ln -s ~/.dotfiles/agents/commands ~/.claude/commands
+ln -s ~/.dotfiles/agents/skills ~/.tclaude/skills
+ln -s ~/.dotfiles/agents/commands ~/.tclaude/commands
 
 # (Optional) Create secrets file for API keys
 cat > ~/.zsh_secrets << 'EOF'
@@ -132,7 +136,7 @@ tsbe, tse            # Translate to English
 
 ### Tmux Configuration
 
-- **Prefix Key**: `Ctrl-Space` (avoids conflict with Vim)
+- **Prefix Key**: `Ctrl-a` (double-tap to pass through literal C-a)
 - **Plugin Manager**: [TPM](https://github.com/tmux-plugins/tpm) (Tmux Plugin Manager)
 - **Seamless Navigation**: Integrated with Neovim via [vim-tmux-navigator](https://github.com/christoomey/vim-tmux-navigator)
 - **Pane Navigation**: `Ctrl-h/j/k/l` to switch between Tmux panes and Neovim splits
@@ -277,11 +281,11 @@ This repository includes custom configurations for [Claude Code](https://claude.
 ### Setup
 
 ```bash
-# Symlink to both .claude and .claude-internal
-ln -s ~/.dotfiles/claude/skills ~/.claude/skills
-ln -s ~/.dotfiles/claude/commands ~/.claude/commands
-ln -s ~/.dotfiles/claude/skills ~/.claude-internal/skills
-ln -s ~/.dotfiles/claude/commands ~/.claude-internal/commands
+# Symlink to .claude and .tclaude
+ln -s ~/.dotfiles/agents/skills ~/.claude/skills
+ln -s ~/.dotfiles/agents/commands ~/.claude/commands
+ln -s ~/.dotfiles/agents/skills ~/.tclaude/skills
+ln -s ~/.dotfiles/agents/commands ~/.tclaude/commands
 ```
 
 ---

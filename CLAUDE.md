@@ -57,8 +57,8 @@ ln -s ~/.dotfiles/vscode/settings.json ~/Library/Application\ Support/Code/User/
 ln -s ~/.dotfiles/zed ~/.config/zed
 
 # Claude skills/commands
-ln -s ~/.dotfiles/claude/skills ~/.claude/skills
-ln -s ~/.dotfiles/claude/commands ~/.claude/commands
+ln -s ~/.dotfiles/agents/skills ~/.claude/skills
+ln -s ~/.dotfiles/agents/commands ~/.claude/commands
 
 # Reload configurations
 source ~/.zshrc
