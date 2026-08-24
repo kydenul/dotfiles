@@ -26,7 +26,7 @@
   "workbench.browser.showInTitleBar": false,
   "window.commandCenter": false,
   // "workbench.activityBar.location": "hidden",
-  "workbench.colorTheme": "Gruvbox Dark Hard",
+  "workbench.colorTheme": "Vim Dark Hard",
   "workbench.iconTheme": "material-icon-theme",
   "workbench.list.smoothScrolling": true,
   "workbench.experimental.modernUI": false,
@@ -47,6 +47,7 @@
   "diffEditor.ignoreTrimWhitespace": false,
   "diffEditor.renderSideBySide": false,
 
+  "chat.agent.enabled": false,
   "chat.disableAIFeatures": true,
   "chat.commandCenter.enabled": false,
 
@@ -409,7 +410,7 @@
   "gitlens.statusBar.enabled": false,
   "gitlens.hovers.enabled": false,
   "gitlens.graph.layout": "editor",
-  "gitlens.ai.model": "gemini:gemini-2.0-flash",
+  "gitlens.ai.model": "openrouter:stealth/ox-alpha",
   "gitlens.views.commitDetails.files.layout": "tree",
   "gitlens.views.scm.grouped.views": {
     "commits": true,

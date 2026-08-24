@@ -9,8 +9,7 @@ theme = Catppuccin Mocha
 # auto / ghostty
 window-theme = auto
 
-keybind = global:ctrl+grave_accent=toggle_quick_terminal
-# top / bottom
+keybind = global:ctrl+shift+grave_accent=toggle_quick_terminal
 quick-terminal-position = top
 
 background-image = ~/.config/images/alone.jpg
@@ -19,9 +18,9 @@ background-image-fit = cover
 
 font-family = "Maple Mono NF CN"
 font-size = 18
-# font-thicken = true
-# background-opacity = 0.85 
-# background-blur-radius = 36
+font-thicken = true
+background-opacity = 0.85 
+background-blur-radius = 36
 window-save-state = always
 window-padding-y = 0
 window-padding-x = 0
@@ -33,7 +32,7 @@ quit-after-last-window-closed = true
 copy-on-select = true
 mouse-hide-while-typing = true
 macos-option-as-alt = true
-# macos-titlebar-style = hidden
+macos-titlebar-style = hidden
 
 # Buffer size in bytes: 256 MB
 scrollback-limit = 256000000
