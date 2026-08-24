@@ -190,7 +190,7 @@ sshc (ssh DevCloud), sshk (ssh K-Claw)
 ## Tmux Configuration
 
 ### Key Bindings
-- Prefix: `Ctrl-Space` (instead of default Ctrl-b to avoid Vim conflicts)
+- Prefix: `Ctrl-a` (double-tap to pass literal C-a through; avoids conflicts with nvim's C-b and C-Space)
 - Pane navigation: `h/j/k/l` (vim-style)
 - Copy mode: `Escape` to enter, `v` to select (vi-style)
 - Reload config: `r` (with prefix)
