@@ -199,7 +199,7 @@
 
     // AI Sidekick / Copilot Chat
     { "before": ["leader", "c", "f"], "commands": [{ "command": "tencentcloud.codingcopilot.addToChat", "when": "editorFocus && !editorReadonly" }] },
-    { "before": ["leader", "c", "k"], "commands": [{ "command": "tencentcloud.codingcopilot.chat.newWindowOpen" }] }
+    { "before": ["leader", "c", "k"], "commands": [{ "command": "coding-copilot.webviews.chat.focus" }] }
   ],
 
   "vim.insertModeKeyBindings": [
