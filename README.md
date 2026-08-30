@@ -68,7 +68,6 @@ ln -s ~/.dotfiles/nvim ~/.config/nvim
 ln -s ~/.dotfiles/.zshrc ~/.zshrc
 ln -s ~/.dotfiles/.tmux.conf ~/.tmux.conf
 ln -s ~/.dotfiles/.gitmessage ~/.gitmessage
-ln -s ~/.dotfiles/.markdownlint.json ~/.markdownlint.json
 
 # Kitty
 ln -s ~/.dotfiles/kitty ~/.config/kitty
@@ -129,7 +128,7 @@ la, ll, c            # Navigation shortcuts
 gs, gp, gm, ga       # Git shortcuts
 gor, gob             # Go shortcuts (go run, go build)
 kicat, kssh, kdiff   # Kitty kittens
-sshc, sshk           # SSH shortcuts (DevCloud, K-Claw)
+sshc, sshk, sshd     # SSH shortcuts (DevCloud [+tmux], K-Claw, DevCloud [plain])
 tsbz, tsz            # Translate to Chinese
 tsbe, tse            # Translate to English
 ```
@@ -138,7 +137,7 @@ tsbe, tse            # Translate to English
 
 - **Prefix Key**: `Ctrl-a` (double-tap to pass through literal C-a)
 - **Plugin Manager**: [TPM](https://github.com/tmux-plugins/tpm) (Tmux Plugin Manager)
-- **Seamless Navigation**: Integrated with Neovim via [vim-tmux-navigator](https://github.com/christoomey/vim-tmux-navigator)
+- **Seamless Navigation**: Pane navigation works with Neovim via manual `Ctrl-h/j/k/l` bindings (the `vim-tmux-navigator` TPM plugin is listed but currently commented out in `.tmux.conf`)
 - **Pane Navigation**: `Ctrl-h/j/k/l` to switch between Tmux panes and Neovim splits
 - **Copy Mode**: `Escape` to enter, `v` to select, `y` to yank (Vi-style)
 - **Mouse Support**: Enabled
@@ -161,8 +160,8 @@ tsbe, tse            # Translate to English
 
 - **Theme**: Catppuccin Mocha
 - **Font**: Maple Mono NF CN (18pt)
-- **Quick Terminal**: `` Ctrl+` `` (global hotkey, bottom position)
-- **Deep Tmux Integration**: Same keybindings as Kitty (`Cmd+1-9`, `Cmd+t`, `Cmd+w`, etc.)
+- **Quick Terminal**: `` Ctrl+Shift+` `` (global hotkey, top position)
+- **Deep Tmux Integration**: Not configured — `ghostty/config` has no Tmux bindings (unlike Kitty)
 
 ### Zed Editor
 
@@ -194,8 +193,8 @@ nvim/
 ├── lua/
 │   ├── klazy.lua        # Lazy.nvim bootstrap
 │   ├── custom/          # Core config (options, keymaps, folding, utils)
-│   ├── plugins/         # 25 plugin configurations
-│   └── snippets/        # Custom snippets (cpp, go)
+│   ├── plugins/         # 24 plugin configurations
+│   └── snippets/        # Custom snippets (cpp, go, javascript)
 └── lsp/                 # Language-specific LSP configs
     ├── gopls.lua        # Go
     ├── ts_ls.lua        # TypeScript/JavaScript
@@ -230,7 +229,7 @@ nvim/
 
 **UI Enhancements**:
 
-- Colorscheme: Catppuccin
+- Colorscheme: duskfox (Catppuccin installed but commented out)
 - Statusline (lualine), notifications (noice.nvim)
 - Dashboard (dashboard-nvim), key hints (which-key)
 - Markdown rendering (render-markdown.nvim)
@@ -239,7 +238,7 @@ nvim/
 
 - Surround (nvim-surround), autopairs (nvim-autopairs)
 - Terminal (toggleterm.nvim), AI assistant (sidekick.nvim)
-- Custom snippets with LuaSnip (C++, Go)
+- Custom snippets with LuaSnip (C++, Go, JavaScript)
 
 **Essential Commands**:
 

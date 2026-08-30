@@ -40,7 +40,6 @@ ln -s ~/.dotfiles/nvim/ ~/.config/nvim
 # Symlink configurations
 ln -s ~/.dotfiles/.zshrc ~/.zshrc
 ln -s ~/.dotfiles/.tmux.conf ~/.tmux.conf
-ln -s ~/.dotfiles/.markdownlint.json ~/.markdownlint.json
 
 # Kitty
 ln -s ~/.dotfiles/kitty ~/.config/kitty
@@ -78,14 +77,14 @@ nvim/
 │   │   ├── keymaps.lua       # Custom key mappings
 │   │   ├── folding.lua       # Code folding configuration
 │   │   └── util.lua          # Utility functions
-│   ├── plugins/              # Plugin configurations (25 files)
+│   ├── plugins/              # Plugin configurations (24 files)
 │   │   ├── lsp.lua          # LSP setup with mason and lspconfig
 │   │   ├── blink-cmp.lua    # Autocompletion engine (with Codeium AI)
 │   │   ├── nvim-treesitter.lua
 │   │   ├── gitsigns.lua     # Git integration
 │   │   ├── which-key.lua    # Key binding hints
 │   │   └── ...              # Other plugin configs
-│   └── snippets/             # Custom snippets (cpp, go)
+│   └── snippets/             # Custom snippets (cpp, go, javascript)
 └── lsp/                      # Language-specific LSP configs
     ├── gopls.lua
     ├── ts_ls.lua
@@ -113,7 +112,7 @@ nvim/
 
 **Core Functionality:**
 - Plugin Manager: `lazy.nvim` (auto-bootstrapping, lockfile support)
-- Colorscheme: `catppuccin` (configured in options.lua)
+- Colorscheme: `duskfox` (Catppuccin is installed but currently commented out in options.lua)
 - Session Management: `auto-session` (auto-saves workspace state)
 
 **Code Intelligence:**
@@ -177,7 +176,7 @@ tsbe, tse (translate to English)
 kicat (icat), kssh (ssh), kdiff (diff)
 
 # SSH shortcuts
-sshc (ssh DevCloud), sshk (ssh K-Claw)
+sshc (ssh DevCloud, with tmux attach), sshk (ssh K-Claw), sshd (ssh DevCloud, plain)
 ```
 
 ### Environment Setup
@@ -204,14 +203,14 @@ sshc (ssh DevCloud), sshk (ssh K-Claw)
 
 ### Plugins (via TPM)
 - `tmux-plugins/tmux-sensible` - Sensible defaults
-- `christoomey/vim-tmux-navigator` - Seamless Neovim/Tmux pane navigation
+- `christoomey/vim-tmux-navigator` - Listed but currently **commented out** in `.tmux.conf`; pane navigation is instead provided by manual `C-h/j/k/l` bindings
 - `tmux-plugins/tmux-yank` - Clipboard integration
 
 ## Kitty Configuration
 
 ### Key Settings
 - Font: Maple Mono NF CN, 18pt
-- Background: Custom image with blur and opacity
+- Background: Custom image with `background_tint 0.94` (semi-transparent look; Kitty on macOS has no native blur)
 - Terminal: `xterm-256color` (for SSH compatibility)
 - Cursor: Block shape with trail effect
 - Tab bar: Top position with slant style
@@ -232,12 +231,13 @@ Kitty keybindings send Tmux prefix sequences for seamless control:
 ### Key Settings
 - Theme: Catppuccin Mocha
 - Font: Maple Mono NF CN, 18pt
-- Background: Custom image with 0.2 opacity
+- Background: Custom image — `background-image-opacity = 0.05`, window `background-opacity = 0.85`
 - Window: Hidden titlebar, saves state
-- Quick Terminal: `Ctrl+`` (global hotkey, bottom position)
+- Quick Terminal: `Ctrl+Shift+`` (global hotkey, top position)
 
 ### Deep Tmux Integration
-Same Tmux integration pattern as Kitty:
+> Note: `ghostty/config` currently has **no** Tmux-integration bindings — unlike Kitty. The
+> following mappings are not yet configured in Ghostty and only apply to Kitty:
 - `Cmd+1-9` - Switch Tmux windows
 - `Cmd+T` - Create new Tmux window
 - `Cmd+D` / `Cmd+Shift+D` - Split panes
@@ -261,7 +261,7 @@ Same Tmux integration pattern as Kitty:
 - Cursor: bar shape, no blink
 - Soft wrap at editor width, wrap guide at 120
 - Outline panel on right side
-- Collaboration panel disabled
+- Collaboration panel: docked on the right with its button hidden (not disabled)
 - Telemetry disabled
 
 ## tclaude-proxy (Internal Claude Gateway)
@@ -341,9 +341,9 @@ Each language has a dedicated LSP config file in `nvim/lsp/` that can be customi
 ## Important Notes
 
 - **Leader key:** `<Space>` in Neovim
-- **Colorscheme:** Currently using Catppuccin (see `nvim/lua/custom/options.lua`)
+- **Colorscheme:** Currently using `duskfox` (Catppuccin is installed but commented out in `nvim/lua/custom/options.lua`)
 - **Clipboard:** Uses OSC 52 automatically over SSH, native clipboard otherwise
 - **Plugin lockfile:** `nvim/lazy-lock.json` pins plugin versions for reproducibility
 - **Git commit template:** `.gitmessage` provides structured commit format
-- **Markdown linting:** `.markdownlint.json` defines rules for markdown files
+- **Markdown linting:** Not currently configured — this repo does not ship a `.markdownlint.json`, so the documented symlink source is missing
 - **Terminal fonts:** Maple Mono NF CN is the primary font across Kitty, Ghostty, and Zed
