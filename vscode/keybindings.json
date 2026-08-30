@@ -109,5 +109,27 @@
         "key": "escape",
         "command": "workbench.action.focusFirstEditorGroup",
         "when": "sideBarFocus && !findWidgetVisible"
+    },
+
+    // NOTE: auxiliaryBar（左栏）与 sideBar（右栏，workbench.sideBar.location=right）是两个独立的 Part，
+    // sideBarFocus 不会覆盖它在辅助侧边栏（左栏）任意视图，只需按 esc，就可回到编辑器
+    {
+        "key": "escape",
+        "command": "workbench.action.focusFirstEditorGroup",
+        "when": "auxiliaryBarFocus && !findWidgetVisible"
+    },
+    // NOTE: 底部面板要避开终端自己的 esc 语义：terminalFocus 交给上面 Termial 那条；
+    // terminalFindVisible / terminalChatVisible 时焦点在查找框 / chat 输入框，应优先"关闭它们"而非跳编辑器
+    { // 在底部面板（Problems / Output / Debug Console / Comments），只需按 esc，就可回到编辑器
+        "key": "escape",
+        "command": "workbench.action.focusFirstEditorGroup",
+        "when": "panelFocus && !terminalFocus && !terminalFindVisible && !terminalChatVisible && !findWidgetVisible"
+    },
+    // NOTE: CodeBuddy 聊天面板是 webview（iframe 挂在工作台根节点的 overlay 上，不在侧边栏 DOM 内），
+    // 因此 sideBarFocus / focusedView 都取不到，只能用"当前侧栏容器"来判定在 CodeBuddy 输入框，只需按 esc，就可回到编辑器
+    {
+        "key": "escape",
+        "command": "workbench.action.focusFirstEditorGroup",
+        "when": "(activeViewlet == 'workbench.view.extension.coding-copilot-chat' || activeAuxiliary == 'workbench.view.extension.coding-copilot-chat') && !editorFocus && !terminalFocus && !inQuickOpen && !findWidgetVisible && !webviewFindWidgetVisible"
     }
 ]
