@@ -1,18 +1,9 @@
 // Place your key bindings in this file to override the defaults
 [
-    { "key": "cmd+i", "command": "composerMode.agent"},
-
     {  /* Outline */ "key": "F12", "command": "outline.focus" },
     {  // File Explorer Sidebar
-        "key": "space e",
-        "command": "workbench.action.toggleSidebarVisibility",
-        "when": "filesExplorerFocus && !inputFocus"
-    },
-    {
-        "key": "q",
-        "command": "workbench.action.focusFirstEditorGroup",
-        "when": "filesExplorerFocus && !inputFocus"
-    },
+        "key": "space e", "command": "workbench.action.toggleSidebarVisibility", "when": "filesExplorerFocus && !inputFocus" },
+    { "key": "q", "command": "workbench.action.focusFirstEditorGroup", "when": "filesExplorerFocus && !inputFocus" },
 
     { // Refresh File Explorer
         "key": "R",
@@ -82,7 +73,33 @@
         "when": "inSearchEditor && inputBoxFocus|| inputBoxFocus && searchViewletVisible"
     },
 
-    // ------------------------- 
+    // NOTE: Next / Prev Suggestion => Tab 只"下移候选"，由 Enter 确认
+    { "key": "tab", "command": "selectNextSuggestion", "when": "editorTextFocus && suggestWidgetVisible && !inQuickOpen" },
+    { "key": "shift+tab", "command": "selectPrevSuggestion", "when": "editorTextFocus && suggestWidgetVisible && !inQuickOpen" },
+
+    // <C-j> / <C-k> 在候选项间移动
+    { "key": "ctrl+j", "command": "selectNextSuggestion", "when": "editorTextFocus && suggestWidgetVisible" },
+    { "key": "ctrl+k", "command": "selectPrevSuggestion", "when": "editorTextFocus && suggestWidgetVisible" },
+    // <C-Space> 手动触发补全
+    { "key": "ctrl+space", "command": "editor.action.triggerSuggest", "when": "editorTextFocus && !suggestWidgetVisible" },
+    // <C-e> 取消补全菜单
+    { "key": "ctrl+e", "command": "hideSuggestWidget", "when": "editorTextFocus && suggestWidgetVisible" },
+
+    // -------------------------
+    // Next Quick Open
+    { "key": "tab", "command": "workbench.action.quickOpenSelectNext", "when": "inQuickOpen" },
+    // Prev Quick Open
+    { "key": "shift+tab", "command": "workbench.action.quickOpenSelectPrevious", "when": "inQuickOpen" },
+
+    // Termial
+    { "key": "escape", "command": "workbench.action.focusActiveEditorGroup", "when": "terminalFocus" },
+
+    // Scrolling popups
+    { "key": "h", "command": "editor.action.scrollLeftHover", "when": "editorHoverFocused" },
+    { "key": "j", "command": "editor.action.scrollDownHover", "when": "editorHoverFocused" },
+    { "key": "k", "command": "editor.action.scrollUpHover", "when": "editorHoverFocused" },
+    { "key": "l", "command": "editor.action.scrollRightHover", "when": "editorHoverFocused" },
+
     { // 在文件浏览界面，只需按 esc，就可回到编辑器
         "key": "escape",
         "command": "workbench.action.focusFirstEditorGroup",
@@ -92,50 +109,5 @@
         "key": "escape",
         "command": "workbench.action.focusFirstEditorGroup",
         "when": "sideBarFocus && !findWidgetVisible"
-    },
-
-    { // Accept Selected Suggestion
-        "key": "tab",
-        "command": "acceptSelectedSuggestion",
-        "when": "suggestWidgetVisible && textInputFocus"
-    },
-
-    { // Next Suggestion
-        "key": "tab",
-        "command": "selectNextSuggestion",
-        "when": "editorTextFocus && suggestWidgetMultipleSuggestions && suggestWidgetVisible"
-    },
-    { // Prev Suggestion
-        "key": "shift+tab",
-        "command": "selectPrevSuggestion",
-        "when": "editorTextFocus && suggestWidgetMultipleSuggestions && suggestWidgetVisible"
-    },
-
-    // -------------------------
-    { // Next Quick Open
-        "key": "tab",
-        "command": "workbench.action.quickOpenSelectNext",
-        "when": "inQuickOpen"
-    },
-    { // Prev Quick Open
-        "key": "shift+tab",
-        "command": "workbench.action.quickOpenSelectPrevious",
-        "when": "inQuickOpen"
-    },
- 
-    { // Termial
-        "key": "escape",
-        "command": "workbench.action.focusActiveEditorGroup",
-        "when": "terminalFocus"
-    },
-
-    // Scrolling popups
-    { "key": "h", "command": "editor.action.scrollLeftHover", "when": "editorHoverFocused" },
-    { "key": "j", "command": "editor.action.scrollDownHover", "when": "editorHoverFocused" },
-    { "key": "k", "command": "editor.action.scrollUpHover", "when": "editorHoverFocused" },
-    {
-        "key": "l",
-        "command": "editor.action.scrollRightHover",
-        "when": "editorHoverFocused"
     }
 ]
