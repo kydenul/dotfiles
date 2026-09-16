@@ -1,6 +1,6 @@
-# 复用 tclaude 网关给原生 Claude Code
+# 复用 tclaude 网关给原生 Claude Code 与 pi
 
-把 `tclaude` 的本地网关代理出来，供原生 `claude` / cc-switch 使用。
+把 `tclaude` 的本地网关代理出来，供原生 `claude` / `pi` / cc-switch 使用。
 
 > ⚠️ **先读这个**：本方案把公司内部 AI 额度（`copilot.tencent.com`，iOA SSO 鉴权、按 credits 计费）
 > 转给通用客户端使用。`product.json` 里 `telemetry.report.standard.enabled: true`，用量是上报的。
@@ -94,18 +94,22 @@ let ei = await this.probePort(0); // 失败则让 OS 随机分配
 await this.metadataStore.writePort(ei); // 并写回 daemon.port
 ```
 
-所以端口是**尽力保持稳定，但不保证**。本机 `daemon.port` = `51247`，已稳定两个月未变。
+所以端口是**尽力保持稳定，但不保证**。实测已经漂过一次：`51247` → `54380`
+（cc-switch 里存的 provider 还留在旧端口，`claude` 直接连不上）。
 **脚本必须动态读取 `daemon.json`，不要硬编码端口。**
 
 ## 3. 验证记录
 
-`/v1/models`（本地 handler，无需鉴权即可读）：
+`/v1/models`（本地 handler，无需鉴权即可读）报 14 个模型，
+实测 13 个能通，**`claude-opus-5[1m]` 上游 400**：
 
 ```
-claude-opus-5[1m]         claude-opus-4-8[1m]        claude-sonnet-5[1m]
-claude-kimi-k3[1m]        claude-glm-5.2[1m]         claude-deepseek-v4-pro[1m]
-claude-deepseek-v4-flash[1m]                         claude-hy3
+{"code":11102,"error":"11102:model [claude-opus-5-1m] service info not found"}
 ```
+
+网关侧只挂了名字没配服务（加 `anthropic-beta: context-1m-2025-08-07`
+或伪装 `claude-cli` UA 都无效）。属网关侧问题，等其修复即可，
+本脚本仍会把它写进模型清单——一旦上游 provision 好就自动可用。
 
 `/v1/messages` 首次请求失败，daemon 日志给出确切原因：
 
@@ -131,7 +135,7 @@ curl -s -X POST http://127.0.0.1:51247/v1/messages \
 因此**零改造兼容**。端到端验证：
 
 ```bash
-ANTHROPIC_BASE_URL=http://127.0.0.1:51247 \
+ANTHROPIC_BASE_URL=$(tclaude-proxy url) \
 ANTHROPIC_AUTH_TOKEN=placeholder \
 ANTHROPIC_MODEL=claude-haiku-4-5 \
 CLAUDE_CONFIG_DIR=/tmp/cc-proxy-test-1 \
@@ -139,7 +143,47 @@ claude -p "Reply with exactly: NATIVE_CLAUDE_VIA_TCLAUDE_OK"
 # → NATIVE_CLAUDE_VIA_TCLAUDE_OK
 ```
 
+`pi` 则需要改一个请求头才能通（见 §4.3）。配好之后同样端到端验证过：
+
+```bash
+pi -p --no-session --provider tclaude --model 'claude-sonnet-5[1m]' \
+   "Reply with exactly: PI_VIA_TCLAUDE_OK"
+# → PI_VIA_TCLAUDE_OK
+
+# 工具调用（真实 agent 负载，不只是文本补全）
+pi -p --no-session -t read --provider tclaude --model claude-haiku-4-5 \
+   "Use the read tool on /tmp/probe.txt and reply with only its contents."
+# → 正确读回文件内容
+```
+
+网关侧的协议能力也逐项验证过：流式 SSE、`tools` + `eager_input_streaming: true`、
+`strict: true` 工具定义、`thinking.budget_tokens`——全部 200 通过。
+`max_tokens` 给到 128000（opus/sonnet）/ 64000（其余）均被接受。
+
 ## 4. 接入 cc-switch
+
+cc-switch 同时管 `claude` 和 `pi`，但**两者的数据流方向相反**——这是本节最重要的一点：
+
+```
+claude:  cc-switch  ──写──▶  ~/.claude/settings.json     ──▶  claude
+pi:      cc-switch  ◀─读──   ~/.pi/agent/models.json     ◀──  你/本脚本写这里
+```
+
+证据是 binary 里的字符串：
+
+```
+Pi providers are read from Pi's native models file
+Pi providers must be added from the Pi provider page
+Pi provider '...' changed outside CC Switch
+Imported N Pi provider(s) from native config
+```
+
+所以给 pi 接网关，**正确做法是写 `~/.pi/agent/models.json`，让 cc-switch 导入**，
+而不是去改 cc-switch 的 DB。`app_type` 白名单里已含 `pi`
+（`must be 'claude', ..., 'hermes', or 'pi'`），`~/.cc-switch/settings.json` 的
+`visibleApps.pi` 也已是 `true`。
+
+### 4.1 claude（cc-switch 写 settings.json）
 
 cc-switch（v3.20.0，`~/.cc-switch/cc-switch.db`）的 provider 存储结构极简：
 
@@ -154,7 +198,7 @@ claude-official|claude|{"env":{}}
 ```json
 {
   "env": {
-    "ANTHROPIC_BASE_URL": "http://127.0.0.1:51247",
+    "ANTHROPIC_BASE_URL": "http://127.0.0.1:<port>",
     "ANTHROPIC_AUTH_TOKEN": "placeholder",
     "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-4-8[1m]",
     "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-4-6[1m]",
@@ -163,7 +207,88 @@ claude-official|claude|{"env":{}}
 }
 ```
 
-端口若变化，用 `tclaude-proxy sync-ccswitch` 自动同步（见下）。
+端口若变化，用 `tclaude-proxy sync-ccswitch claude` 自动同步（见下）。
+
+### 4.2 pi（cc-switch 读 models.json）
+
+一条命令搞定，不需要手写 JSON：
+
+```bash
+tclaude-proxy sync-ccswitch pi           # 预览
+tclaude-proxy sync-ccswitch pi --apply   # 写入 ~/.pi/agent/models.json
+```
+
+写进去的 provider 长这样（模型清单由脚本从 `/v1/models` 动态生成，
+网关上新模型后重跑一次即可跟进）：
+
+```json
+{
+  "providers": {
+    "tclaude": {
+      "baseUrl": "http://127.0.0.1:<port>",
+      "api": "anthropic-messages",
+      "apiKey": "placeholder",
+      "headers": {
+        "Authorization": "Bearer placeholder",
+        "x-api-key": "",
+        "X-Claude-Code-Session-Id": "pi-tclaude-gateway"
+      },
+      "compat": { "supportsStrictTools": true },
+      "models": [{ "id": "claude-sonnet-5[1m]", "contextWindow": 1000000, "...": "..." }]
+    }
+  }
+}
+```
+
+**`"x-api-key": ""` 不是笔误，是本次接入唯一的真坑，详见 §4.3。**
+
+脚本只 upsert `providers.tclaude` 这一个 key，pi 已有的其它 provider
+（openrouter / deepseek 等）原样保留；若该 key 已被指向某个第三方地址，则跳过不动。
+
+启动默认模型（`defaultProvider` / `defaultModel` 在 `~/.pi/agent/settings.json`）
+**脚本不碰**——那个文件 cc-switch 也在管。自己选：
+
+```bash
+pi          # 进 TUI → /model → 选 tclaude/... → Ctrl+S 存为默认
+```
+
+或直接在命令行指定：
+
+```bash
+pi --provider tclaude --model 'claude-sonnet-5[1m]'
+```
+
+方括号 `[1m]` 不会被当成 glob 吃掉，实测可直接选中。
+
+最后打开 CC Switch → Pi 页，确认 `tclaude` provider 已被导入
+（cc-switch 是**打开该页时**才读 models.json，不是后台常驻同步）。
+
+### 4.3 坑：pi 的 `x-api-key` 会被网关拒掉
+
+pi 的 Anthropic SDK（stainless 0.91.1）用 `x-api-key` 鉴权，而网关只认
+`Authorization: Bearer`。用日志反代抓到 pi 实际发出的头：
+
+```
+x-api-key: placeholder
+User-Agent: pi (darwin 25.6.0; arm64)
+anthropic-beta: interleaved-thinking-2025-05-14
+```
+
+逐项 bisect 的结果：
+
+| 请求头                                    | 结果                               |
+| ----------------------------------------- | ---------------------------------- |
+| `Authorization: Bearer placeholder`       | **200**                            |
+| `x-api-key: placeholder`                  | 401 `{"message":"invalid_format"}` |
+| 两个都发                                  | **401** ← `x-api-key` 有毒         |
+| `Authorization` + `x-api-key: ""`（空值） | **200**                            |
+
+**光加 `Authorization` 不够**，必须同时把 `x-api-key` 置成空串才能压掉 SDK 那个头。
+`doctor` 第 7 项会单独校验这一点，因为它从 URL 上完全看不出来，缺了就是必 401。
+
+另外 `X-Claude-Code-Session-Id` **可以是任意固定字符串**，不必是 UUID
+（实测同一个值复用多次都返回 200）。这是 pi 能接进来的前提——models.json 的
+`headers` 是静态的，没有「每会话生成一个动态值」的机制。
 
 ### cc-switch 自带的代理层
 
@@ -178,7 +303,7 @@ max_retries=6    circuit_failure_threshold=8   pricing_model_source=response
 当前 `settings.json` 里 `enableLocalProxy: false`，关着。若开启则形成两层代理：
 
 ```
-claude → 15721 (cc-switch) → 51247 (tclaude) → copilot.tencent.com
+claude → 15721 (cc-switch) → <tclaude port> → copilot.tencent.com
 ```
 
 好处是能拿到 token 用量与成本统计（`proxy_request_logs` 表，目前为空）。
@@ -210,19 +335,19 @@ tclaude-proxy ensure      # 不 healthy 时用这个拉起
 ### 步骤 1：拿到当前端口
 
 ```bash
-tclaude-proxy url         # → http://127.0.0.1:51247
+tclaude-proxy url         # → http://127.0.0.1:<port>
 ```
 
 **不要凭记忆填端口**，每次都用这个命令取（原因见 §2）。
 
-### 步骤 2：在 CC Switch 里新建 Claude provider
+### 步骤 2a：在 CC Switch 里新建 Claude provider
 
 打开 CC Switch → Claude 分类 → 新增供应商，配置填：
 
 ```json
 {
   "env": {
-    "ANTHROPIC_BASE_URL": "http://127.0.0.1:51247",
+    "ANTHROPIC_BASE_URL": "http://127.0.0.1:<port>",
     "ANTHROPIC_AUTH_TOKEN": "placeholder",
     "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-4-8[1m]",
     "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-4-6[1m]",
@@ -237,6 +362,14 @@ tclaude-proxy url         # → http://127.0.0.1:51247
 > `ANTHROPIC_AUTH_TOKEN` 填 `placeholder` 就行，**这不是密钥**。
 > 真 token 由 daemon 注入，客户端不需要任何凭证（见 §1）。
 
+### 步骤 2b：给 pi 接上（不用手写 JSON）
+
+```bash
+tclaude-proxy sync-ccswitch pi --apply
+```
+
+然后打开 CC Switch → Pi 页确认已导入。细节和为什么方向是反的见 §4.2。
+
 ### 步骤 3：切过去并验证
 
 在 CC Switch 里点选该 provider，然后：
@@ -245,29 +378,36 @@ tclaude-proxy url         # → http://127.0.0.1:51247
 tclaude-proxy doctor
 ```
 
-六项全绿即可用。第 6 项会检查 `~/.claude/settings.json` 是否真的指向了当前端口
-——这是确认 CC Switch 写入成功的最快方式。
+七项全绿即可用。第 6 / 7 项分别检查 `~/.claude/settings.json` 与
+`~/.pi/agent/models.json` 是否真的指向了当前端口
+——这是确认写入成功的最快方式。
 
 ### 日常使用
 
 ```bash
 claude                    # 正常用，走内部网关
+pi                        # 同上（provider 选 tclaude）
 tclaude-proxy status      # 出问题先看这个
 tclaude-proxy doctor      # 完整体检
 ```
 
 ### 端口漂移后的修复
 
-`claude` 突然连不上，先查端口是否变了：
+`claude` / `pi` 突然连不上，先查端口是否变了：
 
 ```bash
-tclaude-proxy sync-ccswitch          # 只预览，会告诉你差异
-tclaude-proxy sync-ccswitch --apply  # 确认后写入 ~/.claude/settings.json
+tclaude-proxy sync-ccswitch                 # 只预览，claude + pi 都查
+tclaude-proxy sync-ccswitch --apply         # 两个都写
+tclaude-proxy sync-ccswitch pi --apply      # 只写 pi
+tclaude-proxy sync-ccswitch claude --apply  # 只写 claude
 ```
 
-`--apply` 会顺手备份到 `settings.json.bak`。注意它改的是 `~/.claude/settings.json`，
-**CC Switch 里存的 provider 配置仍是旧端口**，下次切换会覆盖回去
-——所以端口变了之后，记得回 CC Switch 把 provider 里的 URL 也改掉。
+`--apply` 会顺手备份到 `*.bak`。两个 app 的善后不一样：
+
+- **claude**：改的是 `~/.claude/settings.json`，**CC Switch 里存的 provider 配置仍是旧端口**，
+  下次切换会覆盖回去——所以记得回 CC Switch 把 provider 里的 URL 也改掉。
+- **pi**：改的是 `~/.pi/agent/models.json`，而 cc-switch 是**读**这个文件的，
+  所以不存在被覆盖的问题，下次打开 Pi 页会读到新端口。
 
 ### 其它用法
 
@@ -293,7 +433,7 @@ tclaude-proxy-agent.sh uninstall   # 卸载，不影响 daemon 本身
 daemon 挂掉后无人重启 → 这正是 `tclaude-proxy-agent.sh` 存在的理由。
 
 **② 端口可能变化。** 见 §2。始终从 `daemon.json` 读取。
-`tclaude-proxy sync-ccswitch` 会在端口漂移后重写配置。
+`tclaude-proxy sync-ccswitch` 会在端口漂移后重写配置（claude 与 pi 都管）。
 
 **③ 401 会触发强制登出。** 转发层：
 
@@ -319,12 +459,34 @@ daemon 挂掉后无人重启 → 这正是 `tclaude-proxy-agent.sh` 存在的理
 **⑥ 重启 daemon 会中断正在运行的会话。** 包括通过该 daemon 运行的 Claude Code 自身。
 `restart` 前先确认没有活跃会话。
 
+**⑦ pi 的 `x-api-key` 必须置空。** 详见 §4.3——这是 pi 接入唯一的真坑，
+且从配置上看不出来（URL 完全正确也会 401）。`doctor` 第 7 项专门查这个。
+若哪天有人"顺手清理"掉 `models.json` 里那行看起来多余的 `"x-api-key": ""`，
+pi 会立刻全线 401 `invalid_format`。
+
+**⑧ `claude-opus-5[1m]` 上游未 provision。** 网关 `/v1/models` 报了它，
+但实际请求返回 400 `service info not found`（见 §3）。属网关侧配置缺失，
+本地无法绕过。pi 的模型列表里能看到它，选中会报错——换 `claude-opus-4-8[1m]`
+或 `claude-sonnet-5[1m]`。
+
+**⑨ pi 的默认模型要自己设。** `sync-ccswitch pi` **故意不碰**
+`~/.pi/agent/settings.json` 的 `defaultProvider` / `defaultModel`
+（那个文件 cc-switch 也在管，少一处冲突面）。在 pi 里 `/model` 选好后
+`Ctrl+S` 存成默认，或每次 `pi --provider tclaude --model ...`。
+
+**⑩ cc-switch 读 pi 配置是懒加载的。** 写完 `models.json` 后要**打开 CC Switch 的
+Pi 页**才会导入，不是后台常驻同步。`providers` 表里 `app_type='pi'` 为 0 行
+不代表配置有问题——`tclaude-proxy doctor` 第 7 项才是判断依据。
+
 ## 7. 参考
 
-| 路径                                                           | 说明                                      |
-| -------------------------------------------------------------- | ----------------------------------------- |
-| `/opt/homebrew/lib/node_modules/@tencent/tclaude/product.json` | 端点、模型表、鉴权配置                    |
-| `~/.tclaude/daemon.json`                                       | 当前 daemon pid / port / url              |
-| `~/.tclaude/logs/<date>/*.log`                                 | daemon 日志（转发失败的真实原因在这里）   |
-| `~/.cc-switch/cc-switch.db`                                    | cc-switch provider / proxy 配置（SQLite） |
-| `~/.cc-switch/settings.json`                                   | `enableLocalProxy` 等开关                 |
+| 路径                                                           | 说明                                        |
+| -------------------------------------------------------------- | ------------------------------------------- |
+| `/opt/homebrew/lib/node_modules/@tencent/tclaude/product.json` | 端点、模型表、鉴权配置                      |
+| `~/.tclaude/daemon.json`                                       | 当前 daemon pid / port / url                |
+| `~/.tclaude/logs/<date>/*.log`                                 | daemon 日志（转发失败的真实原因在这里）     |
+| `~/.cc-switch/cc-switch.db`                                    | cc-switch provider / proxy 配置（SQLite）   |
+| `~/.cc-switch/settings.json`                                   | `enableLocalProxy` / `visibleApps` 等开关   |
+| `~/.pi/agent/models.json`                                      | pi 的 provider 定义（cc-switch **读**这里） |
+| `~/.pi/agent/settings.json`                                    | pi 的 `defaultProvider` / `defaultModel`    |
+| `<pi 安装目录>/docs/models.md`                                 | `models.json` 全部字段与 `compat` 语义      |

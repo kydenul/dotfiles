@@ -10,9 +10,12 @@
 #   tclaude-proxy env              输出 export 语句，配合 eval 使用
 #   tclaude-proxy ensure           确保 daemon 运行（守护进程调用此命令）
 #   tclaude-proxy doctor           完整体检
-#   tclaude-proxy sync-ccswitch    预览端口同步改动（只读）
-#   tclaude-proxy sync-ccswitch --apply
-#                                  真正写入 ~/.claude/settings.json
+#   tclaude-proxy sync-ccswitch [claude|pi]
+#                                  预览端口同步改动（只读）；省略 app 则两者都处理
+#   tclaude-proxy sync-ccswitch [claude|pi] --apply
+#                                  真正写入 ~/.claude/settings.json 和/或
+#                                  ~/.pi/agent/models.json
+# END-USAGE
 # ============================================================================
 
 set -euo pipefail
@@ -43,6 +46,18 @@ DAEMON_META="$TCLAUDE_DIR/daemon.json"
 HEALTH_PATH="/__tclaude/health"
 CCSWITCH_DB="$HOME/.cc-switch/cc-switch.db"
 CLAUDE_SETTINGS="$HOME/.claude/settings.json"
+
+# pi-coding-agent (`pi`). PI_CODING_AGENT_DIR is pi's own override for its config
+# directory, so honour it rather than hardcoding ~/.pi/agent.
+PI_DIR="${PI_CODING_AGENT_DIR:-$HOME/.pi/agent}"
+PI_MODELS="$PI_DIR/models.json"
+PI_PROVIDER_KEY="tclaude"
+
+# The gateway rejects requests without X-Claude-Code-Session-Id, but does not
+# require a UUID — a fixed string is accepted and can be reused across requests.
+# That matters because models.json headers are static; there is no hook for
+# minting a per-session value.
+PI_SESSION_ID="pi-tclaude-gateway"
 
 # The literal token tclaude injects — auth happens inside the daemon, so any
 # value works. Kept as a constant to document that this is not a secret.
@@ -83,6 +98,56 @@ daemon_healthy() {
     curl -fsS --max-time 5 "${url}${HEALTH_PATH}" 2>/dev/null |
         grep -q '"ok":[[:space:]]*true'
 }
+
+# Model ids as advertised by the gateway's local /v1/models handler, one per line.
+gateway_models() {
+    local url
+    url="$(daemon_url)"
+    [ -n "$url" ] || return 1
+    curl -fsS --max-time 10 -H "Authorization: Bearer $PLACEHOLDER_TOKEN" \
+        "$url/v1/models" 2>/dev/null |
+        python3 -c '
+import json, sys
+try:
+    for m in json.load(sys.stdin).get("data", []):
+        # One id per line downstream, so an embedded newline would split into
+        # two bogus models.
+        if m.get("id") and "\n" not in m["id"]:
+            print(m["id"])
+except Exception:
+    pass
+' 2>/dev/null
+}
+
+# ── pi model metadata ───────────────────────────────────────────────────────
+#
+# The model *list* is pulled live from /v1/models so new gateway models appear
+# without editing this script. Only the per-family metadata pi needs (and the
+# gateway does not report) lives here, matched by longest id prefix.
+#
+# Fields: prefix | contextWindow | maxTokens | vision | allowEmptySignature
+#
+# contextWindow is the *base* window; an id ending in the gateway's `[1m]`
+# marker overrides it to 1000000. That keeps claude-sonnet-4-6 (200K) and
+# claude-sonnet-4-6[1m] (1M) correct from a single row.
+#
+# Every model the gateway exposes accepted thinking.budget_tokens when probed,
+# so reasoning is true across the board and is not a column.
+#
+# allowEmptySignature: hy3 and kimi-k3 stream thinking blocks whose `signature`
+# is an empty string. Without this flag pi downgrades those blocks to plain text.
+# glm and deepseek send real signatures, so they must not set it.
+PI_MODEL_META=$(
+    cat <<'EOF'
+claude-opus-       200000  128000   true  false
+claude-sonnet-     200000  128000   true  false
+claude-haiku-      200000   64000   true  false
+claude-deepseek-   200000   64000  false  false
+claude-glm-        200000   64000  false  false
+claude-kimi-       200000   64000  false   true
+claude-hy3         200000   64000  false   true
+EOF
+)
 
 # ── Commands ────────────────────────────────────────────────────────────────
 
@@ -260,7 +325,7 @@ except Exception:
         rc=1
     fi
 
-    section "6. cc-switch wiring"
+    section "6. cc-switch wiring (claude)"
     if [ -f "$CLAUDE_SETTINGS" ] && [ -n "$url" ]; then
         local configured
         configured="$(python3 - "$CLAUDE_SETTINGS" <<'PY' 2>/dev/null || true
@@ -278,11 +343,73 @@ PY
             success "settings.json points at $url"
         else
             warn "settings.json points at $configured but daemon is at $url"
-            warn "run: tclaude-proxy sync-ccswitch"
+            warn "run: tclaude-proxy sync-ccswitch claude"
             rc=1
         fi
     else
         warn "skipped"
+    fi
+
+    section "7. pi wiring"
+    if ! command -v pi >/dev/null 2>&1; then
+        warn "pi not installed — skipped"
+    elif [ ! -f "$PI_MODELS" ]; then
+        warn "$PI_MODELS not found"
+        warn "run: tclaude-proxy sync-ccswitch pi --apply"
+    elif [ -z "$url" ]; then
+        warn "skipped — no daemon url"
+        rc=1
+    else
+        # Report baseUrl and the x-api-key override separately: a missing/non-empty
+        # x-api-key is a guaranteed 401, and is invisible from the URL alone.
+        local pi_state
+        pi_state="$(python3 - "$PI_MODELS" "$PI_PROVIDER_KEY" <<'PY' 2>/dev/null || true
+import json, sys
+try:
+    with open(sys.argv[1]) as f:
+        p = (json.load(f).get("providers") or {}).get(sys.argv[2])
+    if not isinstance(p, dict):
+        print("MISSING")
+    else:
+        headers = p.get("headers") or {}
+        suppressed = "yes" if headers.get("x-api-key", None) == "" else "no"
+        print(f"{p.get('baseUrl','')}\t{suppressed}\t{len(p.get('models') or [])}")
+except Exception:
+    print("UNREADABLE")
+PY
+)"
+        case "$pi_state" in
+        MISSING)
+            warn "no '$PI_PROVIDER_KEY' provider in $PI_MODELS"
+            warn "run: tclaude-proxy sync-ccswitch pi --apply"
+            ;;
+        UNREADABLE | "")
+            error "$PI_MODELS unreadable"
+            rc=1
+            ;;
+        *)
+            local pi_url pi_suppressed pi_count
+            pi_url="$(printf '%s' "$pi_state" | cut -f1)"
+            pi_suppressed="$(printf '%s' "$pi_state" | cut -f2)"
+            pi_count="$(printf '%s' "$pi_state" | cut -f3)"
+
+            if [ "$pi_url" = "$url" ]; then
+                success "models.json points at $url ($pi_count models)"
+            else
+                warn "models.json points at $pi_url but daemon is at $url"
+                warn "run: tclaude-proxy sync-ccswitch pi --apply"
+                rc=1
+            fi
+
+            if [ "$pi_suppressed" = "yes" ]; then
+                success "x-api-key suppressed (required — see docs)"
+            else
+                error "x-api-key not suppressed — pi will get 401 invalid_format"
+                warn "run: tclaude-proxy sync-ccswitch pi --apply"
+                rc=1
+            fi
+            ;;
+        esac
     fi
 
     echo ""
@@ -301,16 +428,18 @@ PY
 # which backend every `claude` invocation talks to, so it requires --apply.
 # Only touches entries that are unset or already a 127.0.0.1 tclaude URL, so it
 # will never clobber an official-API or third-party provider.
-cmd_sync_ccswitch() {
-    need python3
-    local apply=0
-    [ "${1:-}" = "--apply" ] && apply=1
-
+sync_claude() {
+    local apply="$1"
     local url
-    url="$(cmd_url)"
 
+    # Explicit guard, not `set -e`: these functions are invoked as `sync_x || rc=1`,
+    # and bash disables errexit inside a function called from a `&&`/`||` list. A
+    # failing cmd_url would otherwise fall through and write an empty base URL.
+    url="$(cmd_url)" || return 1
+    [ -n "$url" ] || return 1
+
+    section "claude"
     info "daemon url: $url"
-    [ "$apply" -eq 1 ] || warn "dry run — re-run with --apply to write changes"
 
     # ── ~/.claude/settings.json ─────────────────────────────────────────────
     if [ -f "$CLAUDE_SETTINGS" ]; then
@@ -363,9 +492,14 @@ PY
     # cc-switch may hold the DB open; a copy-modify-restore would risk losing
     # its concurrent writes. Report instead of mutating, and let the user apply
     # it through the UI.
+    #
+    # Select id and config together. Re-querying per id would mean interpolating
+    # the id back into SQL, and the sqlite3 CLI runs `;`-separated statements —
+    # so a provider id containing a quote could execute arbitrary SQL (including
+    # DELETEs) from what is meant to be a read-only report.
     local matches
-    matches="$(sqlite3 "$CCSWITCH_DB" \
-        "select id from providers where app_type='claude' and settings_config like '%127.0.0.1%';" \
+    matches="$(sqlite3 -separator "$(printf '\t')" "$CCSWITCH_DB" \
+        "select id, settings_config from providers where app_type='claude' and settings_config like '%127.0.0.1%';" \
         2>/dev/null || true)"
 
     if [ -z "$matches" ]; then
@@ -387,12 +521,10 @@ EOF
         return 0
     fi
 
-    echo "$matches" | while read -r pid; do
+    # settings_config is single-line JSON, so one row per line holds.
+    echo "$matches" | while IFS="$(printf '\t')" read -r pid stored; do
         [ -n "$pid" ] || continue
-        local stored
-        stored="$(sqlite3 "$CCSWITCH_DB" \
-            "select settings_config from providers where id='$pid' and app_type='claude';")"
-        if echo "$stored" | grep -q "$url"; then
+        if [ "${stored#*"$url"}" != "$stored" ]; then
             success "cc-switch provider '$pid' already at $url"
         else
             warn "cc-switch provider '$pid' has a stale port"
@@ -402,8 +534,220 @@ EOF
     done
 }
 
+# Upsert the `tclaude` provider into ~/.pi/agent/models.json.
+#
+# NOTE the data flow here is the REVERSE of sync_claude's. For Claude, cc-switch
+# writes ~/.claude/settings.json. For pi, cc-switch *reads* pi's native
+# models.json and imports providers from it ("Pi providers are read from Pi's
+# native models file" / "Pi providers must be added from the Pi provider page").
+# So the way to wire pi up through cc-switch is to write this file and let
+# cc-switch pick it up — not to touch the cc-switch DB.
+#
+# Only providers.tclaude is touched; pi's other providers are preserved.
+sync_pi() {
+    local apply="$1"
+    local url models
+
+    # Same guard as sync_claude — see the note there.
+    url="$(cmd_url)" || return 1
+    [ -n "$url" ] || return 1
+
+    section "pi"
+    info "daemon url: $url"
+
+    if ! command -v pi >/dev/null 2>&1; then
+        warn "pi not installed — continuing anyway (config is harmless until pi shows up)"
+    fi
+
+    models="$(gateway_models)"
+    if [ -z "$models" ]; then
+        error "could not read $url/v1/models — cannot build pi model list"
+        return 1
+    fi
+
+    python3 - "$PI_MODELS" "$url" "$PLACEHOLDER_TOKEN" "$apply" \
+        "$PI_PROVIDER_KEY" "$PI_SESSION_ID" "$models" "$PI_MODEL_META" <<'PY'
+import json, os, shutil, sys
+
+path, url, token, apply, key, session_id, models_raw, meta_raw = sys.argv[1:9]
+apply = apply == "1"
+
+# ── metadata table ──────────────────────────────────────────────────────────
+# prefix -> (contextWindow, maxTokens, vision, allowEmptySignature)
+meta = []
+for line in meta_raw.splitlines():
+    parts = line.split()
+    if len(parts) == 5:
+        meta.append((parts[0], int(parts[1]), int(parts[2]),
+                     parts[3] == "true", parts[4] == "true"))
+# Longest prefix wins, so claude-hy3 is not shadowed by a shorter row.
+meta.sort(key=lambda r: len(r[0]), reverse=True)
+
+DEFAULT = (200000, 16384, False, False)
+
+
+def describe(model_id):
+    ctx, max_tokens, vision, empty_sig = DEFAULT
+    for prefix, p_ctx, p_max, p_vision, p_empty in meta:
+        if model_id.startswith(prefix):
+            ctx, max_tokens, vision, empty_sig = p_ctx, p_max, p_vision, p_empty
+            break
+
+    # The gateway marks its long-context variants with a literal "[1m]" suffix.
+    if model_id.endswith("[1m]"):
+        ctx = 1000000
+
+    entry = {
+        "id": model_id,
+        "contextWindow": ctx,
+        "maxTokens": max_tokens,
+        # Every gateway model accepted thinking.budget_tokens when probed.
+        "reasoning": True,
+        "input": ["text", "image"] if vision else ["text"],
+    }
+    if empty_sig:
+        # This model streams thinking blocks with an empty `signature`; without
+        # the flag pi converts them to plain text.
+        entry["compat"] = {"allowEmptySignature": True}
+    return entry
+
+
+models = [describe(line.strip()) for line in models_raw.splitlines() if line.strip()]
+
+provider = {
+    "baseUrl": url,
+    "api": "anthropic-messages",
+    "apiKey": token,
+    "headers": {
+        "Authorization": f"Bearer {token}",
+        # NOT a typo, and not removable. pi's Anthropic SDK authenticates with
+        # `x-api-key`, which this gateway rejects outright:
+        #     x-api-key alone            -> 401 {"message":"invalid_format"}
+        #     x-api-key + Authorization  -> 401 (x-api-key poisons the request)
+        #     Authorization alone        -> 200
+        # An empty value suppresses the SDK's header so only Bearer is sent.
+        "x-api-key": "",
+        # Mandatory upstream; any stable string works.
+        "X-Claude-Code-Session-Id": session_id,
+    },
+    # The gateway accepted tool definitions with `strict: true`.
+    "compat": {"supportsStrictTools": True},
+    "models": models,
+}
+
+# ── read (or invent) the file ───────────────────────────────────────────────
+data, existed = {"providers": {}}, os.path.exists(path)
+if existed:
+    try:
+        with open(path) as f:
+            data = json.load(f)
+    except (OSError, ValueError) as exc:
+        print(f"         ERROR  {path} is not readable JSON — leaving it alone")
+        print(f"                {exc}")
+        sys.exit(1)
+    if not isinstance(data, dict):
+        print(f"         ERROR  {path} root is not an object — leaving it alone")
+        sys.exit(1)
+
+providers = data.setdefault("providers", {})
+if not isinstance(providers, dict):
+    print(f"         ERROR  {path} 'providers' is not an object — leaving it alone")
+    sys.exit(1)
+
+existing = providers.get(key)
+if existing is not None and not isinstance(existing, dict):
+    print(f"         ERROR  {path} provider '{key}' is not an object — leaving it alone")
+    sys.exit(1)
+
+current = (existing or {}).get("baseUrl", "")
+
+# Never clobber a provider someone pointed at a real remote endpoint.
+if current and "127.0.0.1" not in current and "localhost" not in current:
+    print(f"         SKIP  third-party endpoint left alone: {current}")
+    sys.exit(0)
+
+up_to_date = existing == provider
+
+if up_to_date:
+    print(f"         NOOP  provider '{key}' already correct ({len(models)} models)")
+    sys.exit(0)
+
+if existing is None:
+    change = f"ADD  provider '{key}' -> {url}"
+elif current == url:
+    # Same endpoint, but headers/compat/models drifted (e.g. the gateway gained
+    # a model, or someone hand-edited the auth headers).
+    change = f"REFRESH  provider '{key}' config at {url}"
+else:
+    change = f"SET  provider '{key}'  {current or '(no baseUrl)'} -> {url}"
+
+if not apply:
+    print(f"         WOULD {change}  ({len(models)} models)")
+    sys.exit(0)
+
+parent = os.path.dirname(path) or "."
+os.makedirs(parent, exist_ok=True)
+backup = ""
+if existed:
+    shutil.copy2(path, path + ".bak")
+    backup = f"  (backup: {path}.bak)"
+
+providers[key] = provider
+with open(path, "w") as f:
+    json.dump(data, f, indent=2)
+    f.write("\n")
+print(f"         {change}  ({len(models)} models){backup}")
+PY
+}
+
+# Ports drift, so both sync paths key off the live daemon.json rather than any
+# stored value. See sync_claude / sync_pi for the per-app semantics.
+cmd_sync_ccswitch() {
+    need python3
+
+    local apply=0 app="" arg
+    for arg in "$@"; do
+        case "$arg" in
+        --apply) apply=1 ;;
+        claude | pi)
+            # Reject a second app rather than silently letting the last one win:
+            # `sync-ccswitch claude pi --apply` must not leave claude unwritten
+            # while looking like it succeeded.
+            if [ -n "$app" ] && [ "$app" != "$arg" ]; then
+                error "sync-ccswitch: pick one app, or none for both (got '$app' and '$arg')"
+                return 1
+            fi
+            app="$arg"
+            ;;
+        "") ;;
+        *)
+            error "sync-ccswitch: unexpected argument '$arg'"
+            echo ""
+            usage
+            return 1
+            ;;
+        esac
+    done
+    [ -n "$app" ] || app="all"
+
+    [ "$apply" -eq 1 ] || warn "dry run — re-run with --apply to write changes"
+
+    local rc=0
+    case "$app" in
+    claude) sync_claude "$apply" || rc=1 ;;
+    pi) sync_pi "$apply" || rc=1 ;;
+    all)
+        sync_claude "$apply" || rc=1
+        sync_pi "$apply" || rc=1
+        ;;
+    esac
+    return "$rc"
+}
+
 usage() {
-    sed -n '3,15p' "$0" | sed 's/^# \{0,1\}//'
+    # Bounded by line count as well as the END-USAGE sentinel: if that marker is
+    # ever lost, print nothing extra rather than dumping the whole script.
+    sed -n '/^# Usage:/,/^# END-USAGE/p' "$0" | sed '$d; s/^# \{0,1\}//' | head -40
 }
 
 main() {
@@ -417,7 +761,10 @@ main() {
     env) cmd_env ;;
     ensure) cmd_ensure ;;
     doctor) cmd_doctor ;;
-    sync-ccswitch) cmd_sync_ccswitch "${2:-}" ;;
+    sync-ccswitch)
+        shift
+        cmd_sync_ccswitch "$@"
+        ;;
     -h | --help | help) usage ;;
     *)
         error "Unknown command: $1"

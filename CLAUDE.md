@@ -17,12 +17,13 @@ This is a personal dotfiles repository for configuring development environments 
 
 ### Neovim Setup
 ```bash
-# Install Neovim (requires 0.9+)
+# Install Neovim (requires 0.11+; config uses vim.lsp.enable / vim.lsp.config / vim.uv)
 brew install neovim
 
 # Dependencies for plugins
-brew install latexdiff mercurial fd
-brew install im-select pngpaste latex2html
+# fd: snacks.nvim picker; pngpaste: img-clip.nvim (paste images into markdown);
+# tree-sitter: CLI required by nvim-treesitter to install parsers
+brew install fd pngpaste tree-sitter
 
 # Create symlink
 ln -s ~/.dotfiles/nvim/ ~/.config/nvim
@@ -79,12 +80,12 @@ nvim/
 │   │   └── util.lua          # Utility functions
 │   ├── plugins/              # Plugin configurations (24 files)
 │   │   ├── lsp.lua          # LSP setup with mason and lspconfig
-│   │   ├── blink-cmp.lua    # Autocompletion engine (with Codeium AI)
+│   │   ├── blink-cmp.lua    # Autocompletion engine (Codeium AI via windsurf.vim)
 │   │   ├── nvim-treesitter.lua
 │   │   ├── gitsigns.lua     # Git integration
 │   │   ├── which-key.lua    # Key binding hints
 │   │   └── ...              # Other plugin configs
-│   └── snippets/             # Custom snippets (cpp, go, javascript)
+│   └── snippets/             # Custom snippets (init, cpp, go, javascript)
 └── lsp/                      # Language-specific LSP configs
     ├── gopls.lua
     ├── ts_ls.lua
@@ -112,12 +113,12 @@ nvim/
 
 **Core Functionality:**
 - Plugin Manager: `lazy.nvim` (auto-bootstrapping, lockfile support)
-- Colorscheme: `duskfox` (Catppuccin is installed but currently commented out in options.lua)
+- Colorscheme: `duskfox` (Catppuccin, carbonfox, and hybrid are installed; all commented out in options.lua)
 - Session Management: `auto-session` (auto-saves workspace state)
 
 **Code Intelligence:**
 - LSP: `mason.nvim` + `nvim-lspconfig` (Go, TypeScript, C++, Python, Lua, Bash, etc.)
-- Completion: `blink-cmp` with LSP, buffer, path, and Codeium AI sources
+- Completion: `blink-cmp` with LSP, snippets, path, and buffer sources; Codeium AI via `windsurf.vim`
 - Snippets: `LuaSnip` with custom snippets in `lua/snippets/`
 - Syntax: `nvim-treesitter` for advanced parsing
 - Folding: Custom implementation in `custom/folding.lua` with Treesitter and semantic tokens
@@ -139,7 +140,6 @@ nvim/
 **UI Enhancements:**
 - Statusline: `lualine`
 - Notifications: `noice.nvim` (replaces default UI)
-- Startup: `dashboard-nvim`
 
 **Editing:**
 - Surround: `nvim-surround` (add/delete/change surroundings)
@@ -190,7 +190,7 @@ sshc (ssh DevCloud, with tmux attach), sshk (ssh K-Claw), sshd (ssh DevCloud, pl
 
 ### Key Bindings
 - Prefix: `Ctrl-a` (double-tap to pass literal C-a through; avoids conflicts with nvim's C-b and C-Space)
-- Pane navigation: `h/j/k/l` (vim-style)
+- Pane navigation: `C-h/j/k/l` (vim-style, vim-aware pass-through)
 - Copy mode: `Escape` to enter, `v` to select (vi-style)
 - Reload config: `r` (with prefix)
 
@@ -267,12 +267,13 @@ Kitty keybindings send Tmux prefix sequences for seamless control:
 ## tclaude-proxy (Internal Claude Gateway)
 
 `script/tclaude-proxy` re-exports the local gateway spawned by Tencent's
-`tclaude` CLI, so native `claude` / cc-switch can use the internal
-`copilot.tencent.com` endpoint. Auth happens inside the tclaude daemon; the
-client only needs `ANTHROPIC_AUTH_TOKEN=placeholder`.
+`tclaude` CLI, so native `claude`, `pi` (pi-coding-agent), and cc-switch can use
+the internal `copilot.tencent.com` endpoint. Auth happens inside the tclaude
+daemon; the client only needs `ANTHROPIC_AUTH_TOKEN=placeholder`.
 
 - `script/tclaude-proxy` — CLI: `status`, `port`, `url`, `env`, `ensure`,
-  `doctor`, `sync-ccswitch [--apply]`
+  `doctor`, `sync-ccswitch [claude|pi] [--apply]` (no app arg = both; dry-run
+  unless `--apply`)
 - `script/tclaude-proxy-agent.sh` — installs a launchd agent
   (`com.kyden.tclaude-proxy`) that runs `tclaude-proxy ensure` every 5 min to
   keep the daemon alive
@@ -282,7 +283,13 @@ Key facts:
 - Read the daemon port from `~/.tclaude/daemon.json` (`url`); never hardcode it.
 - `X-Claude-Code-Session-Id` is mandatory upstream. Native `claude` sends it; raw
   curl / SDK calls must add it or get a misleading "Failed to reach upstream
-  gateway" error.
+  gateway" error. Any stable string works — it need not be a UUID.
+- The two cc-switch data flows run in **opposite** directions: for `claude`,
+  cc-switch *writes* `~/.claude/settings.json`; for `pi`, cc-switch *reads*
+  `~/.pi/agent/models.json`. So wiring pi up means writing that file.
+- pi's Anthropic SDK sends `x-api-key`, which the gateway rejects with
+  `401 invalid_format`. The generated provider sets `"x-api-key": ""` to suppress
+  it — do not "clean up" that line. `doctor` check 7 verifies it.
 - A 401 upstream forces a logout (`tclaude login` to recover) — the launchd agent
   can't fix that; `doctor` distinguishes it from a crashed daemon.
 - Full write-up: `docs/tclaude-proxy.md` (Chinese).
@@ -312,7 +319,7 @@ Key facts:
 ### Testing Changes
 ```bash
 # Neovim
-nvim --version  # Check version (requires 0.9+)
+nvim --version  # Check version (requires 0.11+)
 nvim -c "checkhealth"  # Check plugin health
 nvim -c "Lazy health"  # Check lazy.nvim health
 
@@ -341,7 +348,7 @@ Each language has a dedicated LSP config file in `nvim/lsp/` that can be customi
 ## Important Notes
 
 - **Leader key:** `<Space>` in Neovim
-- **Colorscheme:** Currently using `duskfox` (Catppuccin is installed but commented out in `nvim/lua/custom/options.lua`)
+- **Colorscheme:** Currently using `duskfox` (Catppuccin, carbonfox, and hybrid are installed; all commented out in `nvim/lua/custom/options.lua`)
 - **Clipboard:** Uses OSC 52 automatically over SSH, native clipboard otherwise
 - **Plugin lockfile:** `nvim/lazy-lock.json` pins plugin versions for reproducibility
 - **Git commit template:** `.gitmessage` provides structured commit format
