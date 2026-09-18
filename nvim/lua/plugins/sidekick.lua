@@ -6,7 +6,7 @@ return {
     -- add any options here
     cli = {
       win = { layout = "right", split = { width = 120 } },
-      mux = { enabled = true, backend = "tmux", create = "terminal" },
+      mux = { enabled = true, backend = "tmux", create = "split" }, -- "terminal"|"window"|"split"
       tools = { ["TClaude"] = { cmd = { "tclaude" } } },
       prompts = {
         -- refactor = "Please refactor {this} to be more maintainable",
