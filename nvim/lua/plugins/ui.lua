@@ -3,19 +3,6 @@ return {
   -- Colorschemes
   -- ==============================================================
   {
-    "HoNamDuong/hybrid.nvim",
-    lazy = false,
-    priority = 1000,
-    opts = {
-      terminal_colors = false,
-      undercurl = true,
-      underline = true,
-      bold = true,
-      transparent = true,
-    },
-  },
-
-  {
     "EdenEast/nightfox.nvim",
     name = "nightfox",
     priority = 1000,
@@ -40,48 +27,6 @@ return {
             LspReferenceRead = { bg = "palette.sel0", style = "bold,underline" },
             LspReferenceWrite = { bg = "palette.sel1", style = "bold,underline" },
           },
-        },
-      })
-    end,
-  },
-
-  {
-    "catppuccin/nvim",
-
-    config = function()
-      require("catppuccin").setup({
-        transparent_background = true,
-        term_colors = false,
-        integrations = {
-          aerial = true,
-          diffview = true,
-          noice = true,
-          treesitter = true,
-          notify = true,
-          gitsigns = true,
-          flash = true,
-          blink_cmp = true,
-          mason = true,
-          snacks = true,
-        },
-
-        highlight_overrides = {
-          mocha = function(mocha)
-            return {
-              CursorLine = { bg = "#44475a" }, -- mocha.surface1
-              CursorLineNr = { fg = mocha.yellow },
-              FlashCurrent = { bg = mocha.peach, fg = mocha.base },
-              FlashMatch = { bg = mocha.red, fg = mocha.base },
-              FlashLabel = { bg = mocha.teal, fg = mocha.base },
-              NormalFloat = { bg = mocha.base },
-              FloatBorder = { bg = mocha.base },
-              FloatTitle = { bg = mocha.base },
-              RenderMarkdownCode = { bg = mocha.crust },
-              Pmenu = { bg = mocha.surface0 },
-              Comment = { bg = nil },
-              statusline = { bg = nil },
-            }
-          end,
         },
       })
     end,
