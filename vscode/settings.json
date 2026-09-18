@@ -7,7 +7,7 @@
   "editor.cursorBlinking": "solid",
   "editor.cursorSmoothCaretAnimation": "on",
   "editor.fontFamily": "'Maple Mono NF CN','Hack Nerd Font Mono', 'Fira Code', 'Source Code Pro'",
-  "editor.lineNumbers": "relative",
+  // "editor.lineNumbers": "relative",
   "editor.guides.bracketPairs": "active",
   "editor.rulers": [120],
   "editor.wordWrap": "on",
@@ -26,10 +26,12 @@
   "workbench.browser.showInTitleBar": false,
   "window.commandCenter": false,
   // "workbench.activityBar.location": "hidden",
-  "workbench.colorTheme": "Dark Modern",
+  "workbench.colorTheme": "Monokai",
   "workbench.iconTheme": "material-icon-theme",
   "workbench.list.smoothScrolling": true,
-  "workbench.experimental.modernUI": false,
+  "workbench.activityBar.location": "top",
+  "workbench.layoutControl.enabled": false,
+  "workbench.sideBar.location": "right",
   "workbench.colorCustomizations": {
     "statusBar.background": "#005f5f",
     "statusBar.foreground": "#e6e7e8",
@@ -245,13 +247,16 @@
   // -----------------------------------------------------------------
   // Git
   "git.autofetch": true,
+  "git.diagnosticsCommitHook.enabled": true,
   "git.openRepositoryInParentFolders": "never",
+  "git.confirmSync": false,
+
   "gitlens.codeLens.enabled": false,
   "gitlens.statusBar.enabled": false,
   "gitlens.hovers.enabled": false,
   "gitlens.graph.layout": "editor",
   "gitlens.ai.model": "openrouter:tencent/hy4-preview",
-  "gitlens.views.commitDetails.files.layout": "tree",
+  "gitlens.views.commitDetails.files.layout": "list",
   "gitlens.views.scm.grouped.views": {
     "commits": true,
     "branches": true,
@@ -299,8 +304,10 @@
   // Markdownlint
   // 关闭 preview 滚动的时候, Markdown 文件跟着滚动
   "markdown.preview.scrollEditorWithPreview": false,
-  "markdown-preview-enhanced.previewTheme": "vscode.css",
+  "markdown-preview-enhanced.previewTheme": "atom-light.css",
   "markdown-preview-enhanced.enablePreviewZenMode": true,
+  "markdown-preview-enhanced.codeBlockTheme": "vscode.css",
+  "markdown-preview-enhanced.revealjsTheme": "none.css",
   "markdownlint.config": {
     "MD010": false,
     "MD024": false,
@@ -338,6 +345,9 @@
   },
   "[cpp]": {
     "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd"
+  },
+  "[markdown]": {
+    "diffEditor.ignoreTrimWhitespace": false
   },
 
   // -----------------------------------------------------------------
@@ -447,32 +457,9 @@
     "kydenlu-any1.devcloud.woa.com": "linux"
   },
   "update.mode": "default",
-  "gongfeng.copilot.commitMessageLanguage": "English",
   "pixide.selectedLocalIP": "30.31.47.46",
-  "gongfeng.copilot.generationPreference": "Moderate",
-  "gongfeng.copilot.featureConfig": {
-    "terminal": {
-      "autorun": true,
-      "whiteList": [],
-      "blackList": [
-        "kill",
-        "rm",
-        "chmod"
-      ],
-      "shellSelection": "auto"
-    },
-    "chat": {
-      "autofix": false,
-      "autoweb": true,
-      "chattoask": true,
-      "newChatTab": true,
-      "todoListEnable": true,
-      "allowExternalFileAccess": false,
-      "backspaceDeleteReference": true,
-      "autoOpenDiffAfterEdit": false
-    }
-  },
 
+  // CodeBuddy
   "codingcopilot.enableInlineChat": false,
   "codingcopilot.enableInlineChatIDEShortcutsTip": false,
   "codingcopilot.commitMessageStyle": "Auto",
@@ -485,32 +472,16 @@
   "codingcopilot.enableCompletionLanguage": {},
   "codingcopilot.enableFloatShortcut": false,
   "codingcopilot.enableIDENotification": true,
-  "gongfeng.copilot.floatShortcut": false,
-  "gongfeng.copilot.enableCodelensForComments": false,
-  "gongfeng.copilot.enableCompletionLanguage": {
-    "scminput": false,
-    "markdown": true
-  },
-  "workbench.editorAssociations": {
-    "*.html": "codebuddy.html.previewEditor",
-    "*.htm": "codebuddy.html.previewEditor"
-  },
-  "workbench.activityBar.location": "top",
-  "gongfeng.copilot.memoriesConfig": {
-    "enabled": false
-  },
-  "workbench.sideBar.location": "right",
+  "codingcopilot.requestMaxStepLimit": 1000,
   "codingcopilot.enableCodelens": false,
   "codingcopilot.autoRun": true,
-  "[markdown]": {
-    "diffEditor.ignoreTrimWhitespace": true
-  },
-  "git.diagnosticsCommitHook.enabled": true,
-  "workbench.layoutControl.enabled": false,
-  "markdown-preview-enhanced.codeBlockTheme": "darcula.css",
-  "markdown-preview-enhanced.revealjsTheme": "moon.css",
   "codingcopilot.disabledSecurityCategories": [
     "powershell"
   ],
-  "git.confirmSync": false,
+  "workbench.editorAssociations": {
+    "{hexdiff}:/**/*.*": "hexEditor.hexedit",
+    "*.md": "vscode.markdown.preview.editor"
+  },
+  "workbench.experimental.modernUIUppercaseViewHeaders": true,
+  "window.density.layout": "compact",
 }
