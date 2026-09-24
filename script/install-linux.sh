@@ -282,12 +282,14 @@ fi
 # --- Markdownlint ---
 safe_link "$DOTFILES/.markdownlint.json" "$HOME/.markdownlint.json"
 
-# --- Claude Code / tclaude (skills, commands) ---
+# --- Claude Code / tclaude / Pi agent (skills, commands) ---
 if [ -d "$DOTFILES/agents/skills" ] || [ -d "$DOTFILES/agents/commands" ]; then
     safe_link "$DOTFILES/agents/skills" "$HOME/.claude/skills"
     safe_link "$DOTFILES/agents/commands" "$HOME/.claude/commands"
     safe_link "$DOTFILES/agents/skills" "$HOME/.tclaude/skills"
     safe_link "$DOTFILES/agents/commands" "$HOME/.tclaude/commands"
+    safe_link "$DOTFILES/agents/skills" "$HOME/.agents/skills"
+    safe_link "$DOTFILES/agents/commands" "$HOME/.pi/agent/prompts"
 fi
 
 # ── 5. Git Config ───────────────────────────────────────────────────────────

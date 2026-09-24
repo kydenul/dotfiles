@@ -60,6 +60,10 @@ ln -s ~/.dotfiles/zed ~/.config/zed
 ln -s ~/.dotfiles/agents/skills ~/.claude/skills
 ln -s ~/.dotfiles/agents/commands ~/.claude/commands
 
+# Pi skills/commands (prompt templates)
+ln -s ~/.dotfiles/agents/skills ~/.agents/skills
+ln -s ~/.dotfiles/agents/commands ~/.pi/agent/prompts
+
 # Reload configurations
 source ~/.zshrc
 tmux source-file ~/.tmux.conf

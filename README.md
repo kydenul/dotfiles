@@ -89,6 +89,10 @@ ln -s ~/.dotfiles/agents/commands ~/.claude/commands
 ln -s ~/.dotfiles/agents/skills ~/.tclaude/skills
 ln -s ~/.dotfiles/agents/commands ~/.tclaude/commands
 
+# Pi agent (skills, prompt templates)
+ln -s ~/.dotfiles/agents/skills ~/.agents/skills
+ln -s ~/.dotfiles/agents/commands ~/.pi/agent/prompts
+
 # (Optional) Create secrets file for API keys
 cat > ~/.zsh_secrets << 'EOF'
 export KNotClaudeAPIToken="your-token-here"
@@ -285,6 +289,10 @@ ln -s ~/.dotfiles/agents/skills ~/.claude/skills
 ln -s ~/.dotfiles/agents/commands ~/.claude/commands
 ln -s ~/.dotfiles/agents/skills ~/.tclaude/skills
 ln -s ~/.dotfiles/agents/commands ~/.tclaude/commands
+
+# Symlink to Pi agent
+ln -s ~/.dotfiles/agents/skills ~/.agents/skills
+ln -s ~/.dotfiles/agents/commands ~/.pi/agent/prompts
 ```
 
 ---

@@ -227,6 +227,8 @@ link_agent_assets() {
         safe_link "$DOTFILES/agents/commands" "$HOME/.claude/commands"
         safe_link "$DOTFILES/agents/skills" "$HOME/.tclaude/skills"
         safe_link "$DOTFILES/agents/commands" "$HOME/.tclaude/commands"
+        safe_link "$DOTFILES/agents/skills" "$HOME/.agents/skills"
+        safe_link "$DOTFILES/agents/commands" "$HOME/.pi/agent/prompts"
     fi
 }
 
@@ -263,7 +265,7 @@ fi
 # --- Markdownlint ---
 safe_link "$DOTFILES/.markdownlint.json" "$HOME/.markdownlint.json"
 
-# --- Claude Code / tclaude (skills, commands) ---
+# --- Claude Code / tclaude / Pi agent (skills, commands) ---
 link_agent_assets
 
 # ── 6. Git Config ───────────────────────────────────────────────────────────
