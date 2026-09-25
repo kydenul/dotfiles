@@ -230,6 +230,11 @@ link_agent_assets() {
         safe_link "$DOTFILES/agents/skills" "$HOME/.agents/skills"
         safe_link "$DOTFILES/agents/commands" "$HOME/.pi/agent/prompts"
     fi
+    # MCP server config
+    if [ -f "$DOTFILES/agents/mcp.json" ]; then
+        safe_link "$DOTFILES/agents/mcp.json" "$HOME/.claude/mcp.json"
+        safe_link "$DOTFILES/agents/mcp.json" "$HOME/.pi/agent/mcp.json"
+    fi
 }
 
 # --- Neovim ---
