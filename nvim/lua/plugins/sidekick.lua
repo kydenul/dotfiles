@@ -37,5 +37,7 @@ return {
     -- open CLI directly
     -- stylua: ignore
     { "<leader>cc", function() require("sidekick.cli").toggle({ name = "claude", focus = true }) end, desc = "Sidekick: Toggle Claude" },
+    -- stylua: ignore
+    { "<leader>ci", function() require("sidekick.cli").toggle({ name = "pi", focus = true }) end, desc = "Sidekick: Toggle Pi" },
   },
 }
