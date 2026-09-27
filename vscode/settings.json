@@ -26,18 +26,18 @@
   "workbench.browser.showInTitleBar": false,
   "window.commandCenter": false,
   // "workbench.activityBar.location": "hidden",
-  "workbench.colorTheme": "Monokai",
+  "workbench.colorTheme": "OM Theme (Night Owl Italic)",
   "workbench.iconTheme": "material-icon-theme",
   "workbench.list.smoothScrolling": true,
   "workbench.activityBar.location": "top",
   "workbench.layoutControl.enabled": false,
   "workbench.sideBar.location": "right",
-  "workbench.colorCustomizations": {
-    "statusBar.background": "#005f5f",
-    "statusBar.foreground": "#e6e7e8",
-    "terminal.foreground": "#839395",
-    "editorCursor.foreground": "#91d696"
-  },
+  // "workbench.colorCustomizations": {
+  //   "statusBar.background": "#005f5f",
+  //   "statusBar.foreground": "#e6e7e8",
+  //   "terminal.foreground": "#839395",
+  //   "editorCursor.foreground": "#91d696"
+  // },
 
   "terminal.integrated.enableMultiLinePasteWarning": "auto",
   "terminal.integrated.defaultProfile.linux": "zsh",
@@ -484,4 +484,6 @@
   },
   "workbench.experimental.modernUIUppercaseViewHeaders": true,
   "window.density.layout": "compact",
+  "gitlens.graph.details.location": "auto",
+  "diffEditor.useInlineViewWhenSpaceIsLimited": true,
 }
