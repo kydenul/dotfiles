@@ -119,6 +119,22 @@ except Exception:
 ' 2>/dev/null
 }
 
+# Where the daemon writes its own log for today, for use in error hints.
+#
+# The layout moved between tclaude versions: current builds use logs/tclaude/<date>/
+# (gateway.log plus a per-workspace file), older ones logs/<date>/. A hint that
+# names a directory which does not exist is worse than useless when the user is
+# already debugging a dead daemon, so fall back rather than assuming.
+daemon_log_dir() {
+    local day
+    day="$(date +%F)"
+    if [ -d "$TCLAUDE_DIR/logs/tclaude/$day" ]; then
+        echo "$TCLAUDE_DIR/logs/tclaude/$day"
+    else
+        echo "$TCLAUDE_DIR/logs/$day"
+    fi
+}
+
 # ── pi model metadata ───────────────────────────────────────────────────────
 #
 # The model *list* is pulled live from /v1/models so new gateway models appear
@@ -221,8 +237,14 @@ cmd_status() {
 # We deliberately do NOT spawn `node tclaude __tclaude_daemon` ourselves.
 # tclaude's own ensureRunning() takes a start lock (~/.tclaude/locks/daemon.lock),
 # probes/persists the port, and waits for a readiness handshake on stdout.
-# Reimplementing that invites double-start races. `tclaude -v` is the cheapest
-# entry point that triggers the wrapper's own daemon bootstrap.
+# Reimplementing that invites double-start races, so we go through the wrapper's
+# own manager: `tclaude daemon <stop|restart|status>` (see `tclaude --help`).
+#
+# NOT `tclaude -v`. That flag is documented as "Show wrapper and Claude Code
+# versions" and short-circuits to printing a banner — it never touches the
+# daemon. Using it here turned this function into a pure observer: it could only
+# ever report a daemon some human had already started, and reported failure
+# whenever none was running (1977 "already healthy" vs 19 straight failures).
 cmd_ensure() {
     if daemon_healthy; then
         success "daemon already healthy at $(daemon_url)"
@@ -230,17 +252,44 @@ cmd_ensure() {
     fi
 
     need tclaude
-    info "daemon not healthy — bootstrapping via tclaude"
-    tclaude -v >/dev/null 2>&1 || true
+    info "daemon not healthy — restarting via tclaude daemon"
 
+    # Capture the output to a FILE — never with $(...) and never through a pipe.
+    # The daemon this spawns is detached but inherits our stdout/stderr, so a
+    # pipe never reaches EOF and the shell blocks forever. Under launchd that is
+    # a permanently hung job, not a failed one that retries in 5 minutes.
+    local out_file rc=0
+    out_file="$(mktemp "${TMPDIR:-/tmp}/tclaude-ensure.XXXXXX")"
+    tclaude daemon restart >"$out_file" 2>&1 || rc=$?
+
+    local healthy=0
     if daemon_healthy; then
-        success "daemon up at $(daemon_url)"
-        return 0
+        healthy=1
     fi
 
-    error "failed to bring up daemon"
-    warn "if you were logged out, run: tclaude login"
-    warn "daemon logs: $TCLAUDE_DIR/logs/\$(date +%F)/"
+    if [ "$healthy" -eq 1 ]; then
+        success "daemon up at $(daemon_url)"
+    else
+        # Re-probing above re-read daemon.json, so a daemon that came up on a
+        # new port would already be visible — this is genuinely dead, not a
+        # stale-metadata artifact.
+        if [ "$rc" -ne 0 ]; then
+            error "tclaude daemon restart failed (exit $rc)"
+        else
+            error "daemon restart succeeded but $HEALTH_PATH is not responding"
+        fi
+        if [ -s "$out_file" ]; then
+            tail -20 "$out_file" | sed 's/^/         /'
+        fi
+        warn "if you were logged out, run: tclaude login"
+        warn "daemon logs: $(daemon_log_dir)/"
+    fi
+
+    rm -f "$out_file"
+
+    if [ "$healthy" -eq 1 ]; then
+        return 0
+    fi
     return 1
 }
 
@@ -313,7 +362,7 @@ except Exception:
         elif echo "$out" | grep -q "upstream_error"; then
             error "upstream rejected the request"
             warn "most likely logged out — run: tclaude login"
-            warn "real reason in: $TCLAUDE_DIR/logs/\$(date +%F)/"
+            warn "real reason in: $(daemon_log_dir)/"
             rc=1
         else
             error "unexpected response:"

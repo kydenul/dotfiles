@@ -105,6 +105,12 @@ cmd_install() {
     <key>StandardErrorPath</key>
     <string>$LOG_ERR</string>
 
+    <!-- launchd tears down the rest of the job's process group when the job
+         exits. A daemon started by "tclaude daemon restart" is meant to outlive
+         us, so opt out. Verify with: ps -o ppid= -p DAEMON_PID  ->  expect 1. -->
+    <key>AbandonProcessGroup</key>
+    <true/>
+
     <key>ProcessType</key>
     <string>Background</string>
 
@@ -181,15 +187,25 @@ cmd_logs() {
     [ "$found" -eq 1 ] || info "no agent output yet"
 
     section "tclaude daemon logs (today)"
-    local day_dir="$HOME/.tclaude/logs/$(date +%F)"
+    # Current tclaude builds write to logs/tclaude/<date>/; older ones used
+    # logs/<date>/. Prefer the current layout, fall back to the old one.
+    local day_dir="$HOME/.tclaude/logs/tclaude/$(date +%F)"
+    [ -d "$day_dir" ] || day_dir="$HOME/.tclaude/logs/$(date +%F)"
     if [ -d "$day_dir" ]; then
         local latest
         latest="$(ls -t "$day_dir"/*.log 2>/dev/null | head -1 || true)"
         if [ -n "$latest" ]; then
             echo -e "${BOLD}── $latest ──${NC}"
             # Errors are what matter here; the rest is model-list chatter.
-            grep -E "\[Error\]|\[Warning\]" "$latest" | tail -20 ||
+            # The daemon logs upper-case levels — grep is case-sensitive, and a
+            # [Error]/[Warning] pattern matched nothing at all.
+            local hits
+            hits="$(grep -E "\[ERROR\]|\[WARN\]" "$latest" | tail -20 || true)"
+            if [ -n "$hits" ]; then
+                echo "$hits"
+            else
                 info "no errors or warnings today"
+            fi
         else
             info "no log files in $day_dir"
         fi
