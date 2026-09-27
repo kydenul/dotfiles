@@ -73,7 +73,7 @@ return {
         lua = { "stylua" },
 
         -- Go
-        go = { "gofumpt", "goimports-reviser", "golangci-lint" },
+        go = { "golangci-lint" },
 
         -- Web languages => Prettier
         javascript = { "eslint_d", "prettier" },
@@ -117,7 +117,13 @@ return {
           },
         },
 
-        gofumpt = { prepend_args = { "-extra" } },
+        -- 锚定到 buffer 所属 Go module 根，保证 golangci-lint fmt 能发现子目录里的 .golangci.yaml
+        -- 注意：不能写 require("conform.util").root_file(...) —— 静态 opts 表在 conform 加载前求值，会报 module not found
+        ["golangci-lint"] = {
+          cwd = function(_, ctx)
+            return vim.fs.root(ctx.dirname, { "go.mod" })
+          end,
+        },
       },
 
       format_on_save = function()
