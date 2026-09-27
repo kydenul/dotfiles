@@ -233,7 +233,7 @@ link_agent_assets() {
     # MCP server config
     if [ -f "$DOTFILES/agents/mcp.json" ]; then
         safe_link "$DOTFILES/agents/mcp.json" "$HOME/.claude/mcp.json"
-        safe_link "$DOTFILES/agents/mcp.json" "$HOME/.pi/agent/mcp.json"
+        safe_link "$DOTFILES/agents/mcp.json" "$HOME/.pi/agent/mcp-adapter.json"
     fi
 }
 

@@ -293,7 +293,7 @@ if [ -d "$DOTFILES/agents/skills" ] || [ -d "$DOTFILES/agents/commands" ]; then
 fi
 if [ -f "$DOTFILES/agents/mcp.json" ]; then
     safe_link "$DOTFILES/agents/mcp.json" "$HOME/.claude/mcp.json"
-    safe_link "$DOTFILES/agents/mcp.json" "$HOME/.pi/agent/mcp.json"
+    safe_link "$DOTFILES/agents/mcp.json" "$HOME/.pi/agent/mcp-adapter.json"
 fi
 
 # ── 5. Git Config ───────────────────────────────────────────────────────────
