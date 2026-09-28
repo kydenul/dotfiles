@@ -11,8 +11,6 @@ return {
       run_on_start = true,
       ensure_installed = {
         -- Golang
-        -- "gofumpt",
-        -- "goimports-reviser",
         -- "golangci-lint",
 
         -- Python
@@ -98,32 +96,16 @@ return {
       formatters = {
         prettier = { prepend_args = { "--ignore-path", "/dev/null" } },
         eslint_d = { prepend_args = { "--no-ignore" } },
-        stylua = {
-          prepend_args = {
-            "--no-ignore-vcs",
-            "--indent-type",
-            "Spaces",
-            "--indent-width",
-            "2",
-          },
-        },
+        --stylua: ignore
+        stylua = { prepend_args = { "--no-ignore-vcs", "--indent-type", "Spaces", "--indent-width", "2", } },
 
-        black = {
-          prepend_args = {
-            "--target-version",
-            "py314",
-            "--line-length",
-            "120",
-          },
-        },
+        --stylua: ignore
+        black = { prepend_args = { "--target-version", "py314", "--line-length", "120" } },
 
         -- 锚定到 buffer 所属 Go module 根，保证 golangci-lint fmt 能发现子目录里的 .golangci.yaml
         -- 注意：不能写 require("conform.util").root_file(...) —— 静态 opts 表在 conform 加载前求值，会报 module not found
-        ["golangci-lint"] = {
-          cwd = function(_, ctx)
-            return vim.fs.root(ctx.dirname, { "go.mod" })
-          end,
-        },
+        --stylua: ignore
+        ["golangci-lint"] = { cwd = function(_, ctx) return vim.fs.root(ctx.dirname, { "go.mod" }) end },
       },
 
       format_on_save = function()
@@ -131,10 +113,7 @@ return {
           return
         end
 
-        return {
-          timeout_ms = 3000,
-          lsp_fallback = true,
-        }
+        return { timeout_ms = 3000, lsp_fallback = true }
       end,
     },
   },
