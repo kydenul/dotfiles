@@ -318,18 +318,18 @@
   // Golang
   "gopls": { "ui.semanticTokens": true },
   "go.toolsManagement.autoUpdate": true,
-  "go.formatTool": "gofumpt",
-  "go.formatFlags": ["-extra"],
-  "go.inlayHints.parameterNames": false,
+  // 格式化与 lint 全走 golangci-lint，与 Neovim(conform.nvim) 对齐：
+  // conform 的 golangci-lint formatter 实际执行 `golangci-lint fmt --stdin`，按各项目根的 .golangci.yaml formatters 段（gofumpt + gci）生效
+  "go.formatTool": "custom",
+  "go.formatFlags": ["fmt", "--stdin", "--color=never"],
+  "go.inlayHints.parameterNames": true,
   "go.lintTool": "golangci-lint",
-  "go.lintFlags": ["--fast"],
-  "go.alternateTools": { "gofumpt": "gofumpt" },
+  "go.lintFlags": ["--fast-only"],
+  "go.alternateTools": { "customFormatter": "golangci-lint" },
   "[go]": {
     "editor.defaultFormatter": "golang.go",
     "editor.formatOnSave": true,
-    "editor.codeActionsOnSave": {
-      "source.organizeImports": "explicit"
-    }
+    "editor.codeActionsOnSave": { "source.organizeImports": "explicit" }
   },
 
   // -----------------------------------------------------------------
