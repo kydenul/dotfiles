@@ -13,25 +13,32 @@
   "editor.wordWrap": "on",
   "editor.renderWhitespace": "boundary",
   "editor.scrollbar.verticalScrollbarSize": 16,
-  "editor.minimap.enabled": false,
   "editor.scrollbar.horizontal": "hidden",
   "editor.scrollbar.vertical": "auto",
   "editor.unicodeHighlight.ambiguousCharacters": false,
+  "editor.minimap.renderCharacters": false,
+  "editor.minimap.enabled": false,
 
+  "window.commandCenter": false,
+  "window.density.layout": "compact",
   "window.customTitleBarVisibility": "windowed",
   "window.titleBarStyle": "custom",
   "window.title": "${dirty}${activeEditorShort}${separator}${rootName}${separator}${profileName}",
 
   "workbench.panel.showLabels": false,
   "workbench.browser.showInTitleBar": false,
-  "window.commandCenter": false,
   // "workbench.activityBar.location": "hidden",
-  "workbench.colorTheme": "OM Theme (Night Owl Italic)",
+  "workbench.colorTheme": "OM Theme (No Italic)",
   "workbench.iconTheme": "material-icon-theme",
   "workbench.list.smoothScrolling": true,
   "workbench.activityBar.location": "top",
   "workbench.layoutControl.enabled": false,
   "workbench.sideBar.location": "right",
+  "workbench.editorAssociations": {
+    "{hexdiff}:/**/*.*": "hexEditor.hexedit",
+    "*.md": "vscode.markdown.preview.editor"
+  },
+  "workbench.experimental.modernUIUppercaseViewHeaders": true,
   // "workbench.colorCustomizations": {
   //   "statusBar.background": "#005f5f",
   //   "statusBar.foreground": "#e6e7e8",
@@ -48,6 +55,7 @@
   "files.autoSave": "off",
   "diffEditor.ignoreTrimWhitespace": false,
   "diffEditor.renderSideBySide": false,
+  "diffEditor.useInlineViewWhenSpaceIsLimited": true,
 
   "chat.agent.enabled": false,
   "chat.disableAIFeatures": true,
@@ -256,7 +264,9 @@
   "gitlens.hovers.enabled": false,
   "gitlens.graph.layout": "editor",
   "gitlens.ai.model": "openrouter:tencent/hy4-preview",
-  "gitlens.views.commitDetails.files.layout": "list",
+  "gitlens.views.commitDetails.files.layout": "tree",
+  "gitlens.graph.details.location": "auto",
+  "gitlens.views.searchAndCompare.files.layout": "list",
   "gitlens.views.scm.grouped.views": {
     "commits": true,
     "branches": true,
@@ -265,8 +275,9 @@
     "tags": true,
     "worktrees": true,
     "contributors": true,
+    "fileHistory": false,
     "repositories": false,
-    "searchAndCompare": true,
+    "searchAndCompare": false,
     "launchpad": false
   },
 
@@ -304,15 +315,10 @@
   // Markdownlint
   // 关闭 preview 滚动的时候, Markdown 文件跟着滚动
   "markdown.preview.scrollEditorWithPreview": false,
-  "markdown-preview-enhanced.previewTheme": "atom-light.css",
+  "markdown-preview-enhanced.previewTheme": "one-light.css",
   "markdown-preview-enhanced.enablePreviewZenMode": true,
-  "markdown-preview-enhanced.codeBlockTheme": "vscode.css",
-  "markdown-preview-enhanced.revealjsTheme": "none.css",
-  "markdownlint.config": {
-    "MD010": false,
-    "MD024": false,
-    "MD033": false
-  },
+  "markdown-preview-enhanced.codeBlockTheme": "auto.css",
+  "markdown-preview-enhanced.revealjsTheme": "beige.css",
 
   // -----------------------------------------------------------------
   // Golang
@@ -340,15 +346,9 @@
     "--compile-commands-dir=${workspaceFolder}/build",
     "--header-insertion=never"
   ],
-  "[c]": {
-    "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd"
-  },
-  "[cpp]": {
-    "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd"
-  },
-  "[markdown]": {
-    "diffEditor.ignoreTrimWhitespace": false
-  },
+  "[c]": { "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd" },
+  "[cpp]": { "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd" },
+  "[markdown]": { "diffEditor.ignoreTrimWhitespace": false },
 
   // -----------------------------------------------------------------
   // CMake
@@ -457,7 +457,6 @@
     "kydenlu-any1.devcloud.woa.com": "linux"
   },
   "update.mode": "default",
-  "pixide.selectedLocalIP": "30.31.47.46",
 
   // CodeBuddy
   "codingcopilot.enableInlineChat": false,
@@ -475,15 +474,5 @@
   "codingcopilot.requestMaxStepLimit": 1000,
   "codingcopilot.enableCodelens": false,
   "codingcopilot.autoRun": true,
-  "codingcopilot.disabledSecurityCategories": [
-    "powershell"
-  ],
-  "workbench.editorAssociations": {
-    "{hexdiff}:/**/*.*": "hexEditor.hexedit",
-    "*.md": "vscode.markdown.preview.editor"
-  },
-  "workbench.experimental.modernUIUppercaseViewHeaders": true,
-  "window.density.layout": "compact",
-  "gitlens.graph.details.location": "auto",
-  "diffEditor.useInlineViewWhenSpaceIsLimited": true,
+  "codingcopilot.disabledSecurityCategories": [ "powershell" ]
 }
