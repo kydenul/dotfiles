@@ -43,7 +43,8 @@ return {
       ensure_installed = {
         "bashls", -- Bash
         "clangd", -- C/C++
-        "gopls", -- Go
+        -- gopls is intentionally NOT Mason-managed; single binary from
+        -- `go install golang.org/x/tools/gopls@latest` at ~/go/bin/gopls.
         "lua_ls", -- lua_ls
         "pylsp", -- Python
         "ts_ls", -- Typescript
@@ -53,10 +54,16 @@ return {
       },
     })
 
-    -- NOTE: LSP Enable
+    -- gopls comes from ~/go/bin/gopls (managed by `go install`, not Mason) so
+    -- VSCode and Neovim run the same single version. Absolute path avoids $PATH
+    -- differences and mason/bin shadowing it (mason/bin comes first in $PATH).
+    -- Must be set here, not in lsp/gopls.lua: nvim-lspconfig's bundled copy sits
+    -- later in 'runtimepath' and wins over lsp/*.lua during config merging.
+    vim.lsp.enable("gopls")
+    vim.lsp.config("gopls", { cmd = { vim.fn.expand("~/go/bin/gopls") } })
+
     vim.lsp.enable("bashls")
     vim.lsp.enable("clangd")
-    vim.lsp.enable("gopls")
     vim.lsp.enable("lua_ls")
     vim.lsp.enable("pylsp")
     vim.lsp.enable("ts_ls")

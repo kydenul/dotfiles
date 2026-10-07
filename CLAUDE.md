@@ -91,7 +91,6 @@ nvim/
 │   │   └── ...              # Other plugin configs
 │   └── snippets/             # Custom snippets (init, cpp, go, javascript)
 └── lsp/                      # Language-specific LSP configs
-    ├── gopls.lua
     ├── ts_ls.lua
     ├── clangd.lua
     ├── lua_ls.lua
