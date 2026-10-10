@@ -39,7 +39,9 @@ return {
   config = function(_, opts)
     require("mason").setup(opts)
     require("mason-lspconfig").setup({
-      automatic_installation = true,
+      -- v2 removed `automatic_installation` (was silently ignored). Server enabling stays
+      -- fully manual via the explicit vim.lsp.enable() calls below; installation is still handled by ensure_installed.
+      automatic_enable = false,
       ensure_installed = {
         "bashls", -- Bash
         "clangd", -- C/C++
@@ -144,7 +146,7 @@ return {
     -- NOTE: LspInfo, LspLog, LspRestart
     vim.api.nvim_create_user_command("LspInfo", ":checkhealth vim.lsp", { desc = "Alias to `:checkhealth vim.lsp`" })
     vim.api.nvim_create_user_command("LspLog", function()
-      vim.cmd(string.format("tabnew %s", vim.lsp.get_log_path()))
+      vim.cmd(string.format("tabnew %s", vim.lsp.log.get_filename()))
     end, { desc = "Opens the Nvim LSP client log" })
 
     local complete_client = function(arg)
@@ -184,10 +186,12 @@ return {
 
     -- NOTE: Diagnostics
     -- See `:help vim.diagnostic.*` for documentation on any of the below functions.
-    -- stylua: ignore
-    vim.keymap.set("n", "[d", function() vim.diagnostic.goto_prev() end, { noremap = true, silent = true, desc = "[Diagnostics] Prev" })
-    -- stylua: ignore
-    vim.keymap.set("n", "]d", function() vim.diagnostic.goto_next() end, { noremap = true, silent = true, desc = "[Diagnostics] Next" })
+    -- 0.12: goto_prev/goto_next deprecated (removal in 0.13); jump()'s `float` opt is deprecated in turn (removal in 0.14) — use `on_jump` instead.
+    local function diagnostic_jump(count)
+      vim.diagnostic.jump({ count = count, on_jump = function() vim.diagnostic.open_float() end })
+    end
+    vim.keymap.set("n", "[d", function() diagnostic_jump(-1) end, { noremap = true, silent = true, desc = "[Diagnostics] Prev" })
+    vim.keymap.set("n", "]d", function() diagnostic_jump(1) end, { noremap = true, silent = true, desc = "[Diagnostics] Next" })
 
     local signs_handler = {
       text = {

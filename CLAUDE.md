@@ -17,7 +17,7 @@ This is a personal dotfiles repository for configuring development environments 
 
 ### Neovim Setup
 ```bash
-# Install Neovim (requires 0.11+; config uses vim.lsp.enable / vim.lsp.config / vim.uv)
+# Install Neovim (requires 0.12+; config uses vim.lsp.enable / vim.lsp.config / vim.uv)
 brew install neovim
 
 # Dependencies for plugins
@@ -322,7 +322,7 @@ Key facts:
 ### Testing Changes
 ```bash
 # Neovim
-nvim --version  # Check version (requires 0.11+)
+nvim --version  # Check version (requires 0.12+)
 nvim -c "checkhealth"  # Check plugin health
 nvim -c "Lazy health"  # Check lazy.nvim health
 
