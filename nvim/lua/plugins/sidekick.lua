@@ -5,7 +5,7 @@ return {
 
     -- add any options here
     cli = {
-      win = { layout = "right", split = { width = 120 } },
+      win = { layout = "right", split = { width = 130 } },
       mux = { enabled = true, backend = "tmux", create = "terminal" }, -- "terminal"|"window"|"split"
       tools = { ["TClaude"] = { cmd = { "tclaude" } } },
       prompts = {
