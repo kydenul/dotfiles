@@ -28,7 +28,7 @@
   "workbench.panel.showLabels": false,
   "workbench.browser.showInTitleBar": false,
   // "workbench.activityBar.location": "hidden",
-  "workbench.colorTheme": "OM Theme (No Italic)",
+  "workbench.colorTheme": "OM Theme (Night Owl Italic)",
   "workbench.iconTheme": "material-icon-theme",
   "workbench.list.smoothScrolling": true,
   "workbench.activityBar.location": "top",
@@ -474,5 +474,7 @@
   "codingcopilot.requestMaxStepLimit": 1000,
   "codingcopilot.enableCodelens": false,
   "codingcopilot.autoRun": true,
-  "codingcopilot.disabledSecurityCategories": [ "powershell" ]
+  "codingcopilot.disabledSecurityCategories": [
+    "powershell"
+  ]
 }
