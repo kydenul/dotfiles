@@ -150,9 +150,9 @@ daemon_log_dir() {
 # Every model the gateway exposes accepted thinking.budget_tokens when probed,
 # so reasoning is true across the board and is not a column.
 #
-# allowEmptySignature: hy3 and kimi-k3 stream thinking blocks whose `signature`
-# is an empty string. Without this flag pi downgrades those blocks to plain text.
-# glm and deepseek send real signatures, so they must not set it.
+# allowEmptySignature: hy3, hy4 and kimi-k3 stream thinking blocks whose
+# `signature` is an empty string. Without this flag pi downgrades those blocks
+# to plain text. glm and deepseek send real signatures, so they must not set it.
 PI_MODEL_META=$(
     cat <<'EOF'
 claude-opus-       200000  128000   true  false
@@ -162,6 +162,7 @@ claude-deepseek-   200000   64000  false  false
 claude-glm-        200000   64000  false  false
 claude-kimi-       200000   64000  false   true
 claude-hy3         200000   64000  false   true
+claude-hy4         200000   64000  false   true
 EOF
 )
 
