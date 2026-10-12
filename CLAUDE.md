@@ -217,6 +217,7 @@ sshc (ssh DevCloud, with tmux attach), sshk (ssh K-Claw), sshd (ssh DevCloud, pl
 - Terminal: `xterm-256color` (for SSH compatibility)
 - Cursor: Block shape with trail effect (smoothed by the builtin `cursor-trail-motion-blur` custom shader, kitty ≥ 0.49)
 - Tab bar: Top position with slant style
+- Clickable file references: `detect_url_regex` turns `path/file.ext:line[:col]` (compiler output) into links; clicking opens nvim at that position via `kitty/open-actions.conf` → `script/open-file-ref` (new tmux window when tmux is running). Inside tmux the mouse is grabbed, so click with `Ctrl+Shift+Click`; plain click works only outside tmux
 
 ### Deep Tmux Integration
 Kitty keybindings send Tmux prefix sequences for seamless control:

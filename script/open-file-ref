@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+# ============================================================================
+# open-file-ref — 打开 "path/to/file:line[:col]" 格式的文件引用
+#
+# 由 kitty 的 open-actions.conf 调用：kitty.conf 里的 detect_url_regex 会把
+# 编译器输出中的文件引用识别为链接，点击后通过 launch --type=background
+# 启动本脚本。也可手动调用：
+#
+#     open-file-ref src/foo.c:42
+#     open-file-ref ~/proj/a.go:10:5
+#
+# 相对路径解析顺序：
+#   1. launch 继承的 cwd（tmux 内不可靠：是 tmux client 的启动目录）
+#   2. 活动 tmux pane 的目录（#{pane_current_path}）
+# 打开方式：
+#   - 有 tmux 会话时新建 tmux window（与本仓库 tmux-first 的键位风格一致）
+#   - 否则新开一个 kitty OS window
+# ============================================================================
+
+set -euo pipefail
+
+# GUI 方式启动的 kitty，其子进程 PATH 里可能没有 /opt/homebrew/bin（tmux/nvim 在那里）
+PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
+
+die() {
+    printf 'open-file-ref: %s\n' "$*" >&2
+    # background launch 的 stderr 不可见，借 tmux 状态栏提示（尽力而为）
+    command -v tmux >/dev/null 2>&1 && tmux display-message "open-file-ref: $*" 2>/dev/null || true
+    exit 1
+}
+
+[ $# -eq 1 ] || die "usage: open-file-ref <file:line[:col]>"
+
+ref=$1
+case $ref in
+    *:*:*) file=${ref%%:*}; line=${ref#*:}; line=${line%%:*}; col=${ref##*:} ;;
+    *:*)   file=${ref%%:*}; line=${ref##*:}; col=1 ;;
+    *)     die "格式错误（应为 file:line[:col]）: $ref" ;;
+esac
+case $line$col in *[!0-9]*) die "格式错误（应为 file:line[:col]）: $ref" ;; esac
+[ -n "$line" ] && [ -n "$col" ] || die "格式错误（应为 file:line[:col]）: $ref"
+
+# 展开 ~ 前缀
+case $file in '~'*) file=$HOME${file#\~} ;; esac
+
+# 相对路径：launch 的 cwd 在 tmux 内是 tmux client 的启动目录，不可靠，
+# 再尝试活动 tmux pane 的目录
+if [ ! -e "$file" ]; then
+    pane_cwd=$(tmux display-message -p '#{pane_current_path}' 2>/dev/null || true)
+    if [ -n "$pane_cwd" ] && [ -e "$pane_cwd/$file" ]; then
+        file=$pane_cwd/$file
+    fi
+fi
+[ -f "$file" ] || die "file not found: $ref (cwd: $PWD)"
+
+# 防止以 - 开头的文件名被 nvim 当作参数
+case $file in -*) file=./$file ;; esac
+
+if tmux has-session 2>/dev/null; then
+    exec tmux new-window -n "${file##*/}" nvim "+call cursor($line,$col)" "$file"
+fi
+# 没有 tmux 会话：新开 kitty OS window
+exec kitty nvim "+call cursor($line,$col)" "$file"
