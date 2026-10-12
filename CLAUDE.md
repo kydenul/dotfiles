@@ -215,7 +215,7 @@ sshc (ssh DevCloud, with tmux attach), sshk (ssh K-Claw), sshd (ssh DevCloud, pl
 - Font: Maple Mono NF CN, 18pt
 - Background: Custom image with `background_tint 0.94` (semi-transparent look; Kitty on macOS has no native blur)
 - Terminal: `xterm-256color` (for SSH compatibility)
-- Cursor: Block shape with trail effect
+- Cursor: Block shape with trail effect (smoothed by the builtin `cursor-trail-motion-blur` custom shader, kitty ≥ 0.49)
 - Tab bar: Top position with slant style
 
 ### Deep Tmux Integration
