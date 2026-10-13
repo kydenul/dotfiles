@@ -100,16 +100,51 @@ await this.metadataStore.writePort(ei); // 并写回 daemon.port
 
 ## 3. 验证记录
 
-`/v1/models`（本地 handler，无需鉴权即可读）报 14 个模型，
-实测 13 个能通，**`claude-opus-5[1m]` 上游 400**：
+`/v1/models`（本地 handler，无需鉴权即可读）报 18 个模型，
+实测 16 个能通，**`claude-opus-5-5[1m]` 与 `claude-sonnet-5-5[1m]` 上游 400**
+（此前的 `claude-opus-5[1m]` 已被上游 provision，现已可用）：
 
 ```
-{"code":11102,"error":"11102:model [claude-opus-5-1m] service info not found"}
+{"code":11102,"error":"11102:model [claude-opus-5.5-1m] service info not found"}
+{"code":11102,"error":"11102:model [claude-sonnet-5.5-1m] service info not found"}
 ```
 
 网关侧只挂了名字没配服务（加 `anthropic-beta: context-1m-2025-08-07`
 或伪装 `claude-cli` UA 都无效）。属网关侧问题，等其修复即可，
-本脚本仍会把它写进模型清单——一旦上游 provision 好就自动可用。
+本脚本仍会把它写进模型清单——一旦上游 provision 好就自动可用
+（opus-5 就是这样从"挂名"变成可用的）。
+
+**但挂掉的只有 `[1m]` 这个变体，5.5 本身是通的。** daemon 把客户端的 `[1m]`
+翻译成上游的 `-1m` 后缀，而 `claude-sonnet-5.5-1m` / `claude-opus-5.5-1m` 这两项
+在 APISIX 里没注册；不带后缀的 `claude-sonnet-5-5` / `claude-opus-5-5` 正常返回 200
+（上游回的模型名是 `claude-sonnet-5.5` / `claude-opus-5.5`）。
+
+去掉后缀**不损失上下文**——上游对不带后缀的模型名同样按 1M 卡。实测
+（2026-10-13，sonnet 与 opus 结果一致）：
+
+```
+665690 input tokens   → 200 OK
+1024061 input tokens  → 400 {"code":"context_length_exceeded","internal_code":"11115",
+                             "message":"prompt is too long: 1024061 tokens > 1000000 maximum"}
+```
+
+客户端侧也一致。原生 claude 2.1.295 的模型表里 `claude-sonnet-5-5` 是
+`context:{window:1e6,native_1m:!0,supports_1m_beta:!0}`、`max_output_tokens` 128000，
+且两个 id 在代码里映射到同一个模型对象：
+
+```js
+if(e==="claude-sonnet-5-5"||e==="claude-sonnet-5-5[1m]")return Ag;
+```
+
+所以去掉后缀后客户端**不会**按 200K 提前触发 auto-compact。端到端验证：
+
+```bash
+ANTHROPIC_MODEL=claude-sonnet-5-5 claude -p "..."   # → NATIVE_SONNET55_OK
+ANTHROPIC_MODEL=claude-opus-5-5   claude -p "..."   # → NATIVE_OPUS55_OK
+```
+
+因此本脚本给 pi 写的模型清单里，5.5 有两条：`claude-sonnet-5-5[1m]`（等上游
+provision）和 `claude-sonnet-5-5`（当前可用，1M）。见 `PI_EXTRA_MODELS`。
 
 `/v1/messages` 首次请求失败，daemon 日志给出确切原因：
 
@@ -200,14 +235,18 @@ claude-official|claude|{"env":{}}
   "env": {
     "ANTHROPIC_BASE_URL": "http://127.0.0.1:<port>",
     "ANTHROPIC_AUTH_TOKEN": "placeholder",
-    "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-4-8[1m]",
-    "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-4-6[1m]",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-5-5",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-5-5",
     "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-haiku-4-5"
   }
 }
 ```
 
 端口若变化，用 `tclaude-proxy sync-ccswitch claude` 自动同步（见下）。
+
+Opus / Sonnet 故意**不带 `[1m]`**：上游只注册了 5.5 的裸 id，`claude-*-5-5[1m]`
+会 400 `service info not found`。窗口仍是 1M，不是降级（见 §3 / §6⑧）。
+Haiku 保持 4-5 —— 这个网关上没有 haiku 5.5。
 
 ### 4.2 pi（cc-switch 读 models.json）
 
@@ -349,15 +388,16 @@ tclaude-proxy url         # → http://127.0.0.1:<port>
   "env": {
     "ANTHROPIC_BASE_URL": "http://127.0.0.1:<port>",
     "ANTHROPIC_AUTH_TOKEN": "placeholder",
-    "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-4-8[1m]",
-    "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-4-6[1m]",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-5-5",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-5-5",
     "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-haiku-4-5"
   }
 }
 ```
 
 `ANTHROPIC_BASE_URL` 换成步骤 1 的实际输出。名字建议叫 `tclaude-gateway`，
-一眼能看出走的是内部网关。
+一眼能看出走的是内部网关。Opus / Sonnet 不带 `[1m]` 是故意的——5.5 的 `[1m]`
+变体上游没注册（§6⑧），窗口仍是 1M。
 
 > `ANTHROPIC_AUTH_TOKEN` 填 `placeholder` 就行，**这不是密钥**。
 > 真 token 由 daemon 注入，客户端不需要任何凭证（见 §1）。
@@ -464,10 +504,12 @@ daemon 挂掉后无人重启 → 这正是 `tclaude-proxy-agent.sh` 存在的理
 若哪天有人"顺手清理"掉 `models.json` 里那行看起来多余的 `"x-api-key": ""`，
 pi 会立刻全线 401 `invalid_format`。
 
-**⑧ `claude-opus-5[1m]` 上游未 provision。** 网关 `/v1/models` 报了它，
-但实际请求返回 400 `service info not found`（见 §3）。属网关侧配置缺失，
-本地无法绕过。pi 的模型列表里能看到它，选中会报错——换 `claude-opus-4-8[1m]`
-或 `claude-sonnet-5[1m]`。
+**⑧ `claude-opus-5-5[1m]` / `claude-sonnet-5-5[1m]` 上游未 provision，改用不带后缀的 5.5。**
+网关 `/v1/models` 报了它们，但实际请求返回 400 `service info not found`（见 §3）。
+**去掉 `[1m]` 就能用，且上下文仍然是 1M**——上限实测就是 1000000 tokens，
+不是"降级到 200K"；原生 claude 也把两个 id 当同一个 1M 模型（见 §3）。
+属网关侧配置缺失，本地无法绕过，但**只有 `[1m]` 变体受影响**，5.5 本身可用。
+pi 的模型清单里两个 id 都有，选不带后缀的那个。
 
 **⑨ pi 的默认模型要自己设。** `sync-ccswitch pi` **故意不碰**
 `~/.pi/agent/settings.json` 的 `defaultProvider` / `defaultModel`

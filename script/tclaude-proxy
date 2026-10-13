@@ -166,6 +166,33 @@ claude-hy4         200000   64000  false   true
 EOF
 )
 
+# Model ids that work upstream but are absent from /v1/models.
+#
+# 5.5 is advertised only as `claude-sonnet-5-5[1m]` / `claude-opus-5-5[1m]`, and
+# those `[1m]` variants are NOT registered upstream — the daemon rewrites them
+# to `claude-*-5.5-1m`, which APISIX answers with 400 11102 "service info not
+# found". The bare ids are registered and return 200.
+#
+# Dropping the suffix does not cost context: upstream enforces the same 1M cap
+# on the bare id. Measured 2026-10-13, identical for both models:
+#     665690 input tokens  -> 200 OK
+#    1024061 input tokens  -> 400 "prompt is too long: 1024061 tokens > 1000000 maximum"
+# Native claude agrees — its model table gives claude-sonnet-5-5 a
+# context.window of 1e6 with native_1m, and maps the bare and `[1m]` ids to the
+# same model object, so the client does not auto-compact early either.
+#
+# Listed explicitly rather than derived from every `[1m]` id because the window
+# here is measured, not assumed: an unmeasured bare id may well be a 200K
+# service, and telling pi otherwise would push it past a real limit.
+#
+# Fields: id | contextWindow | maxTokens | vision
+PI_EXTRA_MODELS=$(
+    cat <<'EOF'
+claude-sonnet-5-5  1000000  128000  true
+claude-opus-5-5    1000000  128000  true
+EOF
+)
+
 # ── Commands ────────────────────────────────────────────────────────────────
 
 cmd_port() {
@@ -562,8 +589,8 @@ PY
     "env": {
       "ANTHROPIC_BASE_URL": "$url",
       "ANTHROPIC_AUTH_TOKEN": "$PLACEHOLDER_TOKEN",
-      "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-4-8[1m]",
-      "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-4-6[1m]",
+      "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-5-5",
+      "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-5-5",
       "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-haiku-4-5"
     }
   }
@@ -616,10 +643,10 @@ sync_pi() {
     fi
 
     python3 - "$PI_MODELS" "$url" "$PLACEHOLDER_TOKEN" "$apply" \
-        "$PI_PROVIDER_KEY" "$PI_SESSION_ID" "$models" "$PI_MODEL_META" <<'PY'
+        "$PI_PROVIDER_KEY" "$PI_SESSION_ID" "$models" "$PI_MODEL_META" "$PI_EXTRA_MODELS" <<'PY'
 import json, os, shutil, sys
 
-path, url, token, apply, key, session_id, models_raw, meta_raw = sys.argv[1:9]
+path, url, token, apply, key, session_id, models_raw, meta_raw, extras_raw = sys.argv[1:10]
 apply = apply == "1"
 
 # ── metadata table ──────────────────────────────────────────────────────────
@@ -636,6 +663,22 @@ meta.sort(key=lambda r: len(r[0]), reverse=True)
 DEFAULT = (200000, 16384, False, False)
 
 
+def entry(model_id, ctx, max_tokens, vision, empty_sig):
+    e = {
+        "id": model_id,
+        "contextWindow": ctx,
+        "maxTokens": max_tokens,
+        # Every gateway model accepted thinking.budget_tokens when probed.
+        "reasoning": True,
+        "input": ["text", "image"] if vision else ["text"],
+    }
+    if empty_sig:
+        # This model streams thinking blocks with an empty `signature`; without
+        # the flag pi converts them to plain text.
+        e["compat"] = {"allowEmptySignature": True}
+    return e
+
+
 def describe(model_id):
     ctx, max_tokens, vision, empty_sig = DEFAULT
     for prefix, p_ctx, p_max, p_vision, p_empty in meta:
@@ -647,22 +690,23 @@ def describe(model_id):
     if model_id.endswith("[1m]"):
         ctx = 1000000
 
-    entry = {
-        "id": model_id,
-        "contextWindow": ctx,
-        "maxTokens": max_tokens,
-        # Every gateway model accepted thinking.budget_tokens when probed.
-        "reasoning": True,
-        "input": ["text", "image"] if vision else ["text"],
-    }
-    if empty_sig:
-        # This model streams thinking blocks with an empty `signature`; without
-        # the flag pi converts them to plain text.
-        entry["compat"] = {"allowEmptySignature": True}
-    return entry
+    return entry(model_id, ctx, max_tokens, vision, empty_sig)
 
 
 models = [describe(line.strip()) for line in models_raw.splitlines() if line.strip()]
+
+# Working ids the gateway does not advertise — see PI_EXTRA_MODELS. Appended only
+# when absent, so this goes quiet the moment upstream lists the bare id itself.
+seen = {m["id"] for m in models}
+for line in extras_raw.splitlines():
+    parts = line.split()
+    if len(parts) != 4:
+        continue
+    model_id = parts[0]
+    if model_id in seen:
+        continue
+    models.append(entry(model_id, int(parts[1]), int(parts[2]), parts[3] == "true", False))
+    seen.add(model_id)
 
 provider = {
     "baseUrl": url,
