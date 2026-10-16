@@ -13,11 +13,11 @@ keybind = global:ctrl+shift+grave_accent=toggle_quick_terminal
 quick-terminal-position = top
 
 background-image = ~/.config/images/alone.jpg
-background-image-opacity = 0.05
+background-image-opacity = 0.1
 background-image-fit = cover 
 
 font-family = "Maple Mono NF CN"
-font-size = 18
+font-size = 16
 font-thicken = true
 background-opacity = 0.85 
 background-blur-radius = 36
@@ -32,7 +32,9 @@ quit-after-last-window-closed = true
 copy-on-select = true
 mouse-hide-while-typing = true
 macos-option-as-alt = true
-macos-titlebar-style = hidden
+
+# macos-titlebar-style: native / tabs / transparent
+macos-titlebar-style = native 
 
 # Buffer size in bytes: 256 MB
 scrollback-limit = 256000000
