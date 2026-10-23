@@ -78,9 +78,15 @@ tclaude
 | 端口环境变量 | `TCLAUDE_DAEMON_PORT`（**必需**，缺失则 daemon 抛错退出）          |
 | 健康检查     | `GET /__tclaude/health` → `{"ok":true,"pid":N,"version":"x"}`      |
 | 停止         | `POST /__tclaude/stop`                                             |
-| 元数据       | `~/.tclaude/daemon.json`（pid / port / url / version / startedAt） |
-| 端口缓存     | `~/.tclaude/daemon.port`                                           |
-| 启动锁       | `~/.tclaude/locks/daemon.lock`                                     |
+| 元数据       | `~/.tclaude/tcli/daemon/metadata.json`（pid / port / url / version / startedAt） |
+| 端口缓存     | `~/.tclaude/tcli/daemon/port`                                      |
+| 启动锁       | `~/.tclaude/tcli/locks/daemon.lock`                                |
+
+> **0.1.9 搬了家。** 0.1.8 及以前是 `~/.tclaude/daemon.json` / `daemon.port` /
+> `locks/`，0.1.9 起整体挪到 `~/.tclaude/tcli/` 下（运行时也从 `runtime/` 变成
+> `tcli/runtime/claude-code-<ver>/`）。**升级不会清理旧文件**，`daemon.json` 会永远停在
+> 0.1.8 的 pid / version，所以脚本优先读新路径，只有新路径不存在时才回退旧路径
+> （`daemon_meta_file`）。
 
 端口分配逻辑（`acquirePort`）：
 
@@ -96,13 +102,15 @@ await this.metadataStore.writePort(ei); // 并写回 daemon.port
 
 所以端口是**尽力保持稳定，但不保证**。实测已经漂过一次：`51247` → `54380`
 （cc-switch 里存的 provider 还留在旧端口，`claude` 直接连不上）。
-**脚本必须动态读取 `daemon.json`，不要硬编码端口。**
+**脚本必须动态读取 daemon 元数据（`tcli/daemon/metadata.json`），不要硬编码端口。**
 
 ## 3. 验证记录
 
 `/v1/models`（本地 handler，无需鉴权即可读）报 18 个模型，
 实测 16 个能通，**`claude-opus-5-5[1m]` 与 `claude-sonnet-5-5[1m]` 上游 400**
-（此前的 `claude-opus-5[1m]` 已被上游 provision，现已可用）：
+（2026-10-19、tclaude 0.1.9 复测结论不变；此前的 `claude-opus-5[1m]` 已被上游
+provision，现已可用）。0.1.9 的清单与 0.1.8 完全一致，没有新增模型。
+所有 `[1m]` 模型去掉后缀也都返回 200，唯一不通的就是上面这两个 5.5 变体：
 
 ```
 {"code":11102,"error":"11102:model [claude-opus-5.5-1m] service info not found"}
@@ -111,7 +119,8 @@ await this.metadataStore.writePort(ei); // 并写回 daemon.port
 
 网关侧只挂了名字没配服务（加 `anthropic-beta: context-1m-2025-08-07`
 或伪装 `claude-cli` UA 都无效）。属网关侧问题，等其修复即可，
-本脚本仍会把它写进模型清单——一旦上游 provision 好就自动可用
+本脚本把这两个 id 列在 `PI_EXCLUDE_MODELS` 里，不写进 pi 的模型清单（否则就是选了
+必 400 的死条目）；上游 provision 好之后把它们从该列表删掉即可
 （opus-5 就是这样从"挂名"变成可用的）。
 
 **但挂掉的只有 `[1m]` 这个变体，5.5 本身是通的。** daemon 把客户端的 `[1m]`
@@ -143,8 +152,12 @@ ANTHROPIC_MODEL=claude-sonnet-5-5 claude -p "..."   # → NATIVE_SONNET55_OK
 ANTHROPIC_MODEL=claude-opus-5-5   claude -p "..."   # → NATIVE_OPUS55_OK
 ```
 
-因此本脚本给 pi 写的模型清单里，5.5 有两条：`claude-sonnet-5-5[1m]`（等上游
-provision）和 `claude-sonnet-5-5`（当前可用，1M）。见 `PI_EXTRA_MODELS`。
+因此本脚本给 pi 写的模型清单里，5.5 只有不带后缀的 `claude-sonnet-5-5` /
+`claude-opus-5-5`（1M，见 `PI_EXTRA_MODELS`），`[1m]` 变体由 `PI_EXCLUDE_MODELS` 排除。
+
+另外 2026-10-19 复测 thinking 签名时发现：`claude-glm-5.2` 现在回的是**空 `signature`**
+（`glm-5.3` / `glm-5.3-flash` 仍是真实签名），所以 `PI_MODEL_META` 里给 `claude-glm-5.2`
+单独加了一行 `allowEmptySignature=true`，其余 glm 不动。
 
 `/v1/messages` 首次请求失败，daemon 日志给出确切原因：
 
@@ -472,7 +485,7 @@ tclaude-proxy-agent.sh uninstall   # 卸载，不影响 daemon 本身
 它由 `tclaude` 启动时 `ensureRunning()` 拉起。若你只用原生 `claude` 而从不跑 `tclaude`，
 daemon 挂掉后无人重启 → 这正是 `tclaude-proxy-agent.sh` 存在的理由。
 
-**② 端口可能变化。** 见 §2。始终从 `daemon.json` 读取。
+**② 端口可能变化。** 见 §2。始终从 `tcli/daemon/metadata.json` 读取。
 `tclaude-proxy sync-ccswitch` 会在端口漂移后重写配置（claude 与 pi 都管）。
 
 **③ 401 会触发强制登出。** 转发层：
@@ -525,7 +538,7 @@ Pi 页**才会导入，不是后台常驻同步。`providers` 表里 `app_type='
 | 路径                                                           | 说明                                        |
 | -------------------------------------------------------------- | ------------------------------------------- |
 | `/opt/homebrew/lib/node_modules/@tencent/tclaude/product.json` | 端点、模型表、鉴权配置                      |
-| `~/.tclaude/daemon.json`                                       | 当前 daemon pid / port / url                |
+| `~/.tclaude/tcli/daemon/metadata.json`                         | 当前 daemon pid / port / url（0.1.9+）；旧版为 `~/.tclaude/daemon.json` |
 | `~/.tclaude/logs/<date>/*.log`                                 | daemon 日志（转发失败的真实原因在这里）     |
 | `~/.cc-switch/cc-switch.db`                                    | cc-switch provider / proxy 配置（SQLite）   |
 | `~/.cc-switch/settings.json`                                   | `enableLocalProxy` / `visibleApps` 等开关   |

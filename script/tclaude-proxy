@@ -42,7 +42,11 @@ section() {
 
 # ── Constants (extracted from tclaude bundle module 50092) ───────────────────
 TCLAUDE_DIR="$HOME/.tclaude"
-DAEMON_META="$TCLAUDE_DIR/daemon.json"
+# 0.1.9 moved the daemon state under tcli/. The pre-0.1.9 daemon.json is NOT
+# cleaned up on upgrade and keeps its last 0.1.8 contents (stale pid/version), so
+# the new file must win whenever it exists.
+DAEMON_META_NEW="$TCLAUDE_DIR/tcli/daemon/metadata.json"
+DAEMON_META_LEGACY="$TCLAUDE_DIR/daemon.json"
 HEALTH_PATH="/__tclaude/health"
 CCSWITCH_DB="$HOME/.cc-switch/cc-switch.db"
 CLAUDE_SETTINGS="$HOME/.claude/settings.json"
@@ -72,11 +76,26 @@ need() {
 
 # ── Daemon introspection ────────────────────────────────────────────────────
 
-# Read a key out of daemon.json. Returns empty string when absent/unparseable.
+# Path of the daemon metadata file currently in use. Resolved on every call: a
+# `tclaude daemon restart` from an older layout can create the new file mid-run.
+# When neither exists the new path is returned, so error messages name the file
+# a current tclaude would write.
+daemon_meta_file() {
+    if [ -f "$DAEMON_META_NEW" ]; then
+        echo "$DAEMON_META_NEW"
+    elif [ -f "$DAEMON_META_LEGACY" ]; then
+        echo "$DAEMON_META_LEGACY"
+    else
+        echo "$DAEMON_META_NEW"
+    fi
+}
+
+# Read a key out of the daemon metadata. Returns empty string when absent/unparseable.
 daemon_meta() {
-    local key="$1"
-    [ -f "$DAEMON_META" ] || return 0
-    python3 - "$DAEMON_META" "$key" <<'PY' 2>/dev/null || true
+    local key="$1" file
+    file="$(daemon_meta_file)"
+    [ -f "$file" ] || return 0
+    python3 - "$file" "$key" <<'PY' 2>/dev/null || true
 import json, sys
 try:
     with open(sys.argv[1]) as f:
@@ -150,9 +169,11 @@ daemon_log_dir() {
 # Every model the gateway exposes accepted thinking.budget_tokens when probed,
 # so reasoning is true across the board and is not a column.
 #
-# allowEmptySignature: hy3, hy4 and kimi-k3 stream thinking blocks whose
+# allowEmptySignature: hy3, hy4, kimi-k3 and glm-5.2 stream thinking blocks whose
 # `signature` is an empty string. Without this flag pi downgrades those blocks
-# to plain text. glm and deepseek send real signatures, so they must not set it.
+# to plain text. glm-5.3*, deepseek and claude-* send real signatures, so they
+# must not set it. Re-probed 2026-10-19 on tclaude 0.1.9: glm-5.2 flipped to empty
+# while glm-5.3 / glm-5.3-flash still sign, hence the dedicated glm-5.2 row.
 PI_MODEL_META=$(
     cat <<'EOF'
 claude-opus-       200000  128000   true  false
@@ -160,6 +181,7 @@ claude-sonnet-     200000  128000   true  false
 claude-haiku-      200000   64000   true  false
 claude-deepseek-   200000   64000  false  false
 claude-glm-        200000   64000  false  false
+claude-glm-5.2     200000   64000  false   true
 claude-kimi-       200000   64000  false   true
 claude-hy3         200000   64000  false   true
 claude-hy4         200000   64000  false   true
@@ -193,13 +215,25 @@ claude-opus-5-5    1000000  128000  true
 EOF
 )
 
+# Advertised by /v1/models but rejected upstream (400 11102 "service info not
+# found"; re-verified 2026-10-19 on tclaude 0.1.9). Left in pi's model list they
+# are dead picker entries, and they are what PI_EXTRA_MODELS replaces. Every other
+# `[1m]` id the gateway lists — and its bare form — returns 200.
+# Drop an id from here once upstream registers it.
+PI_EXCLUDE_MODELS=$(
+    cat <<'EOF'
+claude-sonnet-5-5[1m]
+claude-opus-5-5[1m]
+EOF
+)
+
 # ── Commands ────────────────────────────────────────────────────────────────
 
 cmd_port() {
     local port
     port="$(daemon_port)"
     [ -n "$port" ] || {
-        error "Daemon not running (no $DAEMON_META). Run: tclaude-proxy ensure"
+        error "Daemon not running (no $(daemon_meta_file)). Run: tclaude-proxy ensure"
         exit 1
     }
     echo "$port"
@@ -209,7 +243,7 @@ cmd_url() {
     local url
     url="$(daemon_url)"
     [ -n "$url" ] || {
-        error "Daemon not running (no $DAEMON_META). Run: tclaude-proxy ensure"
+        error "Daemon not running (no $(daemon_meta_file)). Run: tclaude-proxy ensure"
         exit 1
     }
     echo "$url"
@@ -225,8 +259,10 @@ EOF
 }
 
 cmd_status() {
-    if [ ! -f "$DAEMON_META" ]; then
-        warn "Daemon not running — $DAEMON_META absent"
+    local meta_file
+    meta_file="$(daemon_meta_file)"
+    if [ ! -f "$meta_file" ]; then
+        warn "Daemon not running — $meta_file absent"
         return 1
     fi
 
@@ -235,9 +271,9 @@ cmd_status() {
     pid="$(daemon_pid)"
     port="$(daemon_port)"
 
-    # An unparseable/truncated daemon.json is a realistic crash artifact.
+    # An unparseable/truncated metadata file is a realistic crash artifact.
     if [ -z "$url" ]; then
-        error "$DAEMON_META unreadable or missing 'url' — corrupt metadata"
+        error "$meta_file unreadable or missing 'url' — corrupt metadata"
         warn "recover with: tclaude-proxy ensure"
         return 1
     fi
@@ -298,7 +334,7 @@ cmd_ensure() {
     if [ "$healthy" -eq 1 ]; then
         success "daemon up at $(daemon_url)"
     else
-        # Re-probing above re-read daemon.json, so a daemon that came up on a
+        # Re-probing above re-read the daemon metadata, so a daemon that came up on a
         # new port would already be visible — this is genuinely dead, not a
         # stale-metadata artifact.
         if [ "$rc" -ne 0 ]; then
@@ -643,10 +679,11 @@ sync_pi() {
     fi
 
     python3 - "$PI_MODELS" "$url" "$PLACEHOLDER_TOKEN" "$apply" \
-        "$PI_PROVIDER_KEY" "$PI_SESSION_ID" "$models" "$PI_MODEL_META" "$PI_EXTRA_MODELS" <<'PY'
+        "$PI_PROVIDER_KEY" "$PI_SESSION_ID" "$models" "$PI_MODEL_META" "$PI_EXTRA_MODELS" \
+        "$PI_EXCLUDE_MODELS" <<'PY'
 import json, os, shutil, sys
 
-path, url, token, apply, key, session_id, models_raw, meta_raw, extras_raw = sys.argv[1:10]
+path, url, token, apply, key, session_id, models_raw, meta_raw, extras_raw, exclude_raw = sys.argv[1:11]
 apply = apply == "1"
 
 # ── metadata table ──────────────────────────────────────────────────────────
@@ -693,7 +730,12 @@ def describe(model_id):
     return entry(model_id, ctx, max_tokens, vision, empty_sig)
 
 
-models = [describe(line.strip()) for line in models_raw.splitlines() if line.strip()]
+excluded = {line.strip() for line in exclude_raw.splitlines() if line.strip()}
+models = [
+    describe(line.strip())
+    for line in models_raw.splitlines()
+    if line.strip() and line.strip() not in excluded
+]
 
 # Working ids the gateway does not advertise — see PI_EXTRA_MODELS. Appended only
 # when absent, so this goes quiet the moment upstream lists the bare id itself.
@@ -794,7 +836,7 @@ print(f"         {change}  ({len(models)} models){backup}")
 PY
 }
 
-# Ports drift, so both sync paths key off the live daemon.json rather than any
+# Ports drift, so both sync paths key off the live daemon metadata rather than any
 # stored value. See sync_claude / sync_pi for the per-app semantics.
 cmd_sync_ccswitch() {
     need python3
