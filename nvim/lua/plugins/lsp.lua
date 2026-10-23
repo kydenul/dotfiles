@@ -11,8 +11,6 @@ return {
 
     -- LSP Kind Icons
     { "onsails/lspkind.nvim", event = { "VimEnter" } },
-    -- Commentary
-    "tpope/vim-commentary",
     -- Todo comments
     {
       "folke/todo-comments.nvim",
@@ -61,6 +59,10 @@ return {
     -- differences and mason/bin shadowing it (mason/bin comes first in $PATH).
     -- Must be set here, not in lsp/gopls.lua: nvim-lspconfig's bundled copy sits
     -- later in 'runtimepath' and wins over lsp/*.lua during config merging.
+    -- Log is flooded with harmless "Cannot find request with id N whilst attempting to
+    -- cancel" and clangd stderr (was 45MB). Re-enable when debugging: vim.lsp.log.set_level("WARN")
+    vim.lsp.log.set_level("OFF")
+
     vim.lsp.enable("gopls")
     vim.lsp.config("gopls", { cmd = { vim.fn.expand("~/go/bin/gopls") } })
 
@@ -143,46 +145,11 @@ return {
       end,
     })
 
-    -- NOTE: LspInfo, LspLog, LspRestart
+    -- NOTE: LspInfo, LspLog (restart: built-in `:lsp restart`)
     vim.api.nvim_create_user_command("LspInfo", ":checkhealth vim.lsp", { desc = "Alias to `:checkhealth vim.lsp`" })
     vim.api.nvim_create_user_command("LspLog", function()
       vim.cmd(string.format("tabnew %s", vim.lsp.log.get_filename()))
     end, { desc = "Opens the Nvim LSP client log" })
-
-    local complete_client = function(arg)
-      return vim
-        .iter(vim.lsp.get_clients())
-        :map(function(client)
-          return client.name
-        end)
-        :filter(function(name)
-          return name:sub(1, #arg) == arg
-        end)
-        :totable()
-    end
-
-    vim.api.nvim_create_user_command("LspRestart", function(info)
-      for _, name in ipairs(info.fargs) do
-        if vim.lsp.config[name] == nil then
-          vim.notify(("Invalid server name '%s'"):format(info.args))
-        else
-          vim.lsp.enable(name, false)
-        end
-      end
-
-      local timer = assert(vim.uv.new_timer())
-      timer:start(500, 0, function()
-        for _, name in ipairs(info.fargs) do
-          vim.schedule_wrap(function(x)
-            vim.lsp.enable(x)
-          end)(name)
-        end
-      end)
-    end, {
-      desc = "Restart the given client(s)",
-      nargs = "+",
-      complete = complete_client,
-    })
 
     -- NOTE: Diagnostics
     -- See `:help vim.diagnostic.*` for documentation on any of the below functions.
