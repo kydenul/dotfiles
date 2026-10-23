@@ -127,5 +127,6 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
-vim.cmd.colorscheme("carbonfox")
+vim.cmd.colorscheme("vague")
+-- vim.cmd.colorscheme("carbonfox")
 -- vim.cmd.colorscheme("duskfox")

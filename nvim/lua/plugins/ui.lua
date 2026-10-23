@@ -3,6 +3,19 @@ return {
   -- Colorschemes
   -- ==============================================================
   {
+    "vague-theme/vague.nvim",
+    name = "vague",
+    priority = 1000,
+    config = function()
+      require("vague").setup({
+        transparent = true,
+        bold = true,
+        italic = true,
+      })
+    end,
+  },
+
+  {
     "EdenEast/nightfox.nvim",
     name = "nightfox",
     priority = 1000,

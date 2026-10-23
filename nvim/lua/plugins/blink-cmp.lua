@@ -209,6 +209,12 @@ return {
     vim.api.nvim_set_hl(0, "BlinkCmpLabelDeprecated", { bg = "NONE", fg = "#7E8294", strikethrough = true })
     vim.api.nvim_set_hl(0, "BlinkCmpLabelMatch", { bg = "NONE", fg = "#C586C0", bold = true })
 
+    -- Soft selection / dimmer borders (PmenuSel is reverse-video, which renders as a harsh white block)
+    vim.api.nvim_set_hl(0, "BlinkCmpMenuSelection", { bg = "#333338", bold = true })
+    vim.api.nvim_set_hl(0, "BlinkCmpMenuBorder", { fg = "#4a4a55" })
+    vim.api.nvim_set_hl(0, "BlinkCmpDocBorder", { link = "BlinkCmpMenuBorder" })
+    vim.api.nvim_set_hl(0, "BlinkCmpSignatureHelpBorder", { link = "BlinkCmpMenuBorder" })
+
     -- Kind-specific highlights
     -- light blue
     vim.api.nvim_set_hl(0, "BlinkCmpKindVariable", { bg = "NONE", fg = "#9CDCFE" })
