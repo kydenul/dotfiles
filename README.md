@@ -128,9 +128,7 @@ defaults write -g NSWindowShouldDragOnGesture -bool true
 
 ```bash
 vim -> nvim          # Use Neovim by default
-la, ll, c            # Navigation shortcuts
-gs, gp, gm, ga       # Git shortcuts
-gor, gob             # Go shortcuts (go run, go build)
+la, ll, c            # Navigation / clear
 kicat, kssh, kdiff   # Kitty kittens
 sshc, sshk, sshd     # SSH shortcuts (DevCloud [+tmux], K-Claw, DevCloud [plain])
 tsbz, tsz            # Translate to Chinese
@@ -146,10 +144,11 @@ tsbe, tse            # Translate to English
 - **Copy Mode**: `Escape` to enter, `v` to select, `y` to yank (Vi-style)
 - **Mouse Support**: Enabled
 - **Status Bar**: Top position with custom Catppuccin-style colors
+- **Window Naming**: `automatic-rename` / `allow-rename` off, so windows keep their assigned name
 
 ### Kitty Terminal
 
-- **Font**: Maple Mono NF CN (18pt)
+- **Font**: Maple Mono NF CN (16pt)
 - **Terminal Type**: `xterm-256color` (for SSH compatibility)
 - **Deep Tmux Integration**:
   - `Cmd+1-9` to switch Tmux windows
@@ -163,7 +162,7 @@ tsbe, tse            # Translate to English
 ### Ghostty Terminal
 
 - **Theme**: Catppuccin Mocha
-- **Font**: Maple Mono NF CN (18pt)
+- **Font**: Maple Mono NF CN (16pt)
 - **Quick Terminal**: `` Ctrl+Shift+` `` (global hotkey, top position)
 - **Deep Tmux Integration**: Not configured — `ghostty/config` has no Tmux bindings (unlike Kitty)
 
@@ -186,7 +185,7 @@ Modern Neovim configuration powered by **lazy.nvim** with comprehensive LSP supp
 
 **Requirements**:
 
-- [Neovim 0.9+](https://github.com/neovim/neovim/releases)
+- [Neovim 0.12+](https://github.com/neovim/neovim/releases) (config uses `vim.lsp.enable` / `vim.lsp.config`)
 - [Nerd Font](https://www.nerdfonts.com/) (for icons)
 
 **Configuration Structure**:
@@ -200,7 +199,6 @@ nvim/
 │   ├── plugins/         # 24 plugin configurations
 │   └── snippets/        # Custom snippets (cpp, go, javascript)
 └── lsp/                 # Language-specific LSP configs
-    ├── gopls.lua        # Go
     ├── ts_ls.lua        # TypeScript/JavaScript
     ├── clangd.lua       # C/C++
     ├── lua_ls.lua       # Lua
@@ -217,7 +215,7 @@ nvim/
 
 **LSP & Intelligence**:
 
-- Mason-managed LSP servers (Go, TypeScript, C++, Python, Lua, Bash, Markdown, PHP, CMake)
+- LSP servers (TypeScript, C++, Python, Lua, Bash, Markdown, PHP, CMake via Mason; Go's gopls via `go install`) 
 - Auto-completion (blink-cmp) with LSP, buffer, path, and Codeium AI sources
 - Advanced folding with Treesitter and semantic tokens
 - Code formatting (conform.nvim) and debugging (nvim-dap)
@@ -233,9 +231,9 @@ nvim/
 
 **UI Enhancements**:
 
-- Colorscheme: duskfox (Catppuccin installed but commented out)
+- Colorscheme: vague (transparent; `carbonfox` / `duskfox` available as commented fallbacks)
 - Statusline (lualine), notifications (noice.nvim)
-- Dashboard (dashboard-nvim), key hints (which-key)
+- Key hints (which-key)
 - Markdown rendering (render-markdown.nvim)
 
 **Editing**:
@@ -276,10 +274,13 @@ This repository includes custom configurations for [Claude Code](https://claude.
 
 - `commit` - Structured git commit workflow with conventional commit format and emoji
 
-### Skills (2)
+### Skills (23)
+
+Shared across Claude Code, tclaude, and Pi from `agents/skills/`. Highlights:
 
 - `drawio` - Generate draw.io diagrams from descriptions
 - `tencent-ppt` - Generate web-based presentation slides following the Tencent PPT template design system
+- `api-and-interface-design`, `code-review-and-quality`, `test-driven-development`, `spec-driven-development`, etc. - engineering workflow skills
 
 ### Setup
 
@@ -305,12 +306,16 @@ Reuses the local gateway that Tencent's `tclaude` CLI spawns, so native
 the tclaude daemon, and the client only needs `ANTHROPIC_AUTH_TOKEN=placeholder`.
 
 ```bash
-tclaude-proxy status                  # daemon health
-tclaude-proxy url                     # → http://127.0.0.1:<port>
-tclaude-proxy doctor                  # 6-step full check
-tclaude-proxy sync-ccswitch --apply   # fix port drift in ~/.claude/settings.json
-tclaude-proxy-agent.sh install        # launchd: keep the daemon alive (every 5 min)
+tclaude-proxy status                     # daemon health
+tclaude-proxy url                        # → http://127.0.0.1:<port>
+tclaude-proxy doctor                     # 7-step full check
+tclaude-proxy sync-ccswitch --apply      # wire both claude and pi (dry-run without --apply)
+tclaude-proxy sync-ccswitch pi --apply   # only pi (~/.pi/agent/models.json)
+tclaude-proxy-agent.sh install           # launchd: keep the daemon alive (every 5 min)
 ```
+
+The daemon port is read from `~/.tclaude/tcli/daemon/metadata.json` (tclaude ≥ 0.1.9;
+older builds used `~/.tclaude/daemon.json`, which is left stale after an upgrade).
 
 Full write-up (原理 / daemon 契约 / 接入 cc-switch / 坑与限制):
 [docs/tclaude-proxy.md](docs/tclaude-proxy.md).
@@ -331,9 +336,10 @@ Full write-up (原理 / daemon 契约 / 接入 cc-switch / 坑与限制):
 | ------------------------- | ----------------------------------------- |
 | `\` / `\|`                | Split window horizontally / vertically    |
 | `<C-h/j/k/l>`             | Navigate between windows (and Tmux panes) |
-| `<leader>h/j/k/l`         | Resize windows                            |
+| `<C-Up/Down/Left/Right>`  | Resize windows                            |
 | `<leader>w`               | Save file                                 |
-| `<leader>q` / `<leader>Q` | Quit window / Quit all                    |
+| `<leader>wd`              | Close window                              |
+| `<leader>q` / `<leader>Q` | Delete buffer / Quit all                  |
 | `<leader>e`               | Toggle file explorer                      |
 
 ### Navigation & Editing
@@ -358,32 +364,30 @@ Full write-up (原理 / daemon 契约 / 接入 cc-switch / 坑与限制):
 
 ### Plugin Shortcuts
 
-| Key                | Action                      |
-| ------------------ | --------------------------- |
-| `<leader>ff`       | Find files (snacks.nvim)    |
-| `<leader>fg`       | Find grep (snacks.nvim)     |
-| `<leader>fb`       | Find buffers (snacks.nvim)  |
-| `<leader>/`        | Search in current file      |
-| `<leader>rn`       | LSP rename (IncRename)      |
-| `<leader>g`        | Open Git interface (Neogit) |
-| `,`                | Flash jump to position      |
-| `gc` / `gcc`       | Comment toggle              |
-| `gt` / `gT`        | Next / previous buffer      |
-| `gz<motion><char>` | Add surroundings            |
-| `gzd<char>`        | Delete surroundings         |
-| `<C-t>`            | Toggle terminal             |
+| Key                   | Action                        |
+| --------------------- | ----------------------------- |
+| `<leader>ff`          | Find files (snacks.nvim)      |
+| `<leader>fg`          | Find grep (snacks.nvim)       |
+| `<leader>fb`          | Find buffers (snacks.nvim)    |
+| `<leader>/`           | Search in current file        |
+| `<leader>rn`          | LSP rename (IncRename)        |
+| `<leader>g`           | Open Git interface (Neogit)   |
+| `,`                   | Flash jump to position        |
+| `gc` / `gcc`          | Comment toggle (built-in)     |
+| `gsa<motion><char>`   | Add surroundings              |
+| `gsd<char>`           | Delete surroundings           |
+| `gsr<char><char>`     | Replace surroundings          |
+| `<C-t>`               | Toggle terminal               |
 
 ---
 
+## More Docs
+
+- [docs/tclaude-proxy.md](docs/tclaude-proxy.md) - Internal Claude gateway proxy (Chinese)
+- [docs/local-llama-cpp.md](docs/local-llama-cpp.md) - Local llama.cpp / GGUF models with Pi
+- [docs/pi-resource-config.md](docs/pi-resource-config.md) - Toggle Pi packages/extensions/skills via `pi config` (Chinese)
+
 ## Troubleshooting
-
-### Markdown Preview Issues
-
-If you encounter `Error: Cannot find module 'tslib'`, manually install the preview bundle:
-
-```vim
-:call mkdp#util#install()
-```
 
 ### Linux Clipboard Not Working
 
@@ -408,10 +412,16 @@ sudo apt install xsel
 ### LSP Not Working
 
 ```vim
-:Mason            " Install/reinstall language servers
-:LspInfo          " Check LSP status
-:checkhealth lsp  " Check LSP diagnostics
+:Mason                " Install/reinstall language servers
+:LspInfo              " Check LSP status (alias to :checkhealth vim.lsp)
+:checkhealth vim.lsp  " Check LSP diagnostics
+:LspLog               " Open the LSP log
 ```
+
+LSP logging is disabled by default (`vim.lsp.log.set_level("OFF")` in
+`nvim/lua/plugins/lsp.lua`) to avoid multi-MB logs. Re-enable it with
+`:lua vim.lsp.log.set_level("WARN")` before investigating. Restart a client with
+the built-in `:lsp restart`.
 
 ---
 

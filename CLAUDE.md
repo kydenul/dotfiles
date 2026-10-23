@@ -110,23 +110,24 @@ nvim/
    - `custom.options` - Vim options (loaded last to ensure overrides work)
 
 2. Plugins are lazy-loaded via `lazy.nvim` with automatic bootstrapping on first run
-3. LSP servers are managed by Mason and configured in `lsp/` directory
+3. LSP servers are configured with Neovim 0.12's native `vim.lsp.enable` / `vim.lsp.config` in `plugins/lsp.lua` plus per-server files under `lsp/`. Most are installed by Mason, but **gopls is not Mason-managed**: it is `go install`ed to `~/go/bin/gopls` and enabled with an absolute `cmd`
 
 ### Key Plugins & Features
 
 **Core Functionality:**
 - Plugin Manager: `lazy.nvim` (auto-bootstrapping, lockfile support)
-- Colorscheme: `duskfox` (Catppuccin, carbonfox, and hybrid are installed; all commented out in options.lua)
+- Colorscheme: `vague` (vague-theme/vague.nvim, transparent); `carbonfox` / `duskfox` from nightfox can be switched at the end of options.lua
 - Session Management: `auto-session` (auto-saves workspace state)
 
 **Code Intelligence:**
-- LSP: `mason.nvim` + `nvim-lspconfig` (Go, TypeScript, C++, Python, Lua, Bash, etc.)
+- LSP: `mason.nvim` + `nvim-lspconfig` with native `vim.lsp.enable` (TypeScript, C++, Python, Lua, Bash, etc.; Go via `~/go/bin/gopls`)
 - Completion: `blink-cmp` with LSP, snippets, path, and buffer sources; Codeium AI via `windsurf.vim`
 - Snippets: `LuaSnip` with custom snippets in `lua/snippets/`
 - Syntax: `nvim-treesitter` for advanced parsing
 - Folding: Custom implementation in `custom/folding.lua` with Treesitter and semantic tokens
 - Formatting: `conform.nvim` (async, multi-formatter support)
 - Debugging: `nvim-dap` with Mason-installed adapters
+- LSP logging is set to `OFF` in `plugins/lsp.lua` (was flooding a 45MB log with harmless cancel/clangd messages); re-enable with `vim.lsp.log.set_level("WARN")`
 
 **Navigation & Search:**
 - File Explorer: `nvim-tree` (sidebar file browser)
@@ -203,6 +204,7 @@ sshc (ssh DevCloud, with tmux attach), sshk (ssh K-Claw), sshd (ssh DevCloud, pl
 - Status bar at top with custom Catppuccin-style colors
 - Clipboard integration with OSC 52 support
 - Windows automatically renumber when closed
+- Window naming: `automatic-rename` / `allow-rename` off, so windows keep their manual/default name
 
 ### Plugins (via TPM)
 - `tmux-plugins/tmux-sensible` - Sensible defaults
@@ -212,8 +214,8 @@ sshc (ssh DevCloud, with tmux attach), sshk (ssh K-Claw), sshd (ssh DevCloud, pl
 ## Kitty Configuration
 
 ### Key Settings
-- Font: Maple Mono NF CN, 18pt
-- Background: Custom image with `background_tint 0.94` (semi-transparent look; Kitty on macOS has no native blur)
+- Font: Maple Mono NF CN, 16pt
+- Background: Custom image (`~/.config/images/nasa.bg.png`) with `background_tint 0.95` (semi-transparent look; Kitty on macOS has no native blur)
 - Terminal: `xterm-256color` (for SSH compatibility)
 - Cursor: Block shape with trail effect (smoothed by the builtin `cursor-trail-motion-blur` custom shader, kitty ≥ 0.49)
 - Tab bar: Top position with slant style
@@ -234,8 +236,8 @@ Kitty keybindings send Tmux prefix sequences for seamless control:
 
 ### Key Settings
 - Theme: Catppuccin Mocha
-- Font: Maple Mono NF CN, 18pt
-- Background: Custom image — `background-image-opacity = 0.05`, window `background-opacity = 0.85`
+- Font: Maple Mono NF CN, 16pt
+- Background: Custom image — `background-image-opacity = 0.1`, window `background-opacity = 0.85`, `background-blur-radius = 36`
 - Window: Hidden titlebar, saves state
 - Quick Terminal: `Ctrl+Shift+`` (global hotkey, top position)
 
@@ -254,10 +256,11 @@ Kitty keybindings send Tmux prefix sequences for seamless control:
 ## Zed Configuration
 
 ### Key Settings
-- Font: Maple Mono NF CN (primary), Hack Nerd Font Mono (fallback)
+- Font: Maple Mono NF CN (primary), Hack Nerd Font Mono (fallback); buffer 18pt, UI 16pt
 - Theme: Gruvbox (Dark Hard / Light, follows system mode)
-- Vim mode enabled with system clipboard
+- Vim mode enabled with system clipboard; leader `<Space>`
 - Base keymap: VSCode
+- Agent: default profile `write`, model `gemini-3.1-pro-preview` with thinking enabled, docked left
 - SSH connections: DevCloud remote development support
 
 ### Features
@@ -267,6 +270,22 @@ Kitty keybindings send Tmux prefix sequences for seamless control:
 - Outline panel on right side
 - Collaboration panel: docked on the right with its button hidden (not disabled)
 - Telemetry disabled
+
+## VSCode Configuration
+
+### Key Settings (`vscode/settings.json`)
+- Theme: `OM Theme (Night Owl Italic)`; side bar on the right; minimap disabled
+- Font: Maple Mono NF CN 16pt (fallbacks Hack Nerd Font Mono, Fira Code, Source Code Pro)
+- VSCodeVim: leader `<Space>`, easymotion, system clipboard, highlighted yank (500ms), custom normal/insert/visual mode bindings
+- Go: `golangci-lint` as both lint tool (`--fast-only`) and custom formatter (`golangci-lint fmt --stdin`, which applies the repo's `gofumpt` + `gci` config); parameter-name inlay hints off
+- Claude Code extension: runs through the tclaude wrapper (`claudeCode.claudeProcessWrapper = /opt/homebrew/bin/tclaude`), opened in the panel/terminal
+- GitLens: graph in the editor, details on the right, commit files as a list
+
+### Keybindings (`vscode/keybindings.json`)
+- `F12` - focus outline
+- Explorer (Vim-style): `space e` toggle sidebar, `a` / `shift+a` new file / folder, `r` rename, `d` delete, `y` / `x` / `p` copy / cut / paste, `o` / `shift+o` open / open to side
+- `Tab` / `Ctrl-j` / `Ctrl-k` move through suggestions, `<C-Space>` trigger, `Ctrl-e` dismiss
+- `Esc` returns focus to the editor from the explorer, search, terminal, panel, and CodeBuddy chat
 
 ## tclaude-proxy (Internal Claude Gateway)
 
@@ -284,7 +303,9 @@ daemon; the client only needs `ANTHROPIC_AUTH_TOKEN=placeholder`.
 - `.zshrc` already adds `~/.dotfiles/script` to `$PATH`
 
 Key facts:
-- Read the daemon port from `~/.tclaude/daemon.json` (`url`); never hardcode it.
+- Read the daemon port from `~/.tclaude/tcli/daemon/metadata.json` (`url`; tclaude
+  ≥ 0.1.9 — older builds used `~/.tclaude/daemon.json`, which is left behind stale
+  after an upgrade); never hardcode it.
 - `X-Claude-Code-Session-Id` is mandatory upstream. Native `claude` sends it; raw
   curl / SDK calls must add it or get a misleading "Failed to reach upstream
   gateway" error. Any stable string works — it need not be a UUID.
@@ -296,6 +317,11 @@ Key facts:
   it — do not "clean up" that line. `doctor` check 7 verifies it.
 - A 401 upstream forces a logout (`tclaude login` to recover) — the launchd agent
   can't fix that; `doctor` distinguishes it from a crashed daemon.
+- `sync-ccswitch pi` skips the two `[1m]` ids that upstream rejects with a 400
+  (`claude-sonnet-5-5[1m]`, `claude-opus-5-5[1m]`, listed in `PI_EXCLUDE_MODELS`);
+  the bare `claude-sonnet-5-5` / `claude-opus-5-5` ids (from `PI_EXTRA_MODELS`) are
+  the working 1M variants. `claude-glm-5.2` is the only model that needs
+  `allowEmptySignature=true`; other glm/deepseek/claude models sign normally.
 - Full write-up: `docs/tclaude-proxy.md` (Chinese).
 
 ## Working with This Repository
@@ -352,9 +378,15 @@ Each language has a dedicated LSP config file in `nvim/lsp/` that can be customi
 ## Important Notes
 
 - **Leader key:** `<Space>` in Neovim
-- **Colorscheme:** Currently using `duskfox` (Catppuccin, carbonfox, and hybrid are installed; all commented out in `nvim/lua/custom/options.lua`)
+- **Colorscheme:** Currently using `vague` (nightfox's `carbonfox` / `duskfox` available as commented fallbacks at `nvim/lua/custom/options.lua:131-132`)
 - **Clipboard:** Uses OSC 52 automatically over SSH, native clipboard otherwise
 - **Plugin lockfile:** `nvim/lazy-lock.json` pins plugin versions for reproducibility
 - **Git commit template:** `.gitmessage` provides structured commit format
-- **Markdown linting:** Not currently configured — this repo does not ship a `.markdownlint.json`, so the documented symlink source is missing
-- **Terminal fonts:** Maple Mono NF CN is the primary font across Kitty, Ghostty, and Zed
+- **Markdown linting:** the install scripts still attempt to symlink `~/.dotfiles/.markdownlint.json`, but this repo does not ship that file, so `safe_link` skips it with a warning
+- **Terminal fonts:** Maple Mono NF CN is the primary font across Kitty, Ghostty, and Zed (16pt in Kitty/Ghostty; 18pt buffer in Zed)
+
+## Documentation
+
+- `docs/tclaude-proxy.md` — internal Claude gateway proxy: daemon contract, cc-switch/pi wiring, troubleshooting (Chinese)
+- `docs/local-llama-cpp.md` — running local GGUF models with `llama-server` and wiring them into Pi
+- `docs/pi-resource-config.md` — enabling/disabling Pi packages, extensions, skills, prompts via `pi config` (Chinese)
