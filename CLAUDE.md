@@ -206,10 +206,8 @@ sshc (ssh DevCloud, with tmux attach), sshk (ssh K-Claw), sshd (ssh DevCloud, pl
 - Windows automatically renumber when closed
 - Window naming: `automatic-rename` / `allow-rename` off, so windows keep their manual/default name
 
-### Plugins (via TPM)
-- `tmux-plugins/tmux-sensible` - Sensible defaults
-- `christoomey/vim-tmux-navigator` - Listed but currently **commented out** in `.tmux.conf`; pane navigation is instead provided by manual `C-h/j/k/l` bindings
-- `tmux-plugins/tmux-yank` - Clipboard integration
+### Plugins
+None. TPM was removed; pane navigation is provided by manual `C-h/j/k/l` bindings (vim-tmux-navigator logic inlined in `.tmux.conf`), and copy uses OSC 52 via `set-clipboard external` plus a `y` binding in copy-mode-vi
 
 ## Kitty Configuration
 

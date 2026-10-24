@@ -30,10 +30,9 @@ The install script will automatically:
 1. Install Homebrew (if not present)
 2. Install CLI tools, languages, fonts, and terminal emulators via Homebrew
 3. Set up Oh My Zsh with Powerlevel10k theme and plugins
-4. Install Tmux Plugin Manager (TPM)
-5. Create all necessary symlinks (with safe backup of existing files)
-6. Configure Git commit template
-7. Bootstrap Neovim plugins and Treesitter parsers
+4. Create all necessary symlinks (with safe backup of existing files)
+5. Configure Git commit template
+6. Bootstrap Neovim plugins and Treesitter parsers
 
 ### Manual Installation
 
@@ -45,7 +44,7 @@ The install script will automatically:
 ```bash
 # macOS
 brew install neovim fd ripgrep tmux zsh node go python@3 rustup \
-  gofumpt curl tree-sitter pngpaste imagemagick latexdiff mercurial im-select
+  tree-sitter pngpaste imagemagick
 brew install --cask kitty ghostty font-hack-nerd-font font-maple-mono-nf-cn
 
 # Linux (Ubuntu/Debian)
@@ -138,8 +137,8 @@ tsbe, tse            # Translate to English
 ### Tmux Configuration
 
 - **Prefix Key**: `Ctrl-a` (double-tap to pass through literal C-a)
-- **Plugin Manager**: [TPM](https://github.com/tmux-plugins/tpm) (Tmux Plugin Manager)
-- **Seamless Navigation**: Pane navigation works with Neovim via manual `Ctrl-h/j/k/l` bindings (the `vim-tmux-navigator` TPM plugin is listed but currently commented out in `.tmux.conf`)
+- **No Plugins**: No TPM or Tmux plugins; clipboard goes through OSC 52 (`set-clipboard external`)
+- **Seamless Navigation**: Pane navigation works with Neovim via manual `Ctrl-h/j/k/l` bindings (hand-written vim-tmux-navigator logic in `.tmux.conf`)
 - **Pane Navigation**: `Ctrl-h/j/k/l` to switch between Tmux panes and Neovim splits
 - **Copy Mode**: `Escape` to enter, `v` to select, `y` to yank (Vi-style)
 - **Mouse Support**: Enabled
