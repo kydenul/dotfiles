@@ -17,6 +17,7 @@ background-image-opacity = 0.1
 background-image-fit = cover 
 
 font-family = "Maple Mono NF CN"
+font-feature = -calt
 font-size = 16
 font-thicken = true
 background-opacity = 0.85 

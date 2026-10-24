@@ -7,6 +7,7 @@
   "editor.cursorBlinking": "solid",
   "editor.cursorSmoothCaretAnimation": "on",
   "editor.fontFamily": "'Maple Mono NF CN','Hack Nerd Font Mono', 'Fira Code', 'Source Code Pro'",
+  "editor.fontLigatures": false,
   // "editor.lineNumbers": "relative",
   "editor.guides.bracketPairs": "active",
   "editor.rulers": [120],
