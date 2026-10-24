@@ -3,43 +3,14 @@ return {
   -- Colorschemes
   -- ==============================================================
   {
-    "EdenEast/nightfox.nvim",
-    name = "nightfox",
-    priority = 1000,
-    config = function()
-      require("nightfox").setup({
-        options = {
-          transparent = true,
-          terminal_colors = false,
-
-          styles = {
-            comments = "italic",
-            keywords = "bold",
-            types = "italic,bold",
-          },
-        },
-
-        groups = {
-          all = {
-            -- Extra transparency: nightfox only clears Normal/NormalNC/WinBar by default
-            NormalFloat = { bg = "NONE" },
-            FloatBorder = { bg = "NONE" },
-            StatusLine = { bg = "NONE" },
-            StatusLineNC = { bg = "NONE" },
-            TabLine = { bg = "NONE" },
-            TabLineFill = { bg = "NONE" },
-            Folded = { bg = "NONE" },
-            Pmenu = { bg = "NONE" },
-
-            CursorLine = { bg = "#2a2d3e" }, -- subtle, so selection stands out
-            Visual = { bg = "#44475a" }, -- clearly lighter than the cursor line
-            LspReferenceText = { bg = "palette.sel0", style = "bold,underline" },
-            LspReferenceRead = { bg = "palette.sel0", style = "bold,underline" },
-            LspReferenceWrite = { bg = "palette.sel1", style = "bold,underline" },
-          },
-        },
-      })
-    end,
+    "kydenul/aura.nvim",
+    name = "aura",
+    lazy = false,
+    opts = {
+      transparent = true,
+      bold = true,
+      italic = true,
+    },
   },
 
   -- ==============================================================

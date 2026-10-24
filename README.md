@@ -230,7 +230,7 @@ nvim/
 
 **UI Enhancements**:
 
-- Colorscheme: vague (transparent; `carbonfox` / `duskfox` available as commented fallbacks)
+- Colorscheme: aura (kydenul/aura.nvim, transparent)
 - Statusline (lualine), notifications (noice.nvim)
 - Key hints (which-key)
 - Markdown rendering (render-markdown.nvim)

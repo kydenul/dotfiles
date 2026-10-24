@@ -116,7 +116,7 @@ nvim/
 
 **Core Functionality:**
 - Plugin Manager: `lazy.nvim` (auto-bootstrapping, lockfile support)
-- Colorscheme: `vague` (vague-theme/vague.nvim, transparent); `carbonfox` / `duskfox` from nightfox can be switched at the end of options.lua
+- Colorscheme: `aura` (kydenul/aura.nvim, transparent; the only colorscheme plugin, configured in `plugins/ui.lua`)
 - Session Management: `auto-session` (auto-saves workspace state)
 
 **Code Intelligence:**
@@ -376,7 +376,7 @@ Each language has a dedicated LSP config file in `nvim/lsp/` that can be customi
 ## Important Notes
 
 - **Leader key:** `<Space>` in Neovim
-- **Colorscheme:** Currently using `vague` (nightfox's `carbonfox` / `duskfox` available as commented fallbacks at `nvim/lua/custom/options.lua:131-132`)
+- **Colorscheme:** `aura` (kydenul/aura.nvim); set at the end of `nvim/lua/custom/options.lua`
 - **Clipboard:** Uses OSC 52 automatically over SSH, native clipboard otherwise
 - **Plugin lockfile:** `nvim/lazy-lock.json` pins plugin versions for reproducibility
 - **Git commit template:** `.gitmessage` provides structured commit format
