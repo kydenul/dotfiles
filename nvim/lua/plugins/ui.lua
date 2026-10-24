@@ -3,19 +3,6 @@ return {
   -- Colorschemes
   -- ==============================================================
   {
-    "vague-theme/vague.nvim",
-    name = "vague",
-    priority = 1000,
-    config = function()
-      require("vague").setup({
-        transparent = true,
-        bold = true,
-        italic = true,
-      })
-    end,
-  },
-
-  {
     "EdenEast/nightfox.nvim",
     name = "nightfox",
     priority = 1000,
@@ -34,6 +21,16 @@ return {
 
         groups = {
           all = {
+            -- Extra transparency: nightfox only clears Normal/NormalNC/WinBar by default
+            NormalFloat = { bg = "NONE" },
+            FloatBorder = { bg = "NONE" },
+            StatusLine = { bg = "NONE" },
+            StatusLineNC = { bg = "NONE" },
+            TabLine = { bg = "NONE" },
+            TabLineFill = { bg = "NONE" },
+            Folded = { bg = "NONE" },
+            Pmenu = { bg = "NONE" },
+
             CursorLine = { bg = "#2a2d3e" }, -- subtle, so selection stands out
             Visual = { bg = "#44475a" }, -- clearly lighter than the cursor line
             LspReferenceText = { bg = "palette.sel0", style = "bold,underline" },

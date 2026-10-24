@@ -35,7 +35,7 @@ mouse-hide-while-typing = true
 macos-option-as-alt = true
 
 # macos-titlebar-style: native / tabs / transparent
-macos-titlebar-style = native 
+macos-titlebar-style = hidden 
 
 # Buffer size in bytes: 256 MB
 scrollback-limit = 256000000
