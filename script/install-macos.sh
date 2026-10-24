@@ -80,7 +80,7 @@ info "Dotfiles directory: $DOTFILES"
 info "macOS $(sw_vers -productVersion) on $(uname -m)"
 
 # ── 1. Homebrew ─────────────────────────────────────────────────────────────
-section "1/7  Homebrew"
+section "1/6  Homebrew"
 
 if ! command -v brew &>/dev/null; then
     info "Installing Homebrew..."
@@ -101,7 +101,7 @@ info "Updating Homebrew..."
 brew update
 
 # ── 2. CLI Tools & Languages ───────────────────────────────────────────────
-section "2/7  CLI Tools & Languages"
+section "2/6  CLI Tools & Languages"
 
 # Core tools
 BREW_FORMULAS=(
@@ -114,8 +114,6 @@ BREW_FORMULAS=(
     git         # gitsigns, neogit, fugitive
     pngpaste    # image paste support (macOS)
     imagemagick # image rendering
-    latexdiff   # LaTeX diff
-    mercurial   # some plugin dependency
 
     # Shell & Terminal
     tmux
@@ -127,14 +125,7 @@ BREW_FORMULAS=(
     python@3 # pylsp, debugpy, black, isort
     rustup   # Rust toolchain
 
-    # Go formatters (used by conform.nvim)
-    gofumpt
-
-    # Input method
-    im-select # input method auto-switching in Neovim (macOS)
-
     # Other tools
-    curl
     tree-sitter # treesitter CLI (auto_install parsers)
 )
 
@@ -166,7 +157,7 @@ for cask in "${BREW_CASKS[@]}"; do
 done
 
 # ── 3. Oh My Zsh + Plugins + Theme ─────────────────────────────────────────
-section "3/7  Zsh (Oh My Zsh + Powerlevel10k + Plugins)"
+section "3/6  Zsh (Oh My Zsh + Powerlevel10k + Plugins)"
 
 # Oh My Zsh
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
@@ -206,19 +197,8 @@ else
     success "zsh-syntax-highlighting already installed"
 fi
 
-# ── 4. Tmux Plugin Manager ─────────────────────────────────────────────────
-section "4/7  Tmux Plugin Manager (TPM)"
-
-if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
-    info "Installing TPM..."
-    git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
-    success "TPM installed"
-else
-    success "TPM already installed"
-fi
-
-# ── 5. Symlinks ─────────────────────────────────────────────────────────────
-section "5/7  Creating Symlinks"
+# ── 4. Symlinks ─────────────────────────────────────────────────────────────
+section "4/6  Creating Symlinks"
 
 link_agent_assets() {
     # Shared by all agent CLIs: skills + slash commands
@@ -273,8 +253,8 @@ safe_link "$DOTFILES/.markdownlint.json" "$HOME/.markdownlint.json"
 # --- Claude Code / tclaude / Pi agent (skills, commands) ---
 link_agent_assets
 
-# ── 6. Git Config ───────────────────────────────────────────────────────────
-section "6/7  Git Config"
+# ── 5. Git Config ───────────────────────────────────────────────────────────
+section "5/6  Git Config"
 
 # Set commit template if .gitmessage exists
 if [ -f "$DOTFILES/.gitmessage" ]; then
@@ -282,8 +262,8 @@ if [ -f "$DOTFILES/.gitmessage" ]; then
     success "Git commit template set"
 fi
 
-# ── 7. Neovim First-Run Setup ──────────────────────────────────────────────
-section "7/7  Neovim First-Run Bootstrap"
+# ── 6. Neovim First-Run Setup ──────────────────────────────────────────────
+section "6/6  Neovim First-Run Bootstrap"
 
 info "Running Neovim headless to bootstrap lazy.nvim & install plugins..."
 info "(This may take a minute on first run...)"
@@ -303,9 +283,8 @@ section "Installation Complete!"
 echo -e "${GREEN}${BOLD}Everything is set up! Here's what to do next:${NC}"
 echo ""
 echo -e "  1. ${BOLD}Restart your terminal${NC} (or run: ${CYAN}source ~/.zshrc${NC})"
-echo -e "  2. ${BOLD}Start tmux${NC} and press ${CYAN}prefix + I${NC} (Ctrl-a + I) to install tmux plugins"
-echo -e "  3. ${BOLD}Open Neovim${NC} — Mason will auto-install LSP servers on first use"
-echo -e "  4. Run ${CYAN}:checkhealth${NC} in Neovim to verify everything works"
+echo -e "  2. ${BOLD}Open Neovim${NC} — Mason will auto-install LSP servers on first use"
+echo -e "  3. Run ${CYAN}:checkhealth${NC} in Neovim to verify everything works"
 echo ""
 echo -e "${YELLOW}Optional:${NC}"
 echo -e "  - Run ${CYAN}p10k configure${NC} to set up Powerlevel10k prompt"

@@ -96,7 +96,7 @@ if [ -n "$PKG" ]; then
 fi
 
 # ── 1. CLI Tools & Languages ───────────────────────────────────────────────
-section "1/6  CLI Tools & Languages"
+section "1/5  CLI Tools & Languages"
 
 install_pkg() {
     local pkg="$1"
@@ -122,7 +122,6 @@ PACKAGES=(
     "ripgrep|ripgrep|ripgrep|ripgrep"
     "git|git|git|git"
     "imagemagick|imagemagick|ImageMagick|imagemagick"
-    "mercurial|mercurial|mercurial|mercurial"
     "tmux|tmux|tmux|tmux"
     "zsh|zsh|zsh|zsh"
     "node|nodejs npm|nodejs npm|nodejs npm"
@@ -163,14 +162,6 @@ else
     success "tree-sitter CLI already installed"
 fi
 
-# gofumpt — via go install
-if ! command -v gofumpt &>/dev/null && command -v go &>/dev/null; then
-    info "Installing gofumpt via go install..."
-    go install mvdan.cc/gofumpt@latest || warn "gofumpt install failed (non-fatal)"
-else
-    success "gofumpt skipped or already installed"
-fi
-
 # Fonts — try distro packages first, otherwise manual download
 FONT_DIR="$HOME/.local/share/fonts"
 mkdir -p "$FONT_DIR"
@@ -197,7 +188,7 @@ else
 fi
 
 # ── 2. Oh My Zsh + Plugins + Theme ─────────────────────────────────────────
-section "2/6  Zsh (Oh My Zsh + Powerlevel10k + Plugins)"
+section "2/5  Zsh (Oh My Zsh + Powerlevel10k + Plugins)"
 
 # Oh My Zsh
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
@@ -237,19 +228,8 @@ else
     success "zsh-syntax-highlighting already installed"
 fi
 
-# ── 3. Tmux Plugin Manager ─────────────────────────────────────────────────
-section "3/6  Tmux Plugin Manager (TPM)"
-
-if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
-    info "Installing TPM..."
-    git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
-    success "TPM installed"
-else
-    success "TPM already installed"
-fi
-
-# ── 4. Symlinks ─────────────────────────────────────────────────────────────
-section "4/6  Creating Symlinks"
+# ── 3. Symlinks ─────────────────────────────────────────────────────────────
+section "3/5  Creating Symlinks"
 
 # --- Neovim ---
 safe_link "$DOTFILES/nvim" "$HOME/.config/nvim"
@@ -296,8 +276,8 @@ if [ -f "$DOTFILES/agents/mcp.json" ]; then
     safe_link "$DOTFILES/agents/mcp.json" "$HOME/.pi/agent/mcp.json"
 fi
 
-# ── 5. Git Config ───────────────────────────────────────────────────────────
-section "5/6  Git Config"
+# ── 4. Git Config ───────────────────────────────────────────────────────────
+section "4/5  Git Config"
 
 # Set commit template if .gitmessage exists
 if [ -f "$DOTFILES/.gitmessage" ]; then
@@ -305,8 +285,8 @@ if [ -f "$DOTFILES/.gitmessage" ]; then
     success "Git commit template set"
 fi
 
-# ── 6. Neovim First-Run Setup ──────────────────────────────────────────────
-section "6/6  Neovim First-Run Bootstrap"
+# ── 5. Neovim First-Run Setup ──────────────────────────────────────────────
+section "5/5  Neovim First-Run Bootstrap"
 
 info "Running Neovim headless to bootstrap lazy.nvim & install plugins..."
 info "(This may take a minute on first run...)"
@@ -326,12 +306,11 @@ section "Installation Complete!"
 echo -e "${GREEN}${BOLD}Everything is set up! Here's what to do next:${NC}"
 echo ""
 echo -e "  1. ${BOLD}Restart your terminal${NC} (or run: ${CYAN}source ~/.zshrc${NC})"
-echo -e "  2. ${BOLD}Start tmux${NC} and press ${CYAN}prefix + I${NC} (Ctrl-a + I) to install tmux plugins"
-echo -e "  3. ${BOLD}Open Neovim${NC} — Mason will auto-install LSP servers on first use"
-echo -e "  4. Run ${CYAN}:checkhealth${NC} in Neovim to verify everything works"
+echo -e "  2. ${BOLD}Open Neovim${NC} — Mason will auto-install LSP servers on first use"
+echo -e "  3. Run ${CYAN}:checkhealth${NC} in Neovim to verify everything works"
 echo ""
 echo -e "${YELLOW}Notes for Linux:${NC}"
-echo -e "  - ${YELLOW}pngpaste / im-select are macOS-only and were skipped${NC}"
+echo -e "  - ${YELLOW}pngpaste is macOS-only and were skipped${NC}"
 echo -e "  - Check that your distro's neovim is >= 0.9 (${CYAN}nvim --version${NC});"
 echo -e "    otherwise install it from https://github.com/neovim/neovim/releases"
 echo -e "  - Ghostty may need a manual install depending on your distro"
