@@ -54,7 +54,7 @@
 
   "files.autoSave": "off",
   "diffEditor.ignoreTrimWhitespace": false,
-  "diffEditor.renderSideBySide": false,
+  "diffEditor.renderSideBySide": true,
   "diffEditor.useInlineViewWhenSpaceIsLimited": true,
 
   "chat.agent.enabled": false,
@@ -264,8 +264,8 @@
   "gitlens.hovers.enabled": false,
   "gitlens.graph.layout": "editor",
   "gitlens.ai.model": "openrouter:tencent/hy4-preview",
-  "gitlens.views.commitDetails.files.layout": "tree",
-  "gitlens.graph.details.location": "auto",
+  "gitlens.views.commitDetails.files.layout": "list",
+  "gitlens.graph.details.location": "right",
   "gitlens.views.searchAndCompare.files.layout": "list",
   "gitlens.views.scm.grouped.views": {
     "commits": true,
@@ -328,7 +328,7 @@
   // conform 的 golangci-lint formatter 实际执行 `golangci-lint fmt --stdin`，按各项目根的 .golangci.yaml formatters 段（gofumpt + gci）生效
   "go.formatTool": "custom",
   "go.formatFlags": ["fmt", "--stdin", "--color=never"],
-  "go.inlayHints.parameterNames": true,
+  "go.inlayHints.parameterNames": false,
   "go.lintTool": "golangci-lint",
   "go.lintFlags": ["--fast-only"],
   "go.alternateTools": { "customFormatter": "golangci-lint" },
@@ -459,22 +459,37 @@
   "update.mode": "default",
 
   // CodeBuddy
-  "codingcopilot.enableInlineChat": false,
+  "codingcopilot.enableInlineChat": true,
   "codingcopilot.enableInlineChatIDEShortcutsTip": false,
   "codingcopilot.commitMessageStyle": "Auto",
-  "codingcopilot.commitMessageLanguage": "en",
+  "codingcopilot.commitMessageLanguage": "zh_CN",
   "codingcopilot.toolbarOnSelection": false,
   "codingcopilot.enableAutoCompletions": true,
-  "codingcopilot.enableNextEditSuggestions": true,
+  "codingcopilot.enableNextEditSuggestions": false,
   "codingcopilot.generationPreference": "intelligentMode",
   "codingcopilot.selectedCompletionModel": "",
-  "codingcopilot.enableCompletionLanguage": {},
+  "codingcopilot.enableCompletionLanguage": {
+    "scmInput": false
+  },
   "codingcopilot.enableFloatShortcut": false,
   "codingcopilot.enableIDENotification": true,
   "codingcopilot.requestMaxStepLimit": 1000,
   "codingcopilot.enableCodelens": false,
   "codingcopilot.autoRun": true,
   "codingcopilot.disabledSecurityCategories": [
+    "injection",
+    "scriptExec",
     "powershell"
-  ]
+  ],
+  "makefile.configureOnOpen": true,
+  "codingcopilot.taskList": false,
+  "codingcopilot.enabledWebSearch": true,
+  "codingcopilot.autoAcceptWebSearch": true,
+  "codingcopilot.standaloneTerminal": true,
+  "codingcopilot.enableCraftCodeBase": true,
+  "codingcopilot.customBlacklistCommands": [],
+  "gitlens.graph.changesColumn.enabled": true,
+
+  "claudeCode.claudeProcessWrapper": "/opt/homebrew/bin/tclaude",
+  "claudeCode.preferredLocation": "panel"
 }
