@@ -200,7 +200,7 @@ return {
       virtual_lines = false,
       severity_sort = true,
       float = {
-        border = "single",
+        border = "double",
         source = "always",
         focusable = true,
       },
