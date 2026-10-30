@@ -313,13 +313,21 @@ Key facts:
 - pi's Anthropic SDK sends `x-api-key`, which the gateway rejects with
   `401 invalid_format`. The generated provider sets `"x-api-key": ""` to suppress
   it — do not "clean up" that line. `doctor` check 7 verifies it.
+- `sync-ccswitch claude --apply` also fixes the stale port stored in cc-switch's DB:
+  it backs the DB up to `~/.cc-switch/backups/`, quits CC Switch, rewrites only
+  `env.ANTHROPIC_BASE_URL` of local-proxy providers, then relaunches it if it was
+  running. Port drift is the usual reason to run it.
 - A 401 upstream forces a logout (`tclaude login` to recover) — the launchd agent
   can't fix that; `doctor` distinguishes it from a crashed daemon.
 - `sync-ccswitch pi` skips the two `[1m]` ids that upstream rejects with a 400
   (`claude-sonnet-5-5[1m]`, `claude-opus-5-5[1m]`, listed in `PI_EXCLUDE_MODELS`);
   the bare `claude-sonnet-5-5` / `claude-opus-5-5` ids (from `PI_EXTRA_MODELS`) are
-  the working 1M variants. `claude-glm-5.2` is the only model that needs
-  `allowEmptySignature=true`; other glm/deepseek/claude models sign normally.
+  the working 1M variants. Only `claude-hy3`, `claude-hy4-preview` and
+  `claude-kimi-k3` need `allowEmptySignature=true` (glm-5.2 did on tclaude 0.1.9 but
+  signs normally again on 0.1.10); glm/deepseek/claude models otherwise sign normally.
+- When probing the gateway by hand, send only `Authorization` + `X-Claude-Code-Session-Id`.
+  Adding `x-api-key` yields a misleading `401 "session has expired"` even though you
+  are still logged in.
 - Full write-up: `docs/tclaude-proxy.md` (Chinese).
 
 ## Working with This Repository

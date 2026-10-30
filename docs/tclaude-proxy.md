@@ -108,8 +108,8 @@ await this.metadataStore.writePort(ei); // 并写回 daemon.port
 
 `/v1/models`（本地 handler，无需鉴权即可读）报 18 个模型，
 实测 16 个能通，**`claude-opus-5-5[1m]` 与 `claude-sonnet-5-5[1m]` 上游 400**
-（2026-10-19、tclaude 0.1.9 复测结论不变；此前的 `claude-opus-5[1m]` 已被上游
-provision，现已可用）。0.1.9 的清单与 0.1.8 完全一致，没有新增模型。
+（2026-10-30、tclaude 0.1.10 复测结论不变；此前的 `claude-opus-5[1m]` 已被上游
+provision，现已可用）。0.1.9、0.1.10 的清单与 0.1.8 完全一致，没有新增模型。
 所有 `[1m]` 模型去掉后缀也都返回 200，唯一不通的就是上面这两个 5.5 变体：
 
 ```
@@ -155,9 +155,15 @@ ANTHROPIC_MODEL=claude-opus-5-5   claude -p "..."   # → NATIVE_OPUS55_OK
 因此本脚本给 pi 写的模型清单里，5.5 只有不带后缀的 `claude-sonnet-5-5` /
 `claude-opus-5-5`（1M，见 `PI_EXTRA_MODELS`），`[1m]` 变体由 `PI_EXCLUDE_MODELS` 排除。
 
-另外 2026-10-19 复测 thinking 签名时发现：`claude-glm-5.2` 现在回的是**空 `signature`**
-（`glm-5.3` / `glm-5.3-flash` 仍是真实签名），所以 `PI_MODEL_META` 里给 `claude-glm-5.2`
-单独加了一行 `allowEmptySignature=true`，其余 glm 不动。
+另外 thinking 签名会随版本变：2026-10-19（0.1.9）`claude-glm-5.2` 回过**空 `signature`**，
+当时在 `PI_MODEL_META` 里给它单独加了一行 `allowEmptySignature=true`；2026-10-30（0.1.10，
+连测 3 轮）它又变回真实签名，该行已删除。目前只有 `claude-hy3` / `claude-hy4-preview` /
+`claude-kimi-k3` 是空签名。若某个 glm 再翻回空签名，在 `claude-glm-` 行上方补一条更长前缀的行即可
+（最长前缀优先）。
+
+> **探测时别同时发 `x-api-key`。** 手写 curl 探测只带 `Authorization: Bearer placeholder`
+> 和 `X-Claude-Code-Session-Id`；加上 `x-api-key` 会得到 `401 "Your session has expired"`，
+> 看起来像被登出，其实是请求头毒化（见上文），`tclaude-proxy doctor` 仍然是绿的。
 
 `/v1/messages` 首次请求失败，daemon 日志给出确切原因：
 
@@ -255,7 +261,18 @@ claude-official|claude|{"env":{}}
 }
 ```
 
-端口若变化，用 `tclaude-proxy sync-ccswitch claude` 自动同步（见下）。
+端口若变化，用 `tclaude-proxy sync-ccswitch claude --apply` 一条命令同步，它会同时改两处：
+
+- `~/.claude/settings.json`（备份为 `settings.json.bak`）；
+- cc-switch 数据库里的 provider。这一步会先用 sqlite 备份 API 备份到
+  `~/.cc-switch/backups/cc-switch.db.pre-port-fix-<时间戳>`，再**正常退出 CC Switch**
+  （app 在内存里持有 provider 列表，不退出就改，下次保存会被它写回旧值），只改
+  `env.ANTHROPIC_BASE_URL` 这一个键，改完**仅当它原本在运行时**重新打开。
+  如果 10 秒内退不掉，脚本放弃修改并报错，不会和 app 抢写数据库。
+
+只会改 `ANTHROPIC_BASE_URL` 已经是 `127.0.0.1` / `localhost` 的 provider，指向第三方地址的
+provider 不动；不带 `--apply` 只预览。改数据库用的是 python `sqlite3` 的参数化查询，
+provider id 不会被拼进 SQL。
 
 Opus / Sonnet 故意**不带 `[1m]`**：上游只注册了 5.5 的裸 id，`claude-*-5-5[1m]`
 会 400 `service info not found`。窗口仍是 1M，不是降级（见 §3 / §6⑧）。

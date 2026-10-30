@@ -48,7 +48,7 @@ TCLAUDE_DIR="$HOME/.tclaude"
 DAEMON_META_NEW="$TCLAUDE_DIR/tcli/daemon/metadata.json"
 DAEMON_META_LEGACY="$TCLAUDE_DIR/daemon.json"
 HEALTH_PATH="/__tclaude/health"
-CCSWITCH_DB="$HOME/.cc-switch/cc-switch.db"
+CCSWITCH_DB="${CCSWITCH_DB:-$HOME/.cc-switch/cc-switch.db}"
 CLAUDE_SETTINGS="$HOME/.claude/settings.json"
 
 # pi-coding-agent (`pi`). PI_CODING_AGENT_DIR is pi's own override for its config
@@ -169,11 +169,13 @@ daemon_log_dir() {
 # Every model the gateway exposes accepted thinking.budget_tokens when probed,
 # so reasoning is true across the board and is not a column.
 #
-# allowEmptySignature: hy3, hy4, kimi-k3 and glm-5.2 stream thinking blocks whose
+# allowEmptySignature: hy3, hy4 and kimi-k3 stream thinking blocks whose
 # `signature` is an empty string. Without this flag pi downgrades those blocks
-# to plain text. glm-5.3*, deepseek and claude-* send real signatures, so they
-# must not set it. Re-probed 2026-10-19 on tclaude 0.1.9: glm-5.2 flipped to empty
-# while glm-5.3 / glm-5.3-flash still sign, hence the dedicated glm-5.2 row.
+# to plain text. glm-*, deepseek and claude-* send real signatures, so they
+# must not set it. Re-probed 2026-10-30 on tclaude 0.1.10 (3 rounds, stable):
+# glm-5.2 is back to real signatures (it was empty on 0.1.9, which is why it once
+# had a dedicated row). If a glm model flips to empty again, re-add a longer
+# prefix row above the `claude-glm-` one — longest prefix wins.
 PI_MODEL_META=$(
     cat <<'EOF'
 claude-opus-       200000  128000   true  false
@@ -181,7 +183,6 @@ claude-sonnet-     200000  128000   true  false
 claude-haiku-      200000   64000   true  false
 claude-deepseek-   200000   64000  false  false
 claude-glm-        200000   64000  false  false
-claude-glm-5.2     200000   64000  false   true
 claude-kimi-       200000   64000  false   true
 claude-hy3         200000   64000  false   true
 claude-hy4         200000   64000  false   true
@@ -216,7 +217,7 @@ EOF
 )
 
 # Advertised by /v1/models but rejected upstream (400 11102 "service info not
-# found"; re-verified 2026-10-19 on tclaude 0.1.9). Left in pi's model list they
+# found"; re-verified 2026-10-30 on tclaude 0.1.10). Left in pi's model list they
 # are dead picker entries, and they are what PI_EXTRA_MODELS replaces. Every other
 # `[1m]` id the gateway lists — and its bare form — returns 200.
 # Drop an id from here once upstream registers it.
@@ -534,8 +535,8 @@ PY
     return "$rc"
 }
 
-# Rewrite the proxy provider's port in ~/.claude/settings.json, and report on
-# cc-switch's DB.
+# Rewrite the proxy provider's port in ~/.claude/settings.json and in cc-switch's
+# DB (backed up first; cc-switch is quit and relaunched around the edit).
 #
 # Dry-run by default: pointing settings.json at the internal gateway changes
 # which backend every `claude` invocation talks to, so it requires --apply.
@@ -597,25 +598,13 @@ PY
         return 0
     fi
 
-    if ! command -v sqlite3 >/dev/null 2>&1; then
-        warn "sqlite3 not available — skipping cc-switch db"
+    local scan
+    scan="$(ccswitch_providers scan "$url")" || {
+        warn "could not read cc-switch db — skipping"
         return 0
-    fi
+    }
 
-    # cc-switch may hold the DB open; a copy-modify-restore would risk losing
-    # its concurrent writes. Report instead of mutating, and let the user apply
-    # it through the UI.
-    #
-    # Select id and config together. Re-querying per id would mean interpolating
-    # the id back into SQL, and the sqlite3 CLI runs `;`-separated statements —
-    # so a provider id containing a quote could execute arbitrary SQL (including
-    # DELETEs) from what is meant to be a read-only report.
-    local matches
-    matches="$(sqlite3 -separator "$(printf '\t')" "$CCSWITCH_DB" \
-        "select id, settings_config from providers where app_type='claude' and settings_config like '%127.0.0.1%';" \
-        2>/dev/null || true)"
-
-    if [ -z "$matches" ]; then
+    if [ "$scan" = "NONE" ]; then
         info "no local-proxy provider in cc-switch yet"
         echo ""
         echo "  Add a Claude provider in CC Switch with this config:"
@@ -634,17 +623,114 @@ EOF
         return 0
     fi
 
-    # settings_config is single-line JSON, so one row per line holds.
-    echo "$matches" | while IFS="$(printf '\t')" read -r pid stored; do
-        [ -n "$pid" ] || continue
-        if [ "${stored#*"$url"}" != "$stored" ]; then
-            success "cc-switch provider '$pid' already at $url"
-        else
-            warn "cc-switch provider '$pid' has a stale port"
-            warn "update it in the CC Switch UI to: $url"
-            warn "(not edited automatically — the app may have the DB open)"
+    local kind pid current stale=0
+    while IFS="$(printf '\t')" read -r kind pid current; do
+        case "$kind" in
+        OK) success "cc-switch provider '$pid' already at $url" ;;
+        STALE)
+            stale=$((stale + 1))
+            if [ "$apply" != "1" ]; then
+                echo "         WOULD SET  cc-switch provider '$pid': $current -> $url"
+            fi
+            ;;
+        esac
+    done <<<"$scan"
+
+    [ "$stale" -gt 0 ] && [ "$apply" = "1" ] || return 0
+
+    # cc-switch keeps the provider list in memory and writes it back, so editing
+    # the DB under a running app can be undone by its next save. Quit it first
+    # (graceful, via AppleScript), edit, then relaunch only if it was running.
+    # If it will not quit, leave the DB alone rather than race it.
+    local was_running=0 i
+    if ccswitch_running; then
+        was_running=1
+        info "quitting CC Switch to edit its database"
+        osascript -e 'tell application "CC Switch" to quit' >/dev/null 2>&1 || true
+        for i in 1 2 3 4 5 6 7 8 9 10; do
+            ccswitch_running || break
+            sleep 1
+        done
+        if ccswitch_running; then
+            warn "CC Switch did not quit — database left unchanged"
+            warn "quit it and re-run, or update the port in the CC Switch UI to: $url"
+            return 1
         fi
-    done
+    fi
+
+    local rc=0
+    ccswitch_providers apply "$url" || rc=1
+
+    if [ "$was_running" = "1" ]; then
+        open -a "CC Switch" >/dev/null 2>&1 && info "CC Switch relaunched" ||
+            warn "could not relaunch CC Switch — open it manually"
+    fi
+    return "$rc"
+}
+
+ccswitch_running() {
+    pgrep -f "CC Switch.app/Contents/MacOS/cc-switch" >/dev/null 2>&1
+}
+
+# Inspect (scan) or fix (apply) the local-proxy Claude providers in cc-switch's
+# DB. Uses python's sqlite3 with bound parameters rather than the sqlite3 CLI:
+# the CLI would need provider ids interpolated into SQL, and it runs
+# `;`-separated statements.
+#
+# Only providers whose ANTHROPIC_BASE_URL is already 127.0.0.1/localhost are
+# considered, so a third-party provider is never rewritten. Only that one env key
+# changes; the rest of settings_config (model mapping, token) is kept as is.
+#
+# scan  -> NONE | one line per provider: OK<TAB>id | STALE<TAB>id<TAB>current
+# apply -> backs the DB up under ~/.cc-switch/backups/, then rewrites STALE rows
+ccswitch_providers() {
+    python3 - "$1" "$CCSWITCH_DB" "$2" <<'PY'
+import json, os, sqlite3, sys, time
+from urllib.parse import urlparse
+
+mode, db, url = sys.argv[1:4]
+
+def is_local(u):
+    return urlparse(u).hostname in ("127.0.0.1", "localhost")
+
+con = sqlite3.connect(db)
+rows = []
+for pid, cfg in con.execute(
+        "select id, settings_config from providers where app_type = 'claude'"):
+    try:
+        data = json.loads(cfg)
+        cur = data["env"]["ANTHROPIC_BASE_URL"]
+    except (ValueError, KeyError, TypeError):
+        continue
+    if is_local(cur):
+        rows.append((pid, data, cur))
+
+if mode == "scan":
+    if not rows:
+        print("NONE")
+    for pid, _, cur in rows:
+        print(f"OK\t{pid}" if cur == url else f"STALE\t{pid}\t{cur}")
+    sys.exit(0)
+
+stale = [r for r in rows if r[2] != url]
+if not stale:
+    sys.exit(0)
+
+backup = os.path.join(os.path.dirname(db), "backups",
+                      "cc-switch.db.pre-port-fix-" + time.strftime("%Y%m%d-%H%M%S"))
+os.makedirs(os.path.dirname(backup), exist_ok=True)
+dst = sqlite3.connect(backup)
+con.backup(dst)
+dst.close()
+
+with con:
+    for pid, data, cur in stale:
+        data["env"]["ANTHROPIC_BASE_URL"] = url
+        con.execute("update providers set settings_config = ? where id = ? and app_type = 'claude'",
+                    (json.dumps(data, separators=(",", ":"), ensure_ascii=False), pid))
+        print(f"         UPDATED  cc-switch provider '{pid}': {cur} -> {url}")
+print(f"         backup: {backup}")
+PY
 }
 
 # Upsert the `tclaude` provider into ~/.pi/agent/models.json.
