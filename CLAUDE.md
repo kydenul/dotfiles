@@ -330,6 +330,30 @@ Key facts:
   are still logged in.
 - Full write-up: `docs/tclaude-proxy.md` (Chinese).
 
+## Rex Remote Tunnel
+
+`script/rex-tunnel-agent.sh` (`install` / `uninstall` / `status` / `logs`) installs a
+launchd agent (`com.kyden.rex-tunnel.<host>`) that runs `ssh -N -L` to forward a
+remote Rex server's Unix socket to `~/.ssh/rex-<host>.sock`; in Rex for Mac,
+**Add Remote Host…** with that path. Defaults to the `DevCloud` ssh alias; override
+with `REX_TUNNEL_HOST` / `REX_TUNNEL_REMOTE_SOCK` at install time.
+
+- Used because iOA blocks Tailscale. Forwarding the socket (not a TCP listener) means
+  no `--allow-anonymous`: Rex sees the caller as `uid 0 over unix`. Needs a Rex for
+  Mac / CLI build from 2026-10-29 or later (Unix socket hosts).
+- Remote side (DevCloud, TencentOS 4, root): Rex installed from the RPM repo
+  (`/etc/yum.repos.d/rex.repo`, `preview` channel — `install.sh` doesn't recognise
+  TencentOS), run as a systemd **user** unit `~/.config/systemd/user/rex.service`
+  (`rex server run --listen %t/rex/server.sock`) with `loginctl enable-linger root`
+  so `/run/user/0` survives logout.
+- Install requires passwordless (`BatchMode`) ssh; a dead link is redialed within ~45s.
+- Both ends auto-start (Linux at boot via linger, Mac at login via launchd). Cases that
+  still need a hand: `rex server stop` isn't restarted (`Restart=on-failure`) — run
+  `systemctl --user start rex`; any `rex` command while it's down autostarts a stray
+  server outside systemd on the same socket — `rex server stop` it first; `dnf upgrade`
+  doesn't restart the user unit — `systemctl --user restart rex` (kills running programs).
+- Full write-up and troubleshooting: `docs/rex-remote.md` (Chinese).
+
 ## Working with This Repository
 
 ### Making Configuration Changes
@@ -394,5 +418,6 @@ Each language has a dedicated LSP config file in `nvim/lsp/` that can be customi
 ## Documentation
 
 - `docs/tclaude-proxy.md` — internal Claude gateway proxy: daemon contract, cc-switch/pi wiring, troubleshooting (Chinese)
+- `docs/rex-remote.md` — Rex for Mac → DevCloud over an SSH-forwarded Unix socket: remote install on TencentOS, auto-start, failure cases (Chinese)
 - `docs/local-llama-cpp.md` — running local GGUF models with `llama-server` and wiring them into Pi
 - `docs/pi-resource-config.md` — enabling/disabling Pi packages, extensions, skills, prompts via `pi config` (Chinese)
