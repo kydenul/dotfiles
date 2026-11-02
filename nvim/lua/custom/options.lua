@@ -15,7 +15,8 @@ local function in_rex()
   return false
 end
 
-if vim.fn.exists("$SSH_TTY") == 1 or vim.fn.exists("$SSH_CONNECTION") == 1 or in_rex() then
+local rex = in_rex()
+if vim.fn.exists("$SSH_TTY") == 1 or vim.fn.exists("$SSH_CONNECTION") == 1 or rex then
   util.log_info("SSH/Rex detected, enabling OSC 52 clipboard")
 
   local in_tmux = vim.env.TMUX ~= nil
@@ -50,6 +51,19 @@ if vim.fn.exists("$SSH_TTY") == 1 or vim.fn.exists("$SSH_CONNECTION") == 1 or in
     end
   end
 
+  -- Rex 不回应 OSC 52 读取请求（只转发写入），查询会一直等到超时；
+  -- 此时 paste 直接返回 nvim 自身寄存器，本地内容用 Cmd+V 终端粘贴进来。
+  local function register_paste()
+    return { vim.fn.split(vim.fn.getreg(""), "\n"), vim.fn.getregtype("") }
+  end
+
+  local function paste_provider(reg)
+    if in_tmux then
+      return { "tmux", "save-buffer", "-" }
+    end
+    return rex and register_paste or require("vim.ui.clipboard.osc52").paste(reg)
+  end
+
   vim.g.clipboard = {
     name = "OSC52",
     copy = {
@@ -58,8 +72,8 @@ if vim.fn.exists("$SSH_TTY") == 1 or vim.fn.exists("$SSH_CONNECTION") == 1 or in
     },
     paste = {
       -- Tmux 内 OSC 52 paste 响应无法透传，改用 tmux buffer 粘贴更可靠
-      ["+"] = in_tmux and { "tmux", "save-buffer", "-" } or require("vim.ui.clipboard.osc52").paste("+"),
-      ["*"] = in_tmux and { "tmux", "save-buffer", "-" } or require("vim.ui.clipboard.osc52").paste("*"),
+      ["+"] = paste_provider("+"),
+      ["*"] = paste_provider("*"),
     },
   }
 end
