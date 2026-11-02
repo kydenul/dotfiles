@@ -2,8 +2,21 @@ local util = require("custom.util")
 
 -- Clipboard
 vim.opt.clipboard = "unnamedplus"
-if vim.fn.exists("$SSH_TTY") == 1 or vim.fn.exists("$SSH_CONNECTION") == 1 then
-  util.log_info("SSH detected, enabling OSC 52 clipboard")
+-- Rex 的远端 shell 由 systemd 拉起，不经 sshd，没有 $SSH_*；其 TERM 为 xterm-rex。
+-- tmux 内 TERM/TERM_PROGRAM 会被改写，故再问 tmux 外层 client 的 termname。
+local function in_rex()
+  if vim.env.TERM_PROGRAM == "rex" or vim.env.TERM == "xterm-rex" then
+    return true
+  end
+  if vim.env.TMUX then
+    local r = vim.system({ "tmux", "display-message", "-p", "#{client_termname}" }, { text = true }):wait(500)
+    return r.code == 0 and vim.trim(r.stdout) == "xterm-rex"
+  end
+  return false
+end
+
+if vim.fn.exists("$SSH_TTY") == 1 or vim.fn.exists("$SSH_CONNECTION") == 1 or in_rex() then
+  util.log_info("SSH/Rex detected, enabling OSC 52 clipboard")
 
   local in_tmux = vim.env.TMUX ~= nil
 
