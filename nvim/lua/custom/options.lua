@@ -90,6 +90,11 @@ vim.opt.softtabstop = 4 -- number of spacesin tab when editing
 vim.opt.shiftwidth = 4 -- insert 4 spaces on a tab
 vim.opt.expandtab = true -- tabs are spaces, mainly because of python
 
+-- Comment
+-- 默认 fo=tcqj 不含 r/o，各语言 ftplugin 又各自加减（python/go/markdown 就被减掉），
+-- 导致注释里换行是否自动补注释符因语言而异。r: insert 模式 <CR>；o: 普通模式 o/O
+vim.opt.formatoptions:append("ro")
+
 -- UI config
 vim.opt.number = true -- add numbers to each line on the left side
 vim.opt.relativenumber = true -- show absolute number
