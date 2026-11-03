@@ -29,7 +29,7 @@
   "workbench.panel.showLabels": false,
   "workbench.browser.showInTitleBar": false,
   // "workbench.activityBar.location": "hidden",
-  "workbench.colorTheme": "OM Theme (Night Owl Italic)",
+  "workbench.colorTheme": "Light Modern",
   "workbench.iconTheme": "material-icon-theme",
   "workbench.list.smoothScrolling": true,
   "workbench.activityBar.location": "top",
@@ -266,7 +266,6 @@
   "gitlens.graph.layout": "editor",
   "gitlens.ai.model": "openrouter:tencent/hy4-preview",
   "gitlens.views.commitDetails.files.layout": "list",
-  "gitlens.graph.details.location": "right",
   "gitlens.views.searchAndCompare.files.layout": "list",
   "gitlens.views.scm.grouped.views": {
     "commits": true,
@@ -492,5 +491,15 @@
   "gitlens.graph.changesColumn.enabled": true,
 
   "claudeCode.claudeProcessWrapper": "/opt/homebrew/bin/tclaude",
-  "claudeCode.preferredLocation": "panel"
+  "claudeCode.preferredLocation": "panel",
+  "pixide.px.hiddenPlatEditions": {
+    "v2-timi": {
+      "key": "v2-timi",
+      "envKeys": [
+        "v2-timi-prod",
+        "v2-timi-olsb"
+      ],
+      "label": "HOK Edition"
+    }
+  }
 }
