@@ -213,7 +213,7 @@ None. TPM was removed; pane navigation is provided by manual `C-h/j/k/l` binding
 
 ### Key Settings
 - Font: Maple Mono NF CN, 16pt
-- Background: Custom image (`~/.config/images/nasa.bg.png`) with `background_tint 0.95` (semi-transparent look; Kitty on macOS has no native blur)
+- Background: Custom image from `~/.config/images/` with `background_tint` (semi-transparent look; Kitty on macOS has no native blur); the image and tint change often, see `kitty/kitty.conf` for current values
 - Terminal: `xterm-256color` (for SSH compatibility)
 - Cursor: Block shape with trail effect (smoothed by the builtin `cursor-trail-motion-blur` custom shader, kitty ≥ 0.49)
 - Tab bar: Top position with slant style
