@@ -29,7 +29,7 @@
   "workbench.panel.showLabels": false,
   "workbench.browser.showInTitleBar": false,
   // "workbench.activityBar.location": "hidden",
-  "workbench.colorTheme": "Light Modern",
+  "workbench.colorTheme": "OM Theme (Default Dracula Italic)",
   "workbench.iconTheme": "material-icon-theme",
   "workbench.list.smoothScrolling": true,
   "workbench.activityBar.location": "top",
@@ -54,7 +54,7 @@
   "terminal.integrated.inheritEnv": false,
 
   "files.autoSave": "off",
-  "diffEditor.ignoreTrimWhitespace": false,
+  "diffEditor.ignoreTrimWhitespace": true,
   "diffEditor.renderSideBySide": true,
   "diffEditor.useInlineViewWhenSpaceIsLimited": true,
 
@@ -501,5 +501,9 @@
       ],
       "label": "HOK Edition"
     }
+  },
+  "diffEditor.hideUnchangedRegions.enabled": true,
+  "workbench.diffEditorAssociations": {
+    "*.md": "default"
   }
 }
