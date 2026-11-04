@@ -59,6 +59,8 @@ ln -s ~/.dotfiles/zed ~/.config/zed
 # Claude skills/commands
 ln -s ~/.dotfiles/agents/skills ~/.claude/skills
 ln -s ~/.dotfiles/agents/commands ~/.claude/commands
+# Shared checklists that skills link as ../../references/*.md (also ~/.tclaude, ~/.agents)
+ln -s ~/.dotfiles/agents/references ~/.claude/references
 
 # Pi skills/commands (prompt templates)
 ln -s ~/.dotfiles/agents/skills ~/.agents/skills
@@ -375,6 +377,12 @@ with `REX_TUNNEL_HOST` / `REX_TUNNEL_REMOTE_SOCK` at install time.
 - Kitty: Edit `kitty/kitty.conf` (reload with `Ctrl+Shift+F5` or restart)
 - Ghostty: Edit `ghostty/config` (auto-reloads on save)
 - Zed: Edit `zed/settings.json` and `zed/keymap.json` (auto-reloads on save)
+
+**Agent Skills (`agents/skills/`):**
+- Sources (hand-copied, no sync script): most skills and `agents/references/` from addyosmani/agent-skills (`skills/`, `references/`; last synced at `301b02b`, 2026-11-01); `drawio` from jgraph/drawio-mcp `plugins/claude-code/skills/drawio`; `brainstorming` from obra/superpowers (provenance and local diffs in its `README.md`); `tencent-ppt` is internal, no public upstream
+- When re-syncing from addyosmani/agent-skills: skip `interview-me`, `idea-refine` and `spec-driven-development` (deliberately removed, superseded by `brainstorming`), and keep the local edit to `using-agent-skills` that routes the Define phase to `brainstorming`
+- Skills link `../../references/*.md` relative to the symlinked skills dir, so `~/.claude`, `~/.tclaude` and `~/.agents` each need a `references` link to `agents/references` (the installers create them)
+- The `agent-skills@addy-agent-skills` plugin and its marketplace are uninstalled from both `~/.tclaude` and `~/.claude`: it duplicated every skill here with an older copy (and brought the removed ones back as `agent-skills:*`); don't reinstall it. `/agent-skills:plan` → use `/planning-and-task-breakdown`
 
 ### Testing Changes
 ```bash
