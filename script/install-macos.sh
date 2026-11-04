@@ -209,6 +209,10 @@ link_agent_assets() {
         safe_link "$DOTFILES/agents/commands" "$HOME/.tclaude/commands"
         safe_link "$DOTFILES/agents/skills" "$HOME/.agents/skills"
         safe_link "$DOTFILES/agents/commands" "$HOME/.pi/agent/prompts"
+        # Skills link ../../references/*.md, i.e. a sibling of each skills dir
+        safe_link "$DOTFILES/agents/references" "$HOME/.claude/references"
+        safe_link "$DOTFILES/agents/references" "$HOME/.tclaude/references"
+        safe_link "$DOTFILES/agents/references" "$HOME/.agents/references"
     fi
     # MCP server config
     if [ -f "$DOTFILES/agents/mcp.json" ]; then
