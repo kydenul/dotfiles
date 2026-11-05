@@ -1,0 +1,120 @@
+#!/usr/bin/env bash
+# ============================================================================
+# devcloud-scp — 在本机与 DevCloud 远程机器之间上传 / 下载文件（scp 封装）
+#
+# Usage:
+#   devcloud-scp up   [-d REMOTE_DIR] LOCAL...    上传本地文件/目录到 DevCloud
+#   devcloud-scp down [-d LOCAL_DIR]  REMOTE...   从 DevCloud 下载文件/目录到本地
+#
+# Options:
+#   -d DIR   目标目录。
+#            up  : 远程目录，默认 ~/        （不存在会自动 mkdir -p）
+#            down: 本地目录，默认 ~/Downloads（不存在会自动 mkdir -p）
+#   -h       显示帮助
+#
+# Env:
+#   DEVCLOUD_HOST   ~/.ssh/config 里的 Host 别名 (default: DevCloud)
+#
+# Examples:
+#   # 上传日志到远程 ~/（默认目录）
+#   devcloud-scp up ~/Downloads/video_svr_kod_20261105_120706_2202.log
+#
+#   # 上传多个文件和一个目录到远程 ~/logs/（自动创建）
+#   devcloud-scp up -d ~/logs a.log b.log ./some_dir
+#
+#   # 从远程下载到 ~/Downloads（默认目录）
+#   devcloud-scp down /var/log/messages
+#
+#   # 从远程下载多个文件到当前目录
+#   devcloud-scp down -d . ~/logs/a.log ~/logs/b.log
+#
+# Notes:
+#   - 认证、端口、跳板机等全部走 ~/.ssh/config 里的 DevCloud 别名，本脚本不关心。
+#   - 路径中的 ~ 在 up 的远程目录里由远端 shell 展开，因此不要给它加引号转义。
+#   - 远程路径含空格时请写成 "path\ with\ space" 形式（scp 的远端路径会被再解析一次）。
+#   - 大文件 / 需要断点续传时，改用:
+#       rsync -avzP LOCAL DevCloud:REMOTE_DIR/
+# ============================================================================
+
+set -euo pipefail
+
+HOST="${DEVCLOUD_HOST:-DevCloud}"
+
+usage() {
+  # 打印文件头部注释（到第一个分隔线之后的空行为止）作为帮助信息
+  sed -n '2,/^# =====*$/p' "$0" | sed '$d' | sed 's/^# \{0,1\}//'
+}
+
+die() {
+  echo "[ERROR] $*" >&2
+  exit 1
+}
+
+# ── 参数解析 ────────────────────────────────────────────────────────────────
+[[ $# -ge 1 ]] || { usage; exit 1; }
+
+mode="$1"
+shift
+
+case "$mode" in
+  up | down) ;;
+  -h | --help | help)
+    usage
+    exit 0
+    ;;
+  *) die "未知子命令: $mode（应为 up 或 down），用 -h 查看帮助" ;;
+esac
+
+dest=""
+while getopts ":d:h" opt; do
+  case "$opt" in
+    d) dest="$OPTARG" ;;
+    h)
+      usage
+      exit 0
+      ;;
+    :) die "选项 -$OPTARG 需要参数" ;;
+    *) die "未知选项: -$OPTARG" ;;
+  esac
+done
+shift $((OPTIND - 1))
+
+[[ $# -ge 1 ]] || die "缺少要传输的文件/目录，用 -h 查看帮助"
+
+# scp 通用参数:
+#   -r  递归（允许传目录）
+#   -p  保留修改时间、访问时间和权限
+#   （不加 -q，保留 scp 的传输进度条）
+SCP=(scp -r -p)
+
+# ── 上传 ────────────────────────────────────────────────────────────────────
+if [[ "$mode" == "up" ]]; then
+  remote_dir="${dest:-~/}"
+
+  # 先检查本地文件都存在，避免传到一半才报错
+  for f in "$@"; do
+    [[ -e "$f" ]] || die "本地路径不存在: $f"
+  done
+
+  # 确保远程目录存在（~ 由远端 shell 展开）
+  ssh "$HOST" "mkdir -p $remote_dir"
+
+  echo "[INFO] 上传 $# 项 -> $HOST:$remote_dir"
+  "${SCP[@]}" -- "$@" "$HOST:$remote_dir"
+
+# ── 下载 ────────────────────────────────────────────────────────────────────
+else
+  local_dir="${dest:-$HOME/Downloads}"
+  mkdir -p "$local_dir"
+
+  # 每个参数都视作远程路径，加上 "HOST:" 前缀
+  remotes=()
+  for r in "$@"; do
+    remotes+=("$HOST:$r")
+  done
+
+  echo "[INFO] 下载 $# 项 <- $HOST -> $local_dir"
+  "${SCP[@]}" -- "${remotes[@]}" "$local_dir/"
+fi
+
+echo "[OK] 完成"
