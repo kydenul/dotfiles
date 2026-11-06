@@ -7,23 +7,11 @@ local rex = vim.env.TERM_PROGRAM == "rex" or vim.env.TERM == "xterm-rex"
 if vim.fn.exists("$SSH_TTY") == 1 or vim.fn.exists("$SSH_CONNECTION") == 1 or rex then
   util.log_info("SSH/Rex detected, enabling OSC 52 clipboard")
 
-  -- 分块写入 stderr，避免大文本超出 TTY 缓冲区（macOS ~64KB）导致静默失败
-  local function write_chunked(str)
-    local chunk_size = 4096
-    for i = 1, #str, chunk_size do
-      local ok, err = pcall(io.stderr.write, io.stderr, str:sub(i, i + chunk_size - 1))
-      if not ok then
-        util.log_info("OSC52 write failed at byte " .. i .. ": " .. tostring(err))
-        return false
-      end
-    end
-    return true
-  end
-
+  -- nvim_ui_send 由 TUI 排队写出，大文本不会因 TTY 缓冲区（macOS ~64KB）而丢失
   local function osc52_copy(reg)
     return function(lines)
       local base64 = vim.base64.encode(table.concat(lines, "\n"))
-      write_chunked(string.format("\x1b]52;%s;%s\x1b\\", reg, base64))
+      vim.api.nvim_ui_send(string.format("\x1b]52;%s;%s\x1b\\", reg, base64))
     end
   end
 
