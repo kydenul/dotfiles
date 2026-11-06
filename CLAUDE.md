@@ -10,7 +10,6 @@ This is a personal dotfiles repository for configuring development environments 
 - VSCode (alternative editor)
 - Kitty (terminal emulator)
 - Ghostty (alternative terminal emulator)
-- Tmux (terminal multiplexer)
 - Zsh (shell with Oh My Zsh and Powerlevel10k theme)
 
 ## Installation & Setup
@@ -40,7 +39,6 @@ ln -s ~/.dotfiles/nvim/ ~/.config/nvim
 ```bash
 # Symlink configurations
 ln -s ~/.dotfiles/.zshrc ~/.zshrc
-ln -s ~/.dotfiles/.tmux.conf ~/.tmux.conf
 
 # Kitty
 ln -s ~/.dotfiles/kitty ~/.config/kitty
@@ -68,7 +66,6 @@ ln -s ~/.dotfiles/agents/commands ~/.pi/agent/prompts
 
 # Reload configurations
 source ~/.zshrc
-tmux source-file ~/.tmux.conf
 ```
 
 ## Neovim Architecture
@@ -182,7 +179,7 @@ tsbe, tse (translate to English)
 kicat (icat), kssh (ssh), kdiff (diff)
 
 # SSH shortcuts
-sshc (ssh DevCloud, with tmux attach), sshk (ssh K-Claw), sshd (ssh DevCloud, plain)
+sshc (ssh DevCloud), sshk (ssh K-Claw), sshd (ssh DevCloud, plain)
 ```
 
 ### Environment Setup
@@ -192,25 +189,6 @@ sshc (ssh DevCloud, with tmux attach), sshk (ssh K-Claw), sshd (ssh DevCloud, pl
 - Docker: Colima (Docker host via `~/.colima/default/docker.sock`)
 - TERM set to `xterm-256color` for kitty SSH compatibility
 
-## Tmux Configuration
-
-### Key Bindings
-- Prefix: `Ctrl-a` (double-tap to pass literal C-a through; avoids conflicts with nvim's C-b and C-Space)
-- Pane navigation: `C-h/j/k/l` (vim-style, vim-aware pass-through)
-- Copy mode: `Escape` to enter, `v` to select (vi-style)
-- Reload config: `r` (with prefix)
-
-### Features
-- Mouse support enabled
-- Window numbering starts at 1
-- Status bar at top with custom Catppuccin-style colors
-- Clipboard integration with OSC 52 support
-- Windows automatically renumber when closed
-- Window naming: `automatic-rename` / `allow-rename` off, so windows keep their manual/default name
-
-### Plugins
-None. TPM was removed; pane navigation is provided by manual `C-h/j/k/l` bindings (vim-tmux-navigator logic inlined in `.tmux.conf`), and copy uses OSC 52 via `set-clipboard on` (so apps like pi can write the clipboard with raw OSC 52; `external` dropped them) plus a `y` binding in copy-mode-vi
-
 ## Kitty Configuration
 
 ### Key Settings
@@ -219,18 +197,17 @@ None. TPM was removed; pane navigation is provided by manual `C-h/j/k/l` binding
 - Terminal: `xterm-256color` (for SSH compatibility)
 - Cursor: Block shape with trail effect (smoothed by the builtin `cursor-trail-motion-blur` custom shader, kitty ≥ 0.49)
 - Tab bar: Top position with slant style
-- Clickable file references: `detect_url_regex` turns `path/file.ext:line[:col]` (compiler output) into links; clicking opens nvim at that position via `kitty/open-actions.conf` → `script/open-file-ref` (new tmux window when tmux is running). Inside tmux the mouse is grabbed, so click with `Ctrl+Shift+Click`; plain click works only outside tmux
+- Clickable file references: `detect_url_regex` turns `path/file.ext:line[:col]` (compiler output) into links; clicking opens nvim at that position via `kitty/open-actions.conf` → `script/open-file-ref` (opens a new kitty OS window)
 
-### Deep Tmux Integration
-Kitty keybindings send Tmux prefix sequences for seamless control:
-- `Cmd+1-9` - Switch Tmux windows 1-9
-- `Cmd+T` - Create new Tmux window
-- `Cmd+D` / `Cmd+Shift+D` - Split Tmux pane horizontally / vertically
-- `Cmd+W` - Close current Tmux pane
-- `Cmd+R` - Rename current Tmux window
-- `Cmd+H` / `Cmd+L` - Previous / next Tmux window
-- `Cmd+;` - Switch to previous Tmux pane
-- `Cmd+Z` - Toggle Tmux pane zoom (fullscreen)
+### Keybindings
+Native Kitty tabs/windows (`kitty/kitty.conf`):
+- `Cmd+1-9` - Switch tabs 1-9
+- `Cmd+T` - New tab (cwd)
+- `Cmd+D` / `Cmd+Shift+D` - Split window vertically / horizontally
+- `Cmd+W` - Close current window
+- `Cmd+R` - Rename tab
+- `Cmd+H` / `Cmd+L` - Previous / next tab
+- `Cmd+Z` - Toggle stack layout (zoom)
 
 ## Ghostty Configuration
 
@@ -240,18 +217,6 @@ Kitty keybindings send Tmux prefix sequences for seamless control:
 - Background: Custom image — `background-image-opacity = 0.1`, window `background-opacity = 0.85`, `background-blur-radius = 36`
 - Window: Hidden titlebar, saves state
 - Quick Terminal: `Ctrl+Shift+`` (global hotkey, top position)
-
-### Deep Tmux Integration
-> Note: `ghostty/config` currently has **no** Tmux-integration bindings — unlike Kitty. The
-> following mappings are not yet configured in Ghostty and only apply to Kitty:
-- `Cmd+1-9` - Switch Tmux windows
-- `Cmd+T` - Create new Tmux window
-- `Cmd+D` / `Cmd+Shift+D` - Split panes
-- `Cmd+W` - Close pane
-- `Cmd+R` - Rename window
-- `Cmd+H` / `Cmd+L` - Previous / next window
-- `Cmd+;` - Previous pane
-- `Cmd+Z` - Toggle zoom
 
 ## Zed Configuration
 
@@ -373,7 +338,6 @@ with `REX_TUNNEL_HOST` / `REX_TUNNEL_REMOTE_SOCK` at install time.
 
 **Shell Configuration:**
 - Zsh: Edit `.zshrc` (sourced on new shells)
-- Tmux: Edit `.tmux.conf` (reload with `prefix + r`)
 - Kitty: Edit `kitty/kitty.conf` (reload with `Ctrl+Shift+F5` or restart)
 - Ghostty: Edit `ghostty/config` (auto-reloads on save)
 - Zed: Edit `zed/settings.json` and `zed/keymap.json` (auto-reloads on save)
@@ -393,9 +357,6 @@ nvim -c "Lazy health"  # Check lazy.nvim health
 
 # Shell
 zsh -n ~/.zshrc  # Check syntax without executing
-
-# Tmux
-tmux source-file ~/.tmux.conf  # Reload config in running session
 ```
 
 ### Language Support

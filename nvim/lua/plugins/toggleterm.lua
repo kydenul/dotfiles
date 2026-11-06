@@ -12,8 +12,7 @@ return {
     persist_size = true,
     close_on_exit = true,
     auto_scroll = true,
-    -- Tmux 内用 float 避免与 Tmux 分屏冲突，非 Tmux 环境用 vertical
-    direction = vim.env.TMUX and "float" or "vertical",
+    direction = "vertical",
     hide_numbers = true,
     shade_terminals = true,
 

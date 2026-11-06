@@ -69,7 +69,7 @@
             "H": "vim::StartOfLine",
             "L": "vim::EndOfLine",
 
-            // 窗口/面板间跳转（对应 vim-tmux-navigator 在 zed 内仅做 pane 切换）
+            // 窗口/面板间跳转
             "ctrl-h": "workspace::ActivatePaneLeft",
             "ctrl-j": "workspace::ActivatePaneDown",
             "ctrl-k": "workspace::ActivatePaneUp",

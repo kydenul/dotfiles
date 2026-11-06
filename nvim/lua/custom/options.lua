@@ -3,23 +3,9 @@ local util = require("custom.util")
 -- Clipboard
 vim.opt.clipboard = "unnamedplus"
 -- Rex 的远端 shell 由 systemd 拉起，不经 sshd，没有 $SSH_*；其 TERM 为 xterm-rex。
--- tmux 内 TERM/TERM_PROGRAM 会被改写，故再问 tmux 外层 client 的 termname。
-local function in_rex()
-  if vim.env.TERM_PROGRAM == "rex" or vim.env.TERM == "xterm-rex" then
-    return true
-  end
-  if vim.env.TMUX then
-    local r = vim.system({ "tmux", "display-message", "-p", "#{client_termname}" }, { text = true }):wait(500)
-    return r.code == 0 and vim.trim(r.stdout) == "xterm-rex"
-  end
-  return false
-end
-
-local rex = in_rex()
+local rex = vim.env.TERM_PROGRAM == "rex" or vim.env.TERM == "xterm-rex"
 if vim.fn.exists("$SSH_TTY") == 1 or vim.fn.exists("$SSH_CONNECTION") == 1 or rex then
   util.log_info("SSH/Rex detected, enabling OSC 52 clipboard")
-
-  local in_tmux = vim.env.TMUX ~= nil
 
   -- 分块写入 stderr，避免大文本超出 TTY 缓冲区（macOS ~64KB）导致静默失败
   local function write_chunked(str)
@@ -36,18 +22,8 @@ if vim.fn.exists("$SSH_TTY") == 1 or vim.fn.exists("$SSH_CONNECTION") == 1 or re
 
   local function osc52_copy(reg)
     return function(lines)
-      local text = table.concat(lines, "\n")
-      local base64 = vim.base64.encode(text)
-      if in_tmux then
-        -- 异步写入 tmux buffer，使跨 window/pane 粘贴可用（无大小限制）
-        vim.system({ "tmux", "load-buffer", "-" }, { stdin = text })
-        -- DCS passthrough: 绕过 tmux 直接发送到外层终端（同步到本地剪贴板）
-        local seq = string.format("\x1bPtmux;\x1b\x1b]52;%s;%s\x07\x1b\\", reg, base64)
-        write_chunked(seq)
-      else
-        local seq = string.format("\x1b]52;%s;%s\x1b\\", reg, base64)
-        write_chunked(seq)
-      end
+      local base64 = vim.base64.encode(table.concat(lines, "\n"))
+      write_chunked(string.format("\x1b]52;%s;%s\x1b\\", reg, base64))
     end
   end
 
@@ -58,9 +34,6 @@ if vim.fn.exists("$SSH_TTY") == 1 or vim.fn.exists("$SSH_CONNECTION") == 1 or re
   end
 
   local function paste_provider(reg)
-    if in_tmux then
-      return { "tmux", "save-buffer", "-" }
-    end
     return rex and register_paste or require("vim.ui.clipboard.osc52").paste(reg)
   end
 
@@ -71,7 +44,6 @@ if vim.fn.exists("$SSH_TTY") == 1 or vim.fn.exists("$SSH_CONNECTION") == 1 or re
       ["*"] = osc52_copy("p"),
     },
     paste = {
-      -- Tmux 内 OSC 52 paste 响应无法透传，改用 tmux buffer 粘贴更可靠
       ["+"] = paste_provider("+"),
       ["*"] = paste_provider("*"),
     },
@@ -120,7 +92,7 @@ vim.opt.wrap = true
 -- Auto reload file
 vim.o.autoread = true
 
--- 从 Tmux pane/window 切回 Neovim 时自动检测文件变化
+-- 切回 Neovim 时自动检测文件变化
 vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter" }, {
   command = "checktime",
   desc = "Auto reload files changed outside of Neovim",

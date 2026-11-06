@@ -122,7 +122,6 @@ PACKAGES=(
     "ripgrep|ripgrep|ripgrep|ripgrep"
     "git|git|git|git"
     "imagemagick|imagemagick|ImageMagick|imagemagick"
-    "tmux|tmux|tmux|tmux"
     "zsh|zsh|zsh|zsh"
     "node|nodejs npm|nodejs npm|nodejs npm"
     "go|golang-go|golang|go"
@@ -236,7 +235,6 @@ safe_link "$DOTFILES/nvim" "$HOME/.config/nvim"
 
 # --- Shell ---
 safe_link "$DOTFILES/.zshrc" "$HOME/.zshrc"
-safe_link "$DOTFILES/.tmux.conf" "$HOME/.tmux.conf"
 safe_link "$DOTFILES/.gitmessage" "$HOME/.gitmessage"
 
 # --- Kitty (XDG config is the same on Linux) ---

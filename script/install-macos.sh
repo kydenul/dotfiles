@@ -116,7 +116,6 @@ BREW_FORMULAS=(
     imagemagick # image rendering
 
     # Shell & Terminal
-    tmux
     zsh
 
     # Languages & runtimes
@@ -226,7 +225,6 @@ safe_link "$DOTFILES/nvim" "$HOME/.config/nvim"
 
 # --- Shell ---
 safe_link "$DOTFILES/.zshrc" "$HOME/.zshrc"
-safe_link "$DOTFILES/.tmux.conf" "$HOME/.tmux.conf"
 safe_link "$DOTFILES/.gitmessage" "$HOME/.gitmessage"
 
 # --- Kitty ---
