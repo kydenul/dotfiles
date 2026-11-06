@@ -209,7 +209,7 @@ sshc (ssh DevCloud, with tmux attach), sshk (ssh K-Claw), sshd (ssh DevCloud, pl
 - Window naming: `automatic-rename` / `allow-rename` off, so windows keep their manual/default name
 
 ### Plugins
-None. TPM was removed; pane navigation is provided by manual `C-h/j/k/l` bindings (vim-tmux-navigator logic inlined in `.tmux.conf`), and copy uses OSC 52 via `set-clipboard external` plus a `y` binding in copy-mode-vi
+None. TPM was removed; pane navigation is provided by manual `C-h/j/k/l` bindings (vim-tmux-navigator logic inlined in `.tmux.conf`), and copy uses OSC 52 via `set-clipboard on` (so apps like pi can write the clipboard with raw OSC 52; `external` dropped them) plus a `y` binding in copy-mode-vi
 
 ## Kitty Configuration
 
