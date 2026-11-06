@@ -29,7 +29,7 @@
   "workbench.panel.showLabels": false,
   "workbench.browser.showInTitleBar": false,
   // "workbench.activityBar.location": "hidden",
-  "workbench.colorTheme": "OM Theme (Default Dracula Italic)",
+  "workbench.colorTheme": "Gruvbox Dark Hard",
   "workbench.iconTheme": "material-icon-theme",
   "workbench.list.smoothScrolling": true,
   "workbench.activityBar.location": "top",
@@ -502,8 +502,9 @@
       "label": "HOK Edition"
     }
   },
-  "diffEditor.hideUnchangedRegions.enabled": true,
   "workbench.diffEditorAssociations": {
     "*.md": "default"
-  }
+  },
+  "gitlens.graph.details.location": "auto",
+  "diffEditor.hideUnchangedRegions.enabled": true
 }
