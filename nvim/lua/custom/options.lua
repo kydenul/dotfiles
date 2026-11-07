@@ -27,14 +27,8 @@ if vim.fn.exists("$SSH_TTY") == 1 or vim.fn.exists("$SSH_CONNECTION") == 1 or re
 
   vim.g.clipboard = {
     name = "OSC52",
-    copy = {
-      ["+"] = osc52_copy("c"),
-      ["*"] = osc52_copy("p"),
-    },
-    paste = {
-      ["+"] = paste_provider("+"),
-      ["*"] = paste_provider("*"),
-    },
+    copy = { ["+"] = osc52_copy("c"), ["*"] = osc52_copy("p") },
+    paste = { ["+"] = paste_provider("+"), ["*"] = paste_provider("*") },
   }
 end
 
