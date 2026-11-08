@@ -3,7 +3,9 @@ local util = require("custom.util")
 -- Clipboard
 vim.opt.clipboard = "unnamedplus"
 -- Rex 的远端 shell 由 systemd 拉起，不经 sshd，没有 $SSH_*；其 TERM 为 xterm-rex。
-local rex = vim.env.TERM_PROGRAM == "rex" or vim.env.TERM == "xterm-rex"
+-- 本地 Rex 同样设置 TERM_PROGRAM=rex，但还会设置 $REX_SERVER（指向 Mac app 的 socket），
+-- 远端没有，以此区分，避免本地 nvim 误用 OSC 52（否则 p 读不到系统剪贴板）。
+local rex = (vim.env.TERM_PROGRAM == "rex" or vim.env.TERM == "xterm-rex") and vim.env.REX_SERVER == nil
 if vim.fn.exists("$SSH_TTY") == 1 or vim.fn.exists("$SSH_CONNECTION") == 1 or rex then
   util.log_info("SSH/Rex detected, enabling OSC 52 clipboard")
 
