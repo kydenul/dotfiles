@@ -19,6 +19,9 @@ if vim.fn.exists("$SSH_TTY") == 1 or vim.fn.exists("$SSH_CONNECTION") == 1 or re
 
   -- Rex 不回应 OSC 52 读取请求（只转发写入），查询会一直等到超时；
   -- 此时 paste 直接返回 nvim 自身寄存器，本地内容用 Cmd+V 终端粘贴进来。
+  -- 上游已有 feature request（Rex Beta Discord #feedback-mac「Support OSC 52 clipboard querying」，
+  -- https://discord.com/channels/1546797889009881158/1568511121323991141，2026-11-07 提出，未实现）；
+  -- Rex 支持后可去掉 register_paste，改用 vim.ui.clipboard.osc52 的 paste。
   local function register_paste()
     return { vim.fn.split(vim.fn.getreg(""), "\n"), vim.fn.getregtype("") }
   end
