@@ -169,13 +169,15 @@ daemon_log_dir() {
 # Every model the gateway exposes accepted thinking.budget_tokens when probed,
 # so reasoning is true across the board and is not a column.
 #
-# allowEmptySignature: hy3, hy4 and kimi-k3 stream thinking blocks whose
+# allowEmptySignature: hy3, hy4, kimi-k3 and echo stream thinking blocks whose
 # `signature` is an empty string. Without this flag pi downgrades those blocks
 # to plain text. glm-*, deepseek and claude-* send real signatures, so they
 # must not set it. Re-probed 2026-10-30 on tclaude 0.1.10 (3 rounds, stable):
 # glm-5.2 is back to real signatures (it was empty on 0.1.9, which is why it once
-# had a dedicated row). If a glm model flips to empty again, re-add a longer
-# prefix row above the `claude-glm-` one — longest prefix wins.
+# had a dedicated row). Re-probed 2026-11-08 on the same build, after upstream
+# renamed hy4-preview to hy4: hy4 still empty, claude-haiku-5-5 sends a real
+# signature. If a glm model flips to empty again, re-add a longer prefix row
+# above the `claude-glm-` one — longest prefix wins.
 PI_MODEL_META=$(
     cat <<'EOF'
 claude-opus-       200000  128000   true  false
@@ -186,6 +188,7 @@ claude-glm-        200000   64000  false  false
 claude-kimi-       200000   64000  false   true
 claude-hy3         200000   64000  false   true
 claude-hy4         200000   64000  false   true
+claude-echo        200000   64000   true   true
 EOF
 )
 
