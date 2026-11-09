@@ -208,6 +208,9 @@ link_agent_assets() {
         safe_link "$DOTFILES/agents/commands" "$HOME/.tclaude/commands"
         safe_link "$DOTFILES/agents/skills" "$HOME/.agents/skills"
         safe_link "$DOTFILES/agents/commands" "$HOME/.pi/agent/prompts"
+        safe_link "$DOTFILES/agents/AGENTS.md" "$HOME/.pi/agent/AGENTS.md"
+        safe_link "$DOTFILES/pi/SYSTEM.md" "$HOME/.pi/agent/SYSTEM.md"
+        safe_link "$DOTFILES/pi/APPEND_SYSTEM.md" "$HOME/.pi/agent/APPEND_SYSTEM.md"
         # Skills link ../../references/*.md, i.e. a sibling of each skills dir
         safe_link "$DOTFILES/agents/references" "$HOME/.claude/references"
         safe_link "$DOTFILES/agents/references" "$HOME/.tclaude/references"
@@ -216,7 +219,6 @@ link_agent_assets() {
     # MCP server config
     if [ -f "$DOTFILES/agents/mcp.json" ]; then
         safe_link "$DOTFILES/agents/mcp.json" "$HOME/.claude/mcp.json"
-        safe_link "$DOTFILES/agents/mcp.json" "$HOME/.pi/agent/mcp.json"
     fi
 }
 
