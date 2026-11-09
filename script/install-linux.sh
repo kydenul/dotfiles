@@ -101,17 +101,17 @@ section "1/5  CLI Tools & Languages"
 install_pkg() {
     local pkg="$1"
     case "$PKG" in
-        apt)    sudo apt-get update -qq && sudo apt-get install -y "$pkg" ;;
-        dnf)    sudo dnf install -y "$pkg" ;;
-        pacman) sudo pacman -S --needed --noconfirm "$pkg" ;;
+    apt) sudo apt-get update -qq && sudo apt-get install -y "$pkg" ;;
+    dnf) sudo dnf install -y "$pkg" ;;
+    pacman) sudo pacman -S --needed --noconfirm "$pkg" ;;
     esac
 }
 
 pkg_installed() {
     case "$PKG" in
-        apt)    dpkg -s "$pkg" &>/dev/null ;;
-        dnf)    rpm -q "$pkg" &>/dev/null ;;
-        pacman) pacman -Qi "$pkg" &>/dev/null ;;
+    apt) dpkg -s "$pkg" &>/dev/null ;;
+    dnf) rpm -q "$pkg" &>/dev/null ;;
+    pacman) pacman -Qi "$pkg" &>/dev/null ;;
     esac
 }
 
@@ -132,9 +132,9 @@ PACKAGES=(
 for entry in "${PACKAGES[@]}"; do
     IFS='|' read -r name apt_name dnf_name pacman_name <<<"$entry"
     case "$PKG" in
-        apt)    pkg="$apt_name" ;;
-        dnf)    pkg="$dnf_name" ;;
-        pacman) pkg="$pacman_name" ;;
+    apt) pkg="$apt_name" ;;
+    dnf) pkg="$dnf_name" ;;
+    pacman) pkg="$pacman_name" ;;
     esac
     if [ -n "$PKG" ] && pkg_installed; then
         success "Already installed: $name"
