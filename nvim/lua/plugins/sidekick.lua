@@ -1,5 +1,26 @@
 return {
   "folke/sidekick.nvim",
+  init = function()
+    -- An unfocused terminal window only follows output while its cursor is on the
+    -- last line, but leaving it parks the cursor at the TUI's input box. So on
+    -- leave, snap to the last line if the view was at the bottom; a view scrolled
+    -- up to read history keeps its position.
+    vim.api.nvim_create_autocmd("WinLeave", {
+      group = vim.api.nvim_create_augroup("sidekick_follow_output", { clear = true }),
+      callback = function()
+        if vim.bo.filetype ~= "sidekick_terminal" or vim.fn.line("w$") < vim.fn.line("$") then
+          return
+        end
+        local win, buf = vim.api.nvim_get_current_win(), vim.api.nvim_get_current_buf()
+        -- after the switch, otherwise the terminal-cursor sync may overwrite it
+        vim.schedule(function()
+          if vim.api.nvim_win_is_valid(win) and win ~= vim.api.nvim_get_current_win() then
+            vim.api.nvim_win_set_cursor(win, { vim.api.nvim_buf_line_count(buf), 0 })
+          end
+        end)
+      end,
+    })
+  end,
   opts = {
     nes = { enabled = false },
 
