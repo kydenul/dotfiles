@@ -55,7 +55,7 @@
 
   "files.autoSave": "off",
   "diffEditor.ignoreTrimWhitespace": true,
-  "diffEditor.renderSideBySide": true,
+  "diffEditor.renderSideBySide": false,
   "diffEditor.useInlineViewWhenSpaceIsLimited": true,
 
   "chat.agent.enabled": false,
@@ -505,6 +505,5 @@
   "workbench.diffEditorAssociations": {
     "*.md": "default"
   },
-  "gitlens.graph.details.location": "auto",
-  "diffEditor.hideUnchangedRegions.enabled": true
+  "gitlens.graph.details.location": "auto"
 }
