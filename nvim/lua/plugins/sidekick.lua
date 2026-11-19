@@ -1,37 +1,34 @@
--- External tmux sessions (session name != sid of the tool's cwd) can't get a window:
--- sidekick's tmux:attach() returns nil for them. Rename the tmux session to the sid it
--- expects, then attach normally so it opens as a regular terminal window.
-local function attach(state)
-  if not state then
-    return
-  end
-  local State = require("sidekick.cli.state")
-  local Session = require("sidekick.cli.session")
-  local s = state.session
-  if s and state.external and s.backend == "tmux" then
-    local new = Session.sid({ tool = s.tool.name, cwd = s.cwd })
-    local out = vim.fn.system({ "tmux", "rename-session", "-t", s.mux_session, new })
-    if vim.v.shell_error ~= 0 then
-      return vim.notify(("tmux rename-session failed (name taken?): %s"):format(out), vim.log.levels.ERROR)
-    end
-    Session.detach(s) -- drop the stale external instance so attach() re-evaluates it
-    state = State.get({ session = s.id })[1]
-    if not state then
-      return
-    end
-  end
-  State.attach(state, { show = true, focus = true })
-end
-
 return {
   "folke/sidekick.nvim",
+  init = function()
+    -- An unfocused terminal window only follows output while its cursor is on the
+    -- last line, but leaving it parks the cursor at the TUI's input box. So on
+    -- leave, snap to the last line if the view was at the bottom; a view scrolled
+    -- up to read history keeps its position.
+    vim.api.nvim_create_autocmd("WinLeave", {
+      group = vim.api.nvim_create_augroup("sidekick_follow_output", { clear = true }),
+      callback = function()
+        if vim.bo.filetype ~= "sidekick_terminal" or vim.fn.line("w$") < vim.fn.line("$") then
+          return
+        end
+        local win, buf = vim.api.nvim_get_current_win(), vim.api.nvim_get_current_buf()
+        -- after the switch, otherwise the terminal-cursor sync may overwrite it
+        vim.schedule(function()
+          if vim.api.nvim_win_is_valid(win) and win ~= vim.api.nvim_get_current_win() then
+            vim.api.nvim_win_set_cursor(win, { vim.api.nvim_buf_line_count(buf), 0 })
+          end
+        end)
+      end,
+    })
+  end,
   opts = {
     nes = { enabled = false },
 
     -- add any options here
     cli = {
-      win = { layout = "right", split = { width = 120 } },
-      mux = { enabled = true, backend = "tmux", create = "terminal" }, -- "terminal"|"window"|"split"
+      win = { layout = "right", split = { width = 124 } },
+      -- mux = { enabled = true, backend = "tmux", create = "terminal" }, -- "terminal"|"window"|"split"
+      mux = { enabled = false },
       tools = { ["TClaude"] = { cmd = { "tclaude" } } },
       prompts = {
         -- refactor = "Please refactor {this} to be more maintainable",
@@ -47,7 +44,7 @@ return {
     -- stylua: ignore
     { "<leader>ck", function() require("sidekick.cli").toggle() end, mode = { "n", "t", "x" }, desc = "Sidekick: Toggle CLI" },
     -- stylua: ignore
-    { "<leader>cs", function() require("sidekick.cli").select({ filter = { installed = true }, cb = attach }) end, desc = "Sidekick: Select CLI" },
+    { "<leader>cs", function() require("sidekick.cli").select({ filter = { installed = true } }) end, desc = "Sidekick: Select CLI" },
     -- stylua: ignore
     { "<leader>cd", function() require("sidekick.cli").close() end, desc = "Sidekick: Detach a CLI Session" },
     -- stylua: ignore

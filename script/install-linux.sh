@@ -101,17 +101,17 @@ section "1/5  CLI Tools & Languages"
 install_pkg() {
     local pkg="$1"
     case "$PKG" in
-        apt)    sudo apt-get update -qq && sudo apt-get install -y "$pkg" ;;
-        dnf)    sudo dnf install -y "$pkg" ;;
-        pacman) sudo pacman -S --needed --noconfirm "$pkg" ;;
+    apt) sudo apt-get update -qq && sudo apt-get install -y "$pkg" ;;
+    dnf) sudo dnf install -y "$pkg" ;;
+    pacman) sudo pacman -S --needed --noconfirm "$pkg" ;;
     esac
 }
 
 pkg_installed() {
     case "$PKG" in
-        apt)    dpkg -s "$pkg" &>/dev/null ;;
-        dnf)    rpm -q "$pkg" &>/dev/null ;;
-        pacman) pacman -Qi "$pkg" &>/dev/null ;;
+    apt) dpkg -s "$pkg" &>/dev/null ;;
+    dnf) rpm -q "$pkg" &>/dev/null ;;
+    pacman) pacman -Qi "$pkg" &>/dev/null ;;
     esac
 }
 
@@ -122,7 +122,6 @@ PACKAGES=(
     "ripgrep|ripgrep|ripgrep|ripgrep"
     "git|git|git|git"
     "imagemagick|imagemagick|ImageMagick|imagemagick"
-    "tmux|tmux|tmux|tmux"
     "zsh|zsh|zsh|zsh"
     "node|nodejs npm|nodejs npm|nodejs npm"
     "go|golang-go|golang|go"
@@ -133,9 +132,9 @@ PACKAGES=(
 for entry in "${PACKAGES[@]}"; do
     IFS='|' read -r name apt_name dnf_name pacman_name <<<"$entry"
     case "$PKG" in
-        apt)    pkg="$apt_name" ;;
-        dnf)    pkg="$dnf_name" ;;
-        pacman) pkg="$pacman_name" ;;
+    apt) pkg="$apt_name" ;;
+    dnf) pkg="$dnf_name" ;;
+    pacman) pkg="$pacman_name" ;;
     esac
     if [ -n "$PKG" ] && pkg_installed; then
         success "Already installed: $name"
@@ -236,7 +235,6 @@ safe_link "$DOTFILES/nvim" "$HOME/.config/nvim"
 
 # --- Shell ---
 safe_link "$DOTFILES/.zshrc" "$HOME/.zshrc"
-safe_link "$DOTFILES/.tmux.conf" "$HOME/.tmux.conf"
 safe_link "$DOTFILES/.gitmessage" "$HOME/.gitmessage"
 
 # --- Kitty (XDG config is the same on Linux) ---
@@ -270,6 +268,9 @@ if [ -d "$DOTFILES/agents/skills" ] || [ -d "$DOTFILES/agents/commands" ]; then
     safe_link "$DOTFILES/agents/commands" "$HOME/.tclaude/commands"
     safe_link "$DOTFILES/agents/skills" "$HOME/.agents/skills"
     safe_link "$DOTFILES/agents/commands" "$HOME/.pi/agent/prompts"
+    safe_link "$DOTFILES/agents/AGENTS.md" "$HOME/.pi/agent/AGENTS.md"
+    safe_link "$DOTFILES/pi/SYSTEM.md" "$HOME/.pi/agent/SYSTEM.md"
+    safe_link "$DOTFILES/pi/APPEND_SYSTEM.md" "$HOME/.pi/agent/APPEND_SYSTEM.md"
     # Skills link ../../references/*.md, i.e. a sibling of each skills dir
     safe_link "$DOTFILES/agents/references" "$HOME/.claude/references"
     safe_link "$DOTFILES/agents/references" "$HOME/.tclaude/references"
@@ -277,7 +278,6 @@ if [ -d "$DOTFILES/agents/skills" ] || [ -d "$DOTFILES/agents/commands" ]; then
 fi
 if [ -f "$DOTFILES/agents/mcp.json" ]; then
     safe_link "$DOTFILES/agents/mcp.json" "$HOME/.claude/mcp.json"
-    safe_link "$DOTFILES/agents/mcp.json" "$HOME/.pi/agent/mcp.json"
 fi
 
 # ── 4. Git Config ───────────────────────────────────────────────────────────

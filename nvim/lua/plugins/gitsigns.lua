@@ -53,6 +53,8 @@ return {
     -- stylua: ignore
     { "ghb", function() require("gitsigns").blame_line({ full = true }) end, desc = "[Git] Blame line" },
     -- stylua: ignore
+    { "<leader>tb", function() require("gitsigns").toggle_current_line_blame() end, desc = "[Git] Toggle line blame" },
+    -- stylua: ignore
     { "ghd", function() require("gitsigns").diffthis() end, desc = "[Git] Diff this" },
     -- stylua: ignore
     { "ghD", function() require("gitsigns").diffthis("~") end, desc = "[Git] Diff this ~" },
@@ -70,7 +72,7 @@ return {
     },
 
     -- Current line blame
-    current_line_blame = true,
+    current_line_blame = false,
     current_line_blame_opts = {
       virt_text = true,
       virt_text_pos = "eol", --'eol' | 'overlay' | 'right_align'

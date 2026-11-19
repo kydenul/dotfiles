@@ -29,12 +29,11 @@ vim.keymap.set("n", "<C-Down>", ":resize -3<CR>", opts)
 vim.keymap.set("n", "<C-Left>", ":vertical resize +3<CR>", opts)
 vim.keymap.set("n", "<C-Right>", ":vertical resize -3<CR>", opts)
 
--- -- leader + hjkl 在窗口之间跳转
--- vim.keymap.set("n", "<C-j>", "<C-w>j", opts)
--- vim.keymap.set("n", "<C-k>", "<C-w>k", opts)
--- vim.keymap.set("n", "<C-h>", "<C-w>h", opts)
--- vim.keymap.set("n", "<C-l>", "<C-w>l", opts)
--- NOTE: Use vim-tmux-navigator instead
+-- Ctrl + hjkl 在窗口之间跳转
+vim.keymap.set("n", "<C-j>", "<C-w>j", opts)
+vim.keymap.set("n", "<C-k>", "<C-w>k", opts)
+vim.keymap.set("n", "<C-h>", "<C-w>h", opts)
+vim.keymap.set("n", "<C-l>", "<C-w>l", opts)
 
 -- Save file
 vim.keymap.set("n", "<leader>w", ":w!<CR>", { noremap = true, silent = true, desc = "[File] Save" }) -- Save file

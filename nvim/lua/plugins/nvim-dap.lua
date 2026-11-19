@@ -29,12 +29,10 @@ return {
         local hide_info = function()
           print("hide")
           vim.diagnostic.enable(false)
-          vim.cmd("Gitsigns toggle_current_line_blame")
         end
 
         local show_info = function()
           vim.diagnostic.enable()
-          vim.cmd("Gitsigns toggle_current_line_blame")
         end
 
         dap.listeners.after.event_initialized["dapui_config"] = function()

@@ -1,6 +1,6 @@
 # dotfiles
 
-Personal development environment configuration for macOS, featuring Neovim, Zed, VSCode, Kitty, Ghostty, Tmux, and Zsh with Oh My Zsh.
+Personal development environment configuration for macOS, featuring Neovim, Zed, VSCode, Kitty, Ghostty, and Zsh with Oh My Zsh.
 
 ---
 
@@ -43,7 +43,7 @@ The install script will automatically:
 
 ```bash
 # macOS
-brew install neovim fd ripgrep tmux zsh node go python@3 rustup \
+brew install neovim fd ripgrep zsh node go python@3 rustup \
   tree-sitter pngpaste imagemagick
 brew install --cask kitty ghostty font-hack-nerd-font font-maple-mono-nf-cn
 
@@ -65,7 +65,6 @@ ln -s ~/.dotfiles/nvim ~/.config/nvim
 
 # Shell & Terminal
 ln -s ~/.dotfiles/.zshrc ~/.zshrc
-ln -s ~/.dotfiles/.tmux.conf ~/.tmux.conf
 ln -s ~/.dotfiles/.gitmessage ~/.gitmessage
 
 # Kitty
@@ -105,7 +104,6 @@ chmod 600 ~/.zsh_secrets
 
 ```bash
 source ~/.zshrc
-tmux source-file ~/.tmux.conf  # in tmux session
 
 # (Optional) Enable window drag with Ctrl+Cmd+Click
 defaults write -g NSWindowShouldDragOnGesture -bool true
@@ -129,41 +127,28 @@ defaults write -g NSWindowShouldDragOnGesture -bool true
 vim -> nvim          # Use Neovim by default
 la, ll, c            # Navigation / clear
 kicat, kssh, kdiff   # Kitty kittens
-sshc, sshk, sshd     # SSH shortcuts (DevCloud [+tmux], K-Claw, DevCloud [plain])
+sshc, sshk, sshd     # SSH shortcuts (DevCloud, K-Claw)
 tsbz, tsz            # Translate to Chinese
 tsbe, tse            # Translate to English
 ```
-
-### Tmux Configuration
-
-- **Prefix Key**: `Ctrl-a` (double-tap to pass through literal C-a)
-- **No Plugins**: No TPM or Tmux plugins; clipboard goes through OSC 52 (`set-clipboard external`)
-- **Seamless Navigation**: Pane navigation works with Neovim via manual `Ctrl-h/j/k/l` bindings (hand-written vim-tmux-navigator logic in `.tmux.conf`)
-- **Pane Navigation**: `Ctrl-h/j/k/l` to switch between Tmux panes and Neovim splits
-- **Copy Mode**: `Escape` to enter, `v` to select, `y` to yank (Vi-style)
-- **Mouse Support**: Enabled
-- **Status Bar**: Top position with custom Catppuccin-style colors
-- **Window Naming**: `automatic-rename` / `allow-rename` off, so windows keep their assigned name
 
 ### Kitty Terminal
 
 - **Font**: Maple Mono NF CN (16pt)
 - **Terminal Type**: `xterm-256color` (for SSH compatibility)
-- **Deep Tmux Integration**:
-  - `Cmd+1-9` to switch Tmux windows
-  - `Cmd+t` to create new Tmux window
-  - `Cmd+w` to close current Tmux pane
-  - `Cmd+z` to toggle zoom (fullscreen) pane
-  - `Cmd+d` / `Cmd+Shift+d` to split panes
-  - `Cmd+h` / `Cmd+l` to switch previous/next window
-  - `Cmd+;` to switch to previous pane
+- **Keybindings** (native Kitty tabs/windows):
+  - `Cmd+1-9` to switch tabs
+  - `Cmd+t` to create new tab
+  - `Cmd+w` to close current window
+  - `Cmd+z` to toggle zoom (stack layout)
+  - `Cmd+d` / `Cmd+Shift+d` to split windows
+  - `Cmd+h` / `Cmd+l` to switch previous/next tab
 
 ### Ghostty Terminal
 
 - **Theme**: Catppuccin Mocha
 - **Font**: Maple Mono NF CN (16pt)
 - **Quick Terminal**: `` Ctrl+Shift+` `` (global hotkey, top position)
-- **Deep Tmux Integration**: Not configured — `ghostty/config` has no Tmux bindings (unlike Kitty)
 
 ### Zed Editor
 
@@ -334,7 +319,7 @@ Full write-up (原理 / daemon 契约 / 接入 cc-switch / 坑与限制):
 | Key                       | Action                                    |
 | ------------------------- | ----------------------------------------- |
 | `\` / `\|`                | Split window horizontally / vertically    |
-| `<C-h/j/k/l>`             | Navigate between windows (and Tmux panes) |
+| `<C-h/j/k/l>`             | Navigate between windows |
 | `<C-Up/Down/Left/Right>`  | Resize windows                            |
 | `<leader>w`               | Save file                                 |
 | `<leader>wd`              | Close window                              |

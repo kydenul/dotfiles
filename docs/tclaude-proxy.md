@@ -157,8 +157,9 @@ ANTHROPIC_MODEL=claude-opus-5-5   claude -p "..."   # → NATIVE_OPUS55_OK
 
 另外 thinking 签名会随版本变：2026-10-19（0.1.9）`claude-glm-5.2` 回过**空 `signature`**，
 当时在 `PI_MODEL_META` 里给它单独加了一行 `allowEmptySignature=true`；2026-10-30（0.1.10，
-连测 3 轮）它又变回真实签名，该行已删除。目前只有 `claude-hy3` / `claude-hy4-preview` /
-`claude-kimi-k3` 是空签名。若某个 glm 再翻回空签名，在 `claude-glm-` 行上方补一条更长前缀的行即可
+连测 3 轮）它又变回真实签名，该行已删除。目前只有 `claude-hy3` / `claude-hy4` /
+`claude-kimi-k3` / `claude-echo` 是空签名（2026-11-08 复测正式版 `claude-hy4[1m]`，仍是空签名）。
+若某个 glm 再翻回空签名，在 `claude-glm-` 行上方补一条更长前缀的行即可
 （最长前缀优先）。
 
 > **探测时别同时发 `x-api-key`。** 手写 curl 探测只带 `Authorization: Bearer placeholder`
