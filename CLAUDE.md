@@ -289,9 +289,10 @@ Key facts:
 - `sync-ccswitch pi` skips the two `[1m]` ids that upstream rejects with a 400
   (`claude-sonnet-5-5[1m]`, `claude-opus-5-5[1m]`, listed in `PI_EXCLUDE_MODELS`);
   the bare `claude-sonnet-5-5` / `claude-opus-5-5` ids (from `PI_EXTRA_MODELS`) are
-  the working 1M variants. Only `claude-hy3`, `claude-hy4`, `claude-kimi-k3` and
-  `claude-echo` need `allowEmptySignature=true` (glm-5.2 did on tclaude 0.1.9 but
-  signs normally again on 0.1.10); glm/deepseek/claude models otherwise sign normally.
+  the working 1M variants. Only `claude-hy4*` (incl. `claude-hy4flash`), `claude-kimi-k3` and
+  `claude-echo` need `allowEmptySignature=true`; glm/deepseek/claude models sign
+  normally. tclaude 0.1.11 removed `claude-haiku-4-5`, `claude-glm-5.2` and
+  `claude-hy3` upstream (400 `11102`), so the haiku tier is now `claude-haiku-5-5`.
 - When probing the gateway by hand, send only `Authorization` + `X-Claude-Code-Session-Id`.
   Adding `x-api-key` yields a misleading `401 "session has expired"` even though you
   are still logged in.

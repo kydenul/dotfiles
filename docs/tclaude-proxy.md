@@ -106,10 +106,13 @@ await this.metadataStore.writePort(ei); // 并写回 daemon.port
 
 ## 3. 验证记录
 
-`/v1/models`（本地 handler，无需鉴权即可读）报 18 个模型，
-实测 16 个能通，**`claude-opus-5-5[1m]` 与 `claude-sonnet-5-5[1m]` 上游 400**
-（2026-10-30、tclaude 0.1.10 复测结论不变；此前的 `claude-opus-5[1m]` 已被上游
-provision，现已可用）。0.1.9、0.1.10 的清单与 0.1.8 完全一致，没有新增模型。
+`/v1/models`（本地 handler，无需鉴权即可读）在 0.1.11 报 19 个模型，
+**`claude-opus-5-5[1m]` 与 `claude-sonnet-5-5[1m]` 上游 400**
+（2026-11-21、tclaude 0.1.11 复测结论不变；此前的 `claude-opus-5[1m]` 已被上游
+provision，现已可用）。0.1.9、0.1.10 的清单与 0.1.8 完全一致；**0.1.11 起清单有变**：
+上游下线了 `claude-haiku-4-5`、`claude-glm-5.2`、`claude-hy3`（直接请求回
+`400 11102 service info not found`），新增了 `claude-hy4flash`。haiku 档位改用
+`claude-haiku-5-5`（脚本里的探测模型和 cc-switch 示例已同步）。
 所有 `[1m]` 模型去掉后缀也都返回 200，唯一不通的就是上面这两个 5.5 变体：
 
 ```
@@ -157,7 +160,8 @@ ANTHROPIC_MODEL=claude-opus-5-5   claude -p "..."   # → NATIVE_OPUS55_OK
 
 另外 thinking 签名会随版本变：2026-10-19（0.1.9）`claude-glm-5.2` 回过**空 `signature`**，
 当时在 `PI_MODEL_META` 里给它单独加了一行 `allowEmptySignature=true`；2026-10-30（0.1.10，
-连测 3 轮）它又变回真实签名，该行已删除。目前只有 `claude-hy3` / `claude-hy4` /
+连测 3 轮）它又变回真实签名，该行已删除；0.1.11 起 `claude-glm-5.2` 已被上游下线。
+目前只有 `claude-hy4` / `claude-hy4flash`（2026-11-21 实测同为空签名，由 `claude-hy4` 前缀行覆盖）/
 `claude-kimi-k3` / `claude-echo` 是空签名（2026-11-08 复测正式版 `claude-hy4[1m]`，仍是空签名）。
 若某个 glm 再翻回空签名，在 `claude-glm-` 行上方补一条更长前缀的行即可
 （最长前缀优先）。
@@ -181,7 +185,7 @@ curl -s -X POST http://127.0.0.1:51247/v1/messages \
   -H "Authorization: Bearer placeholder" \
   -H "anthropic-version: 2023-06-01" \
   -H "X-Claude-Code-Session-Id: 11111111-2222-3333-4444-555555555555" \
-  -d '{"model":"claude-haiku-4-5","max_tokens":32,
+  -d '{"model":"claude-haiku-5-5","max_tokens":32,
        "messages":[{"role":"user","content":"Reply with exactly: PROXY_OK"}]}'
 # → event: content_block_delta  {"text":"PROXY_OK",...}
 ```
@@ -192,7 +196,7 @@ curl -s -X POST http://127.0.0.1:51247/v1/messages \
 ```bash
 ANTHROPIC_BASE_URL=$(tclaude-proxy url) \
 ANTHROPIC_AUTH_TOKEN=placeholder \
-ANTHROPIC_MODEL=claude-haiku-4-5 \
+ANTHROPIC_MODEL=claude-haiku-5-5 \
 CLAUDE_CONFIG_DIR=/tmp/cc-proxy-test-1 \
 claude -p "Reply with exactly: NATIVE_CLAUDE_VIA_TCLAUDE_OK"
 # → NATIVE_CLAUDE_VIA_TCLAUDE_OK
@@ -206,7 +210,7 @@ pi -p --no-session --provider tclaude --model 'claude-sonnet-5[1m]' \
 # → PI_VIA_TCLAUDE_OK
 
 # 工具调用（真实 agent 负载，不只是文本补全）
-pi -p --no-session -t read --provider tclaude --model claude-haiku-4-5 \
+pi -p --no-session -t read --provider tclaude --model claude-haiku-5-5 \
    "Use the read tool on /tmp/probe.txt and reply with only its contents."
 # → 正确读回文件内容
 ```
@@ -257,7 +261,7 @@ claude-official|claude|{"env":{}}
     "ANTHROPIC_AUTH_TOKEN": "placeholder",
     "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-5-5",
     "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-5-5",
-    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-haiku-4-5"
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-haiku-5-5"
   }
 }
 ```
@@ -421,7 +425,7 @@ tclaude-proxy url         # → http://127.0.0.1:<port>
     "ANTHROPIC_AUTH_TOKEN": "placeholder",
     "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-5-5",
     "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-5-5",
-    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-haiku-4-5"
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-haiku-5-5"
   }
 }
 ```

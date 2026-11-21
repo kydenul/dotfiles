@@ -169,15 +169,17 @@ daemon_log_dir() {
 # Every model the gateway exposes accepted thinking.budget_tokens when probed,
 # so reasoning is true across the board and is not a column.
 #
-# allowEmptySignature: hy3, hy4, kimi-k3 and echo stream thinking blocks whose
+# allowEmptySignature: hy4*, kimi-k3 and echo stream thinking blocks whose
 # `signature` is an empty string. Without this flag pi downgrades those blocks
 # to plain text. glm-*, deepseek and claude-* send real signatures, so they
 # must not set it. Re-probed 2026-10-30 on tclaude 0.1.10 (3 rounds, stable):
 # glm-5.2 is back to real signatures (it was empty on 0.1.9, which is why it once
 # had a dedicated row). Re-probed 2026-11-08 on the same build, after upstream
 # renamed hy4-preview to hy4: hy4 still empty, claude-haiku-5-5 sends a real
-# signature. If a glm model flips to empty again, re-add a longer prefix row
-# above the `claude-glm-` one — longest prefix wins.
+# signature. 2026-11-21 on tclaude 0.1.11: the new claude-hy4flash is empty too
+# (covered by the claude-hy4 prefix); upstream dropped hy3 and glm-5.2. If a glm
+# model flips to empty again, re-add a longer prefix row above the `claude-glm-`
+# one — longest prefix wins.
 PI_MODEL_META=$(
     cat <<'EOF'
 claude-opus-       200000  128000   true  false
@@ -186,7 +188,6 @@ claude-haiku-      200000   64000   true  false
 claude-deepseek-   200000   64000  false  false
 claude-glm-        200000   64000  false  false
 claude-kimi-       200000   64000  false   true
-claude-hy3         200000   64000  false   true
 claude-hy4         200000   64000  false   true
 claude-echo        200000   64000   true   true
 EOF
@@ -220,7 +221,7 @@ EOF
 )
 
 # Advertised by /v1/models but rejected upstream (400 11102 "service info not
-# found"; re-verified 2026-10-30 on tclaude 0.1.10). Left in pi's model list they
+# found"; re-verified 2026-11-21 on tclaude 0.1.11). Left in pi's model list they
 # are dead picker entries, and they are what PI_EXTRA_MODELS replaces. Every other
 # `[1m]` id the gateway lists — and its bare form — returns 200.
 # Drop an id from here once upstream registers it.
@@ -423,7 +424,7 @@ except Exception:
             -H "Authorization: Bearer $PLACEHOLDER_TOKEN" \
             -H "anthropic-version: 2023-06-01" \
             -H "X-Claude-Code-Session-Id: $(uuidgen 2>/dev/null || echo 11111111-2222-3333-4444-555555555555)" \
-            -d '{"model":"claude-haiku-4-5","max_tokens":32,"messages":[{"role":"user","content":"Reply with exactly: PROXY_OK"}]}' \
+            -d '{"model":"claude-haiku-5-5","max_tokens":32,"messages":[{"role":"user","content":"Reply with exactly: PROXY_OK"}]}' \
             2>/dev/null || true)"
         if echo "$out" | grep -q "PROXY_OK"; then
             success "round-trip OK"
@@ -619,7 +620,7 @@ PY
       "ANTHROPIC_AUTH_TOKEN": "$PLACEHOLDER_TOKEN",
       "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-5-5",
       "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-5-5",
-      "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-haiku-4-5"
+      "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-haiku-5-5"
     }
   }
 EOF
@@ -783,7 +784,7 @@ for line in meta_raw.splitlines():
     if len(parts) == 5:
         meta.append((parts[0], int(parts[1]), int(parts[2]),
                      parts[3] == "true", parts[4] == "true"))
-# Longest prefix wins, so claude-hy3 is not shadowed by a shorter row.
+# Longest prefix wins, so a specific row (claude-hy4) is not shadowed by a shorter one.
 meta.sort(key=lambda r: len(r[0]), reverse=True)
 
 DEFAULT = (200000, 16384, False, False)
