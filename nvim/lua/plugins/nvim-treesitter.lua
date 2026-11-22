@@ -113,6 +113,7 @@ return {
       "query", -- Added for treesitter query language
       "regex", -- Added for regex highlighting
       "rust",
+      "scss", -- snacks.image inline rendering
       "sql",
       "php",
       "toml",
