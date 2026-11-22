@@ -81,6 +81,11 @@ return {
     vim.g.loaded_python3_provider = 0
     vim.g.loaded_ruby_provider = 0
 
+    -- nvim-lspconfig 内置配置声明了这些 filetype，但 Neovim 默认没有对应检测，checkhealth 会报 "Unknown filetype" 警告, 注册检测即可消除。
+    vim.filetype.add({ extension = { gotmpl = "gotmpl" }, pattern = { [".*%.mdx"] = "markdown.mdx" } })
+    -- clangd 内置配置的 c.doxygen / cpp.doxygen 是 clangd 虚拟文档类型，无实际文件，直接覆盖为实际会打开的 filetype
+    vim.lsp.config("clangd", { filetypes = { "c", "cpp", "objc", "objcpp", "cuda" } })
+
     -- NOTE: Remove Global Default Key mapping
     vim.keymap.del("n", "grn")
     vim.keymap.del("n", "gra")
@@ -155,10 +160,19 @@ return {
     -- See `:help vim.diagnostic.*` for documentation on any of the below functions.
     -- 0.12: goto_prev/goto_next deprecated (removal in 0.13); jump()'s `float` opt is deprecated in turn (removal in 0.14) — use `on_jump` instead.
     local function diagnostic_jump(count)
-      vim.diagnostic.jump({ count = count, on_jump = function() vim.diagnostic.open_float() end })
+      vim.diagnostic.jump({
+        count = count,
+        on_jump = function()
+          vim.diagnostic.open_float()
+        end,
+      })
     end
-    vim.keymap.set("n", "[d", function() diagnostic_jump(-1) end, { noremap = true, silent = true, desc = "[Diagnostics] Prev" })
-    vim.keymap.set("n", "]d", function() diagnostic_jump(1) end, { noremap = true, silent = true, desc = "[Diagnostics] Next" })
+    vim.keymap.set("n", "[d", function()
+      diagnostic_jump(-1)
+    end, { noremap = true, silent = true, desc = "[Diagnostics] Prev" })
+    vim.keymap.set("n", "]d", function()
+      diagnostic_jump(1)
+    end, { noremap = true, silent = true, desc = "[Diagnostics] Next" })
 
     local signs_handler = {
       text = {
