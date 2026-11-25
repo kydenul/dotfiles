@@ -1,3 +1,7 @@
+-- Rex 支持 Kitty 图形协议，但 XTVERSION 不含 kitty/ghostty/wezterm，snacks 认不出。
+-- 若 Unicode 占位符渲染成乱码方块，把 SNACKS_KITTY 换成 SNACKS_WEZTERM（浮窗渲染，无占位符）。
+if vim.env.TERM_PROGRAM == "rex" then vim.env.SNACKS_KITTY = "1" end
+
 return {
   "folke/snacks.nvim",
   priority = 1000,
