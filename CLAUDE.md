@@ -260,8 +260,8 @@ the internal `copilot.tencent.com` endpoint. Auth happens inside the tclaude
 daemon; the client only needs `ANTHROPIC_AUTH_TOKEN=placeholder`.
 When tcodex is installed, these commands also maintain an independent tcodex
 gateway and export its live catalog to Pi. See `docs/tclaude-proxy.md` §4.2.1;
-implementation and regression tests are in `script/tclaude-proxy-tcodex.py` and
-`script/tclaude-proxy-tcodex_test.py`.
+implementation and regression tests are in `script/lib/tclaude-proxy/`
+(`tclaude.sh`, `tcodex.py`, `cli.sh`, `proxy_test.py`).
 
 - `script/tclaude-proxy` — CLI: `status`, `port`, `url`, `env`, `ensure`,
   `doctor`, `sync-ccswitch [claude|pi] [--apply]` (no app arg = both; dry-run

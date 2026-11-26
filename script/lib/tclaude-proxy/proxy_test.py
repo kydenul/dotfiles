@@ -1,4 +1,5 @@
 import importlib.util
+from datetime import date
 import fcntl
 import json
 import os
@@ -6,13 +7,18 @@ from pathlib import Path
 import tempfile
 import subprocess
 import select
+import shutil
+import shlex
+import plistlib
 import sys
 import unittest
+import uuid
 from unittest.mock import patch
 from unittest.mock import Mock
 
 
-MODULE_PATH = Path(__file__).with_name("tclaude-proxy-tcodex.py")
+MODULE_PATH = Path(__file__).with_name("tcodex.py")
+PROXY_SCRIPT = Path(__file__).resolve().parents[2] / "tclaude-proxy"
 
 
 class TCodexTests(unittest.TestCase):
@@ -163,7 +169,7 @@ class TCodexTests(unittest.TestCase):
 
     def test_both_pi_writers_share_lock_and_preserve_providers(self):
         # Exercise tclaude's actual embedded writer alongside the Python helper.
-        shell = MODULE_PATH.with_name("tclaude-proxy").read_text()
+        shell = MODULE_PATH.with_name("tclaude.sh").read_text()
         writer = shell.split('"$PI_EXCLUDE_MODELS" <<\'PY\'\n', 1)[1].split('\nPY', 1)[0]
         with tempfile.TemporaryDirectory() as folder:
             path = Path(folder)/"models.json"
@@ -187,9 +193,9 @@ io.open = tracked_open(io.open)
 '''
             with Path(str(path)+".lock").open("a") as lock:
                 fcntl.flock(lock, fcntl.LOCK_EX)
-                claude = subprocess.Popen([sys.executable, "-c", instrument+'\nexec('+repr(writer)+')', str(path), "http://127.0.0.1:4000", "placeholder", "1", "tclaude", "test-session", "claude-test", "", "", ""], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                claude = subprocess.Popen([sys.executable, "-B", "-c", instrument+'\nexec('+repr(writer)+')', str(path), "http://127.0.0.1:4000", "placeholder", "1", "tclaude", "test-session", "claude-test", "", "", ""], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
                 code = f'import importlib.util; s=importlib.util.spec_from_file_location("proxy",{str(MODULE_PATH)!r}); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); m.sync_file({str(path)!r},{{"baseUrl":"http://127.0.0.1:5000","models":[]}},True)'
-                codex = subprocess.Popen([sys.executable, "-c", instrument+'\n'+code], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                codex = subprocess.Popen([sys.executable, "-B", "-c", instrument+'\n'+code], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
                 try:
                     for process in (claude, codex):
                         self.assertTrue(select.select([process.stdout], [], [], 5)[0], "writer never reached lock")
@@ -202,6 +208,50 @@ io.open = tracked_open(io.open)
                         _, error = process.communicate(timeout=10)
                         self.assertEqual(process.returncode, 0, error)
             self.assertEqual(set(json.loads(path.read_text())["providers"]), {"tclaude","tcodex","other"})
+
+
+class ProxyCliTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.home = Path(self.temp.name)
+        self.bin = self.home / "bin"
+        self.bin.mkdir()
+        for command in ("cat", "chmod", "date", "dirname", "grep", "head", "id", "ls", "mkdir", "rm", "sed", "tail"):
+            (self.bin / command).symlink_to(shutil.which(command))
+        (self.bin / "python3").symlink_to(sys.executable)
+        self.env = {**os.environ, "HOME": str(self.home), "PATH": str(self.bin),
+                    "PI_CODING_AGENT_DIR": str(self.home / "pi")}
+        self.command("curl", 'echo \'{"ok":true}\'')
+        self.command("tclaude", 'echo "$*" >> "$HOME/tclaude.calls"')
+        self.command("brew", 'echo /opt/homebrew')
+        self.command("launchctl", 'echo "$*" >> "$HOME/launchctl.calls"')
+        self.script = PROXY_SCRIPT
+
+
+    def command(self, name, body):
+        path = self.bin / name
+        path.write_text("#!/bin/bash\nset -eu\n" + body + "\n")
+        path.chmod(0o755)
+
+
+    def run_cli(self, *args):
+        return subprocess.run(["/bin/bash", str(self.script), *args], env=self.env,
+                              capture_output=True, text=True, timeout=10)
+
+
+    def test_tcodex_url_uses_migrated_helper(self):
+        state_dir = self.home / ".tclaude/tcli/tcodex-proxy"
+        state_dir.mkdir(parents=True)
+        (state_dir / "metadata.json").write_text('{"pid":10}')
+        self.command("ps", "cat <<'EOF'\n"
+                     f"10 1 tcodex app-server --listen unix://{state_dir}/app-server.sock\n"
+                     '11 10 codex -c model_providers.tencent={ base_url = "http://127.0.0.1:4000", experimental_bearer_token = "private-token" }\n'
+                     "EOF")
+        result = self.run_cli("url", "tcodex")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout.strip(), "http://127.0.0.1:4000")
+        self.assertNotIn("private-token", result.stdout + result.stderr)
 
 
 if __name__ == "__main__":

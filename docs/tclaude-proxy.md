@@ -346,7 +346,7 @@ tcodex 0.1.7 的 HTTP 网关跟随进程退出，每次启动随机分配端口�
 保持进程存活，不依赖正在使用的交互式 tcodex 终端。现有 launchd agent 每 5 分钟
 运行的 `tclaude-proxy ensure` 同时检查两个网关。
 
-`script/tclaude-proxy-tcodex.py` 管理这个进程，运行状态位于
+`script/lib/tclaude-proxy/tcodex.py` 管理这个进程，运行状态位于
 `~/.tclaude/tcli/tcodex-proxy/`：目录权限 0700，含临时令牌的 `metadata.json`
 权限 0600，`gateway.log` 记录启动错误。它只从自己启动的进程子树读取网关参数，
 不会读取上游 SSO 凭证。Pi 的 `apiKey` 使用请求时执行的命令读取本地令牌，
@@ -368,7 +368,7 @@ tclaude-proxy sync-ccswitch pi --apply   # 同步两个 provider，原文件备�
 
 后台网关重启会刷新已配置 tcodex provider 的端口；正在运行的 Pi 打开 `/model`
 重读 `models.json`。初次预览前先执行 `ensure tcodex`；预览不启动进程或写配置。
-离线回归测试：`python3 script/tclaude-proxy-tcodex_test.py`。
+离线回归测试：`python3 -B script/lib/tclaude-proxy/proxy_test.py`。
 
 ### 4.3 坑：pi 的 `x-api-key` 会被网关拒掉
 
