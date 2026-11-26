@@ -1,6 +1,7 @@
-# 复用 tclaude 网关给原生 Claude Code 与 pi
+# 复用 tclaude / tcodex 网关给原生 Claude Code 与 pi
 
-把 `tclaude` 的本地网关代理出来，供原生 `claude` / `pi` / cc-switch 使用。
+把 `tclaude` 的本地网关代理出来，供原生 `claude` / `pi` / cc-switch 使用；
+安装了 `tcodex` 时，同一套脚本也维护它的本地网关，Pi 可选择两个 provider。
 
 > ⚠️ **先读这个**：本方案把公司内部 AI 额度（`copilot.tencent.com`，iOA SSO 鉴权、按 credits 计费）
 > 转给通用客户端使用。`product.json` 里 `telemetry.report.standard.enabled: true`，用量是上报的。
@@ -316,7 +317,7 @@ tclaude-proxy sync-ccswitch pi --apply   # 写入 ~/.pi/agent/models.json
 
 **`"x-api-key": ""` 不是笔误，是本次接入唯一的真坑，详见 §4.3。**
 
-脚本只 upsert `providers.tclaude` 这一个 key，pi 已有的其它 provider
+脚本 upsert `providers.tclaude`，安装了 `tcodex` 时还会同步 `providers.tcodex`，pi 已有的其它 provider
 （openrouter / deepseek 等）原样保留；若该 key 已被指向某个第三方地址，则跳过不动。
 
 启动默认模型（`defaultProvider` / `defaultModel` 在 `~/.pi/agent/settings.json`）
@@ -330,12 +331,44 @@ pi          # 进 TUI → /model → 选 tclaude/... → Ctrl+S 存为默认
 
 ```bash
 pi --provider tclaude --model 'claude-sonnet-5[1m]'
+pi --provider tcodex --model gpt-6.1-sol
 ```
 
 方括号 `[1m]` 不会被当成 glob 吃掉，实测可直接选中。
 
-最后打开 CC Switch → Pi 页，确认 `tclaude` provider 已被导入
+最后打开 CC Switch → Pi 页，确认 `tclaude` / `tcodex` provider 已被导入
 （cc-switch 是**打开该页时**才读 models.json，不是后台常驻同步）。
+
+### 4.2.1 tcodex 的进程网关
+
+tcodex 0.1.7 的 HTTP 网关跟随进程退出，每次启动随机分配端口和本地 bearer token。
+脚本启动独立的 `tcodex app-server --listen unix://...`，用私有 Unix socket
+保持进程存活，不依赖正在使用的交互式 tcodex 终端。现有 launchd agent 每 5 分钟
+运行的 `tclaude-proxy ensure` 同时检查两个网关。
+
+`script/tclaude-proxy-tcodex.py` 管理这个进程，运行状态位于
+`~/.tclaude/tcli/tcodex-proxy/`：目录权限 0700，含临时令牌的 `metadata.json`
+权限 0600，`gateway.log` 记录启动错误。它只从自己启动的进程子树读取网关参数，
+不会读取上游 SSO 凭证。Pi 的 `apiKey` 使用请求时执行的命令读取本地令牌，
+`models.json` 只保存命令，不保存令牌。
+
+Pi 使用 `openai-responses`，`baseUrl` 是网关根地址；请求路径为 `/responses`，
+加 `/v1` 会返回 400。网关要求 `session_id` 和每次请求独立的
+`X-Conversation-Request-ID`。模型列表从鉴权后的 `/v1/models` 读取，使用其
+`context_window`、`input_modalities` 和 `supported_reasoning_levels`，不从模型名称猜限制。
+目录未提供最大输出长度时，Pi 使用保守的 16384。
+
+```bash
+tclaude-proxy ensure tcodex             # 启动或检查 tcodex 网关
+tclaude-proxy status                    # 两个网关
+tclaude-proxy status tcodex             # 只检查 tcodex
+tclaude-proxy url tcodex                # 当前 tcodex 根地址
+tclaude-proxy sync-ccswitch pi --apply   # 同步两个 provider，原文件备份为 models.json.bak
+```
+
+后台网关重启会刷新已配置 tcodex provider 的端口；正在运行的 Pi 打开 `/model`
+重读 `models.json`。初次预览前先执行 `ensure tcodex`；预览不启动进程或写配置。
+离线回归测试：`python3 script/tclaude-proxy-tcodex_test.py`。
 
 ### 4.3 坑：pi 的 `x-api-key` 会被网关拒掉
 
@@ -453,7 +486,7 @@ tclaude-proxy sync-ccswitch pi --apply
 tclaude-proxy doctor
 ```
 
-七项全绿即可用。第 6 / 7 项分别检查 `~/.claude/settings.json` 与
+安装 tcodex 时共八项检查。第 6 / 7 项分别检查 `~/.claude/settings.json` 与
 `~/.pi/agent/models.json` 是否真的指向了当前端口
 ——这是确认写入成功的最快方式。
 
@@ -461,7 +494,7 @@ tclaude-proxy doctor
 
 ```bash
 claude                    # 正常用，走内部网关
-pi                        # 同上（provider 选 tclaude）
+pi                        # /model 可选 tclaude 或 tcodex
 tclaude-proxy status      # 出问题先看这个
 tclaude-proxy doctor      # 完整体检
 ```
@@ -526,10 +559,10 @@ daemon 挂掉后无人重启 → 这正是 `tclaude-proxy-agent.sh` 存在的理
 否则一律 `{"error":{"message":"Failed to reach upstream gateway","type":"upstream_error"}}`
 ——这个错误信息**具有误导性**，真实原因只在 `~/.tclaude/logs/<date>/*.log` 里。
 
-**⑤ tcodex 当前跑不通。** `~/.tcodex` 配置目录还在（`model = "deepseek-v4-flash-ioa"`），
-但 CLI 已卸载：`/opt/homebrew/lib/node_modules/@tencent/` 下只剩 `tclaude`，`which tcodex` 无结果。
-且 codex 走 OpenAI Responses 协议，与 Anthropic 协议不通，**不能共用此 daemon**。
-要代理 codex 需重装 CLI 并另做协议转换。
+**⑤ tcodex 使用自己的网关。** Pi 的 `tcodex` provider 通过 OpenAI Responses 协议
+连接独立后台进程，`tclaude` provider 通过 Anthropic 协议连接原 daemon。
+两个入口由同一套脚本维护，见 §4.2.1；tcodex 登录失效时运行 `tcodex login`，
+再运行 `tclaude-proxy ensure tcodex`。
 
 **⑥ 重启 daemon 会中断正在运行的会话。** 包括通过该 daemon 运行的 Claude Code 自身。
 `restart` 前先确认没有活跃会话。

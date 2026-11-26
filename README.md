@@ -290,16 +290,21 @@ Reuses the local gateway that Tencent's `tclaude` CLI spawns, so native
 the tclaude daemon, and the client only needs `ANTHROPIC_AUTH_TOKEN=placeholder`.
 
 ```bash
-tclaude-proxy status                     # daemon health
+tclaude-proxy status                     # tclaude / tcodex gateway health
 tclaude-proxy url                        # → http://127.0.0.1:<port>
-tclaude-proxy doctor                     # 7-step full check
+tclaude-proxy doctor                     # full check, including tcodex when installed
 tclaude-proxy sync-ccswitch --apply      # wire both claude and pi (dry-run without --apply)
-tclaude-proxy sync-ccswitch pi --apply   # only pi (~/.pi/agent/models.json)
-tclaude-proxy-agent.sh install           # launchd: keep the daemon alive (every 5 min)
+tclaude-proxy sync-ccswitch pi --apply   # Pi: both tclaude and tcodex providers
+tclaude-proxy ensure tcodex              # start an independent TCodex gateway
+tclaude-proxy-agent.sh install           # launchd: keep both gateways alive (every 5 min)
 ```
 
 The daemon port is read from `~/.tclaude/tcli/daemon/metadata.json` (tclaude ≥ 0.1.9;
 older builds used `~/.tclaude/daemon.json`, which is left stale after an upgrade).
+When `tcodex` is installed, Pi also gets its live model catalog through the
+Responses API. A private background app-server keeps its gateway alive;
+request-time commands resolve its temporary credentials. Select either provider
+with Pi's `/model`, or run `pi --provider tcodex --model gpt-6.1-sol`.
 
 Full write-up (原理 / daemon 契约 / 接入 cc-switch / 坑与限制):
 [docs/tclaude-proxy.md](docs/tclaude-proxy.md).

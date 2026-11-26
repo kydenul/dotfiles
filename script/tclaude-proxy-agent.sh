@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================================
-# tclaude-proxy-agent — launchd 守护，保证 tclaude daemon 常驻
+# tclaude-proxy-agent — launchd 守护，保证 tclaude / tcodex 网关常驻
 # Docs: ~/.dotfiles/docs/tclaude-proxy.md
 #
 # Usage:
@@ -167,7 +167,7 @@ cmd_status() {
         warn "not loaded"
     fi
 
-    section "tclaude daemon"
+    section "local gateways"
     "$PROXY_BIN" status || true
 }
 

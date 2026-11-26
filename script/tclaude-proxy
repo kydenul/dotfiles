@@ -1,20 +1,20 @@
 #!/usr/bin/env bash
 # ============================================================================
-# tclaude-proxy — 复用 tclaude 本地网关给原生 Claude Code / cc-switch
+# tclaude-proxy — 复用 tclaude / tcodex 本地网关给 Claude Code / pi / cc-switch
 # Docs: ~/.dotfiles/docs/tclaude-proxy.md
 #
 # Usage:
-#   tclaude-proxy status           查看 daemon 状态
+#   tclaude-proxy status [tclaude|tcodex] 查看网关状态（默认两者）
 #   tclaude-proxy port             仅输出端口（供脚本消费）
-#   tclaude-proxy url              仅输出 URL
+#   tclaude-proxy url [tcodex]     仅输出 URL（默认 tclaude）
 #   tclaude-proxy env              输出 export 语句，配合 eval 使用
-#   tclaude-proxy ensure           确保 daemon 运行（守护进程调用此命令）
+#   tclaude-proxy ensure [tclaude|tcodex] 确保网关运行（默认两者）
 #   tclaude-proxy doctor           完整体检
 #   tclaude-proxy sync-ccswitch [claude|pi]
 #                                  预览端口同步改动（只读）；省略 app 则两者都处理
 #   tclaude-proxy sync-ccswitch [claude|pi] --apply
 #                                  真正写入 ~/.claude/settings.json 和/或
-#                                  ~/.pi/agent/models.json
+#                                  ~/.pi/agent/models.json（含 tclaude / tcodex）
 # END-USAGE
 # ============================================================================
 
@@ -50,6 +50,9 @@ DAEMON_META_LEGACY="$TCLAUDE_DIR/daemon.json"
 HEALTH_PATH="/__tclaude/health"
 CCSWITCH_DB="${CCSWITCH_DB:-$HOME/.cc-switch/cc-switch.db}"
 CLAUDE_SETTINGS="$HOME/.claude/settings.json"
+TCODEX_HELPER="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/tclaude-proxy-tcodex.py"
+
+tcodex_proxy() { python3 "$TCODEX_HELPER" "$@"; }
 
 # pi-coding-agent (`pi`). PI_CODING_AGENT_DIR is pi's own override for its config
 # directory, so honour it rather than hardcoding ~/.pi/agent.
@@ -530,6 +533,11 @@ PY
         esac
     fi
 
+    if command -v tcodex >/dev/null 2>&1; then
+        section "8. tcodex gateway and pi wiring"
+        tcodex_proxy doctor || rc=1
+    fi
+
     echo ""
     if [ "$rc" -eq 0 ]; then
         success "${BOLD}all checks passed${NC}"
@@ -747,7 +755,7 @@ PY
 # cc-switch pick it up — not to touch the cc-switch DB.
 #
 # Only providers.tclaude is touched; pi's other providers are preserved.
-sync_pi() {
+sync_pi_claude() {
     local apply="$1"
     local url models
 
@@ -771,10 +779,17 @@ sync_pi() {
     python3 - "$PI_MODELS" "$url" "$PLACEHOLDER_TOKEN" "$apply" \
         "$PI_PROVIDER_KEY" "$PI_SESSION_ID" "$models" "$PI_MODEL_META" "$PI_EXTRA_MODELS" \
         "$PI_EXCLUDE_MODELS" <<'PY'
-import json, os, shutil, sys
+import fcntl, json, os, shutil, sys
 
 path, url, token, apply, key, session_id, models_raw, meta_raw, extras_raw, exclude_raw = sys.argv[1:11]
 apply = apply == "1"
+
+# Serialize read/merge/write with tcodex's background port refresh. Dry-run
+# remains read-only. Keep the descriptor alive until this process exits.
+if apply:
+    os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+    models_lock = open(path + ".lock", "a")
+    fcntl.flock(models_lock, fcntl.LOCK_EX)
 
 # ── metadata table ──────────────────────────────────────────────────────────
 # prefix -> (contextWindow, maxTokens, vision, allowEmptySignature)
@@ -926,6 +941,40 @@ print(f"         {change}  ({len(models)} models){backup}")
 PY
 }
 
+sync_pi() {
+    local apply="$1" rc=0
+    sync_pi_claude "$apply" || rc=1
+    if command -v tcodex >/dev/null 2>&1; then
+        section "pi (tcodex)"
+        if [ "$apply" = "1" ]; then
+            tcodex_proxy sync --apply || rc=1
+        else
+            tcodex_proxy sync || rc=1
+        fi
+    fi
+    return "$rc"
+}
+
+# Keep the original tclaude commands usable explicitly; launchd's default
+# ensure now maintains both installed gateways, with independent failures.
+cmd_gateways() {
+    local command="$1" target="${2:-all}" rc=0
+    case "$target" in
+    tclaude) "cmd_$command" ;;
+    tcodex) tcodex_proxy "$command" ;;
+    all)
+        section "tclaude"
+        "cmd_$command" || rc=1
+        if command -v tcodex >/dev/null 2>&1; then
+            section "tcodex"
+            tcodex_proxy "$command" || rc=1
+        fi
+        return "$rc"
+        ;;
+    *) error "expected tclaude or tcodex, got '$target'"; return 1 ;;
+    esac
+}
+
 # Ports drift, so both sync paths key off the live daemon metadata rather than any
 # stored value. See sync_claude / sync_pi for the per-app semantics.
 cmd_sync_ccswitch() {
@@ -981,11 +1030,17 @@ main() {
     need python3
 
     case "${1:-status}" in
-    status) cmd_status ;;
+    status) cmd_gateways status "${2:-all}" ;;
     port) cmd_port ;;
-    url) cmd_url ;;
+    url)
+        case "${2:-tclaude}" in
+        tclaude) cmd_url ;;
+        tcodex) tcodex_proxy url ;;
+        *) error "url: expected tclaude or tcodex"; return 1 ;;
+        esac
+        ;;
     env) cmd_env ;;
-    ensure) cmd_ensure ;;
+    ensure) cmd_gateways ensure "${2:-all}" ;;
     doctor) cmd_doctor ;;
     sync-ccswitch)
         shift
