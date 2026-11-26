@@ -25,7 +25,6 @@ Thumbs.db
 .idea/
 CLAUDE.md
 .claude/
-GEMINI.md
 
 # Local environment files
 *.local
