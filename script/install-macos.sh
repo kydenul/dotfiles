@@ -251,6 +251,12 @@ if [ -d "$DOTFILES/vscode" ]; then
     safe_link "$DOTFILES/vscode/settings.json" "$HOME/Library/Application Support/Code/User/settings.json"
 fi
 
+# --- CodeBuddy CN (VSCode fork, separate user-data dir) ---
+if [ -d "$HOME/Library/Application Support/CodeBuddy CN/User" ]; then
+    safe_link "$DOTFILES/vscode/keybindings.json" "$HOME/Library/Application Support/CodeBuddy CN/User/keybindings.json"
+    safe_link "$DOTFILES/vscode/settings.json" "$HOME/Library/Application Support/CodeBuddy CN/User/settings.json"
+fi
+
 # --- Markdownlint ---
 safe_link "$DOTFILES/.markdownlint.json" "$HOME/.markdownlint.json"
 
