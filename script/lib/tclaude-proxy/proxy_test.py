@@ -228,17 +228,14 @@ class ProxyCliTests(unittest.TestCase):
         self.command("launchctl", 'echo "$*" >> "$HOME/launchctl.calls"')
         self.script = PROXY_SCRIPT
 
-
     def command(self, name, body):
         path = self.bin / name
         path.write_text("#!/bin/bash\nset -eu\n" + body + "\n")
         path.chmod(0o755)
 
-
     def run_cli(self, *args):
         return subprocess.run(["/bin/bash", str(self.script), *args], env=self.env,
                               capture_output=True, text=True, timeout=10)
-
 
     def test_tcodex_url_uses_migrated_helper(self):
         state_dir = self.home / ".tclaude/tcli/tcodex-proxy"
@@ -252,6 +249,122 @@ class ProxyCliTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(result.stdout.strip(), "http://127.0.0.1:4000")
         self.assertNotIn("private-token", result.stdout + result.stderr)
+
+    def test_dynamic_request_id_command_runs_from_other_directory(self):
+        spec = importlib.util.spec_from_file_location("tcodex_proxy", MODULE_PATH)
+        proxy = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(proxy)
+        command = proxy.helper_command("request-id")
+        result = subprocess.run(shlex.split(command[1:]), cwd=self.home, env=self.env,
+                                capture_output=True, text=True, timeout=10)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(str(uuid.UUID(result.stdout.strip())), result.stdout.strip())
+
+    def test_tclaude_metadata_commands_preserve_output(self):
+        meta = self.home / ".tclaude/tcli/daemon/metadata.json"
+        meta.parent.mkdir(parents=True)
+        meta.write_text('{"url":"http://127.0.0.1:4000","port":4000,"pid":10}')
+        for args, expected in [(("url",), "http://127.0.0.1:4000"),
+                               (("port",), "4000"),
+                               (("env",), 'export ANTHROPIC_BASE_URL="http://127.0.0.1:4000"\nexport ANTHROPIC_AUTH_TOKEN="placeholder"')]:
+            result = self.run_cli(*args)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(result.stdout.strip(), expected)
+
+    def test_legacy_agent_entry_delegates_help_without_dependencies(self):
+        (self.bin / "curl").unlink()
+        (self.bin / "python3").unlink()
+        result = subprocess.run(["/bin/bash", str(self.script.with_name("tclaude-proxy-agent.sh")), "--help"],
+                                env=self.env, capture_output=True, text=True, timeout=10)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("tclaude-proxy agent install", result.stdout)
+
+    def test_entry_works_from_path_containing_spaces(self):
+        copied_script = self.home / "dotfiles copy/script"
+        copied_script.mkdir(parents=True)
+        shutil.copy2(self.script, copied_script / "tclaude-proxy")
+        shutil.copytree(MODULE_PATH.parent, copied_script / "lib/tclaude-proxy")
+        self.script = copied_script / "tclaude-proxy"
+        result = self.run_cli("--help")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("tclaude-proxy start", result.stdout)
+
+    def test_help_prioritizes_start_and_agent_commands(self):
+        # Help must work even without gateway dependencies.
+        (self.bin / "curl").unlink()
+        (self.bin / "python3").unlink()
+        result = self.run_cli("--help")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("tclaude-proxy start", result.stdout)
+        self.assertIn("tclaude-proxy agent install", result.stdout)
+        self.assertIn("tclaude-proxy logs", result.stdout)
+        self.assertLess(result.stdout.index("start"), result.stdout.index("sync-ccswitch"))
+
+    def test_start_and_ensure_share_gateway_behavior(self):
+        meta = self.home / ".tclaude/tcli/daemon/metadata.json"
+        meta.parent.mkdir(parents=True)
+        meta.write_text('{"url":"http://127.0.0.1:4000","port":4000,"pid":10}')
+        for args in [("start",), ("start", "tclaude"), ("ensure",), ("ensure", "tclaude")]:
+            result = self.run_cli(*args)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("already healthy", result.stdout)
+        self.assertFalse((self.home / "tclaude.calls").exists())
+        self.assertNotEqual(self.run_cli("start", "unknown").returncode, 0)
+        self.assertNotEqual(self.run_cli("start", "tclaude", "extra").returncode, 0)
+
+    def test_agent_install_status_and_uninstall_preserve_launchd_contract(self):
+        result = self.run_cli("agent", "install")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        plist = self.home / "Library/LaunchAgents/com.kyden.tclaude-proxy.plist"
+        self.assertIn('-//Apple//DTD PLIST 1.0//EN', plist.read_text())
+        with plist.open("rb") as stream:
+            job = plistlib.load(stream)
+        self.assertEqual(job["Label"], "com.kyden.tclaude-proxy")
+        self.assertEqual(job["ProgramArguments"], [str(self.script.resolve()), "ensure"])
+        self.assertEqual(job["StartInterval"], 300)
+        self.assertTrue(job["RunAtLoad"])
+        self.assertTrue(job["AbandonProcessGroup"])
+        self.assertEqual(job["EnvironmentVariables"]["HOME"], str(self.home))
+        self.assertIn("agent status", result.stdout)
+        self.assertEqual(self.run_cli("agent", "status").returncode, 0)
+        self.assertNotEqual(self.run_cli("agent", "invalid").returncode, 0)
+        self.assertNotEqual(self.run_cli("agent", "install", "extra").returncode, 0)
+        result = self.run_cli("agent", "uninstall")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertFalse(plist.exists())
+        self.assertFalse((self.home / "tclaude.calls").exists())
+        calls = (self.home / "launchctl.calls").read_text()
+        self.assertIn("bootstrap gui/", calls)
+        self.assertIn("bootout gui/", calls)
+
+    def test_logs_include_both_gateways_and_redact_credentials(self):
+        paths = [self.home / ".tclaude/logs/agent/agent.log",
+                 self.home / ".tclaude/logs/agent/agent.err.log",
+                 self.home / ".tclaude/tcli/tcodex-proxy/gateway.log",
+                 self.home / ".tclaude/logs/tclaude" / date.today().isoformat() / "gateway.log"]
+        for index, path in enumerate(paths):
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(f'gateway-log-{index}\nAuthorization: Bearer private-value\nCookie: session=private-cookie\n{{"token":"private-token"}}\n')
+        result = self.run_cli("logs")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        for index in range(3):
+            self.assertIn(f"gateway-log-{index}", result.stdout)
+        for secret in ("private-value", "private-cookie", "private-token"):
+            self.assertNotIn(secret, result.stdout)
+        self.assertIn("[REDACTED]", result.stdout)
+
+    def test_logs_redact_json_headers_and_gateway_assignments(self):
+        path = self.home / ".tclaude/tcli/tcodex-proxy/gateway.log"
+        path.parent.mkdir(parents=True)
+        path.write_text('request headers {"Authorization":"Bearer json-secret","Cookie":"session=json-cookie","x-api-key":"json-key"}\n'
+                        'experimental_bearer_token = "assignment-secret"\n'
+                        'token=bare-secret\n'
+                        "headers {'Cookie': 'session=dict-cookie', 'x-api-key': 'dict-key'}\n")
+        result = self.run_cli("logs")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        for secret in ("json-secret", "json-cookie", "json-key", "assignment-secret", "bare-secret", "dict-cookie", "dict-key"):
+            self.assertNotIn(secret, result.stdout)
+        self.assertIn("[REDACTED]", result.stdout)
 
 
 if __name__ == "__main__":

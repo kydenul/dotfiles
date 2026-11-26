@@ -4,6 +4,10 @@
 # Docs: ~/.dotfiles/docs/tclaude-proxy.md
 #
 # Usage:
+#   tclaude-proxy start [tclaude|tcodex]  启动或检查网关（默认两者）
+#   tclaude-proxy agent install|status|uninstall
+#                                  管理开机自启及每 5 分钟的网关检查
+#   tclaude-proxy logs              查看两个网关和守护日志（隐藏凭据）
 #   tclaude-proxy status [tclaude|tcodex] 查看网关状态（默认两者）
 #   tclaude-proxy port             仅输出端口（供脚本消费）
 #   tclaude-proxy url [tcodex]     仅输出 URL（默认 tclaude）
@@ -16,8 +20,6 @@
 #                                  真正写入 ~/.claude/settings.json 和/或
 #                                  ~/.pi/agent/models.json（含 tclaude / tcodex）
 # END-USAGE
-# ============================================================================
-
 # ============================================================================
 
 set -euo pipefail

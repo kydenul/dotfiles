@@ -261,14 +261,14 @@ daemon; the client only needs `ANTHROPIC_AUTH_TOKEN=placeholder`.
 When tcodex is installed, these commands also maintain an independent tcodex
 gateway and export its live catalog to Pi. See `docs/tclaude-proxy.md` §4.2.1;
 implementation and regression tests are in `script/lib/tclaude-proxy/`
-(`tclaude.sh`, `tcodex.py`, `cli.sh`, `proxy_test.py`).
+(`tclaude.sh`, `tcodex.py`, `cli.sh`, `agent.sh`, `logs.py`, `proxy_test.py`).
 
-- `script/tclaude-proxy` — CLI: `status`, `port`, `url`, `env`, `ensure`,
-  `doctor`, `sync-ccswitch [claude|pi] [--apply]` (no app arg = both; dry-run
+- `script/tclaude-proxy` — CLI entry: `start` / `ensure`, `agent`, `logs`,
+  `status`, `port`, `url`, `env`, `doctor`, `sync-ccswitch [claude|pi] [--apply]` (no app arg = both; dry-run
   unless `--apply`)
-- `script/tclaude-proxy-agent.sh` — installs a launchd agent
+- `tclaude-proxy agent install` — installs a launchd agent
   (`com.kyden.tclaude-proxy`) that runs `tclaude-proxy ensure` every 5 min to
-  keep both installed gateways alive
+  keep both installed gateways alive; `script/tclaude-proxy-agent.sh` is a compatibility entry
 - `.zshrc` already adds `~/.dotfiles/script` to `$PATH`
 
 Key facts:

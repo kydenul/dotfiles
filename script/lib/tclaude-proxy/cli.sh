@@ -34,6 +34,8 @@ tcodex_proxy() { python3 "$TCODEX_HELPER" "$@"; }
 
 # shellcheck source=tclaude.sh
 source "$PROXY_LIB_DIR/tclaude.sh"
+# shellcheck source=agent.sh
+source "$PROXY_LIB_DIR/agent.sh"
 
 # Keep the original tclaude commands usable explicitly; launchd's default
 # ensure now maintains both installed gateways, with independent failures.
@@ -52,6 +54,20 @@ cmd_gateways() {
         return "$rc"
         ;;
     *) error "expected tclaude or tcodex, got '$target'"; return 1 ;;
+    esac
+}
+
+cmd_agent() {
+    local command="${1:-status}"
+    if [ "$#" -gt 1 ]; then
+        error "agent: expected one command (install, status, uninstall, logs)"
+        return 1
+    fi
+    case "$command" in
+    install | status | uninstall) "cmd_agent_$command" ;;
+    logs) python3 "$PROXY_LIB_DIR/logs.py" ;;
+    -h | --help | help) usage ;;
+    *) error "agent: unknown command '$command'"; return 1 ;;
     esac
 }
 
@@ -106,6 +122,27 @@ usage() {
 }
 
 main() {
+    case "${1:-status}" in
+    -h | --help | help) usage; return ;;
+    agent)
+        shift
+        case "${1:-status}" in
+        -h | --help | help) usage; return ;;
+        esac
+        cmd_agent "$@"
+        return
+        ;;
+    logs)
+        if [ "$#" -gt 1 ]; then
+            error "logs: unexpected arguments"
+            return 1
+        fi
+        need python3
+        python3 "$PROXY_LIB_DIR/logs.py"
+        return
+        ;;
+    esac
+
     need curl
     need python3
 
@@ -120,7 +157,13 @@ main() {
         esac
         ;;
     env) cmd_env ;;
-    ensure) cmd_gateways ensure "${2:-all}" ;;
+    start | ensure)
+        if [ "$#" -gt 2 ]; then
+            error "$1: expected at most one gateway (tclaude or tcodex)"
+            return 1
+        fi
+        cmd_gateways ensure "${2:-all}"
+        ;;
     doctor) cmd_doctor ;;
     sync-ccswitch)
         shift

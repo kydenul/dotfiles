@@ -428,16 +428,30 @@ export PATH="$HOME/.dotfiles/script:$PATH"
 
 之后 `tclaude-proxy` / `tclaude-proxy-agent.sh` 可直接调用，无需全路径。
 
+`script/tclaude-proxy` 保留命令帮助和入口，实现在 `script/lib/tclaude-proxy/`：
+
+| 文件 | 职责 |
+| --- | --- |
+| `cli.sh` | 命令分发、共享输出和网关选择 |
+| `tclaude.sh` | tclaude daemon 体检、Claude / Pi 配置同步 |
+| `tcodex.py` | tcodex 进程网关、模型目录、Pi 动态凭据 |
+| `agent.sh` | launchd 安装、状态和卸载 |
+| `logs.py` | 两个网关及守护日志，输出前隐藏凭据 |
+| `proxy_test.py` | 离线回归测试 |
+
+搬迁 `tcodex.py` 后，已有 Pi 配置中的动态命令也需要刷新；运行一次
+`tclaude-proxy sync-ccswitch pi --apply`，再用 `doctor` 检查。
+
 ### 前置：确认 daemon 活着
 
 daemon 由 `tclaude` 启动时拉起。若从没跑过 `tclaude`，先跑一次让它起来：
 
 ```bash
 tclaude-proxy status      # healthy 就行
-tclaude-proxy ensure      # 不 healthy 时用这个拉起
+tclaude-proxy start       # 不 healthy 时用这个拉起；ensure 是同义命令
 ```
 
-`ensure` 报错且提示未登录，则先 `tclaude login`。
+`start` / `ensure` 报错且提示未登录，则先 `tclaude login`。
 
 ### 步骤 1：拿到当前端口
 
@@ -497,6 +511,7 @@ claude                    # 正常用，走内部网关
 pi                        # /model 可选 tclaude 或 tcodex
 tclaude-proxy status      # 出问题先看这个
 tclaude-proxy doctor      # 完整体检
+tclaude-proxy logs        # 最近 30 行守护及网关日志，隐藏凭据
 ```
 
 ### 端口漂移后的修复
@@ -525,14 +540,17 @@ eval "$(tclaude-proxy env)"   # 只给当前 shell 导出，不碰任何配置�
 
 ### 可选：装 launchd 守护
 
-不装也能用，代价是 daemon 挂掉后要手动 `tclaude-proxy ensure`。要装：
+不装也能用，代价是 daemon 挂掉后要手动 `tclaude-proxy start`。要装：
 
 ```bash
-tclaude-proxy-agent.sh install     # 开机自启 + 每 5 分钟检查
-tclaude-proxy-agent.sh status
-tclaude-proxy-agent.sh logs
-tclaude-proxy-agent.sh uninstall   # 卸载，不影响 daemon 本身
+tclaude-proxy agent install     # 开机自启 + 每 5 分钟检查
+tclaude-proxy agent status
+tclaude-proxy logs
+tclaude-proxy agent uninstall   # 卸载，不影响 daemon 本身
 ```
+
+`tclaude-proxy-agent.sh install|status|logs|uninstall` 继续作为兼容入口。
+launchd 仍调用 `script/tclaude-proxy ensure`，检查间隔 300 秒。
 
 ## 6. 坑与限制
 
