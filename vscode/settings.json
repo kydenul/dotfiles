@@ -8,7 +8,7 @@
   "editor.cursorSmoothCaretAnimation": "on",
   "editor.fontFamily": "'Maple Mono NF CN','Hack Nerd Font Mono', 'Fira Code', 'Source Code Pro'",
   "editor.fontLigatures": false,
-  // "editor.lineNumbers": "relative",
+  "editor.lineNumbers": "relative",
   "editor.guides.bracketPairs": "active",
   "editor.rulers": [120],
   "editor.wordWrap": "on",
@@ -28,24 +28,25 @@
 
   "workbench.panel.showLabels": false,
   "workbench.browser.showInTitleBar": false,
-  // "workbench.activityBar.location": "hidden",
-  "workbench.colorTheme": "Gruvbox Dark Hard",
+  "workbench.activityBar.location": "top",
+  "workbench.colorTheme": "Gruvbox Light Hard",
   "workbench.iconTheme": "material-icon-theme",
   "workbench.list.smoothScrolling": true,
-  "workbench.activityBar.location": "top",
   "workbench.layoutControl.enabled": false,
   "workbench.sideBar.location": "right",
+  "workbench.editor.enablePreview": false,
   "workbench.editorAssociations": {
     "{hexdiff}:/**/*.*": "hexEditor.hexedit",
-    "*.md": "vscode.markdown.preview.editor"
+    "*.md": "vscode.markdown.preview.editor",
+    "*.markdown": "vscode.markdown.preview.editor"
   },
   "workbench.experimental.modernUIUppercaseViewHeaders": true,
-  // "workbench.colorCustomizations": {
-  //   "statusBar.background": "#005f5f",
-  //   "statusBar.foreground": "#e6e7e8",
-  //   "terminal.foreground": "#839395",
-  //   "editorCursor.foreground": "#91d696"
-  // },
+  "workbench.colorCustomizations": {
+    "statusBar.background": "#005f5f",
+    "statusBar.foreground": "#e6e7e8",
+    "terminal.foreground": "#839395",
+    "editorCursor.foreground": "#91d696"
+  },
 
   "terminal.integrated.enableMultiLinePasteWarning": "auto",
   "terminal.integrated.defaultProfile.linux": "zsh",
@@ -234,20 +235,11 @@
     { "before": ["L"], "after": ["$"] },
 
     // 上下移动选中行 (J/K 移动并 reindent)
-    {
-      "before": ["J"],
-      "commands": [{ "command": "editor.action.moveLinesDownAction" }]
-    },
-    {
-      "before": ["K"],
-      "commands": [{ "command": "editor.action.moveLinesUpAction" }]
-    },
+    { "before": ["J"], "commands": [{ "command": "editor.action.moveLinesDownAction" }] },
+    { "before": ["K"], "commands": [{ "command": "editor.action.moveLinesUpAction" }] },
 
     // Code action
-    {
-      "before": ["leader", "c", "a"],
-      "commands": [{ "command": "editor.action.quickFix" }]
-    },
+    { "before": ["leader", "c", "a"], "commands": [{ "command": "editor.action.quickFix" }] },
 
     // EasyMotion
     { "before": [","], "after": ["leader", "leader", "s"] }
@@ -265,7 +257,7 @@
   "gitlens.hovers.enabled": false,
   "gitlens.graph.layout": "editor",
   "gitlens.ai.model": "openrouter:tencent/hy4-preview",
-  "gitlens.views.commitDetails.files.layout": "list",
+  "gitlens.views.commitDetails.files.layout": "tree",
   "gitlens.views.searchAndCompare.files.layout": "list",
   "gitlens.views.scm.grouped.views": {
     "commits": true,
@@ -357,92 +349,6 @@
   "cmake.parallelJobs": 0,
 
   // -----------------------------------------------------------------
-  // LaTex
-  "latex-workshop.latex.outDir": "%DIR%",
-  "latex-workshop.latex.tools": [
-    {
-      "name": "xelatex",
-      "command": "xelatex",
-      "args": [
-        "-synctex=1",
-        "-interaction=nonstopmode",
-        "-file-line-error",
-        "--output-directory=%OUTDIR%",
-        "%DOCFILE%"
-      ]
-    },
-    {
-      "name": "pdflatex",
-      "command": "pdflatex",
-      "args": [
-        "-synctex=1",
-        "-interaction=nonstopmode",
-        "-file-line-error",
-        "--output-directory=%OUTDIR%",
-        "%DOCFILE%"
-      ]
-    },
-    {
-      "name": "bibtex",
-      "command": "bibtex",
-      "args": ["%OUTDIR%/%DOCFILE%"],
-      "env": { "TEXMFOUTPUT": "%OUTDIR%" }
-    },
-    {
-      "name": "biber",
-      "command": "biber",
-      "args": ["%OUTDIR%/%DOCFILE%"],
-      "env": { "TEXMFOUTPUT": "%OUTDIR%" }
-    }
-  ],
-  "latex-workshop.latex.recipes": [
-    { "name": "xelatex", "tools": ["xelatex"] },
-    { "name": "pdflatex", "tools": ["pdflatex"] },
-    {
-      "name": "xe->bibtex->xe*2",
-      "tools": ["xelatex", "bibtex", "xelatex", "xelatex"]
-    },
-    {
-      "name": "xe->biber->xe*2",
-      "tools": ["xelatex", "biber", "xelatex", "xelatex"]
-    },
-    {
-      "name": "pdf->bib->pdf*2",
-      "tools": ["pdflatex", "bibtex", "pdflatex", "pdflatex"]
-    }
-  ],
-  "latex-workshop.view.pdf.viewer": "tab",
-  "latex-workshop.view.pdf.internal.synctex.keybinding": "double-click",
-  "latex-workshop.latex.clean.fileTypes": [
-    "*.aux",
-    "*.bbl",
-    "*.blg",
-    "*.idx",
-    "*.ind",
-    "*.lof",
-    "*.lot",
-    "*.out",
-    "*.toc",
-    "*.acn",
-    "*.acr",
-    "*.alg",
-    "*.glg",
-    "*.glo",
-    "*.gls",
-    "*.ist",
-    "*.fls",
-    "*.log",
-    "*.fdb_latexmk",
-    "*.gz"
-  ],
-  "latex-workshop.latex.autoClean.run": "onFailed",
-  "latex-workshop.latex.autoBuild.run": "onSave",
-  "latex-workshop.latex.recipe.default": "lastUsed",
-  "latex-workshop.showContextMenu": true,
-  "latex-workshop.message.error.show": false,
-  "latex-workshop.message.warning.show": false,
-
-  // -----------------------------------------------------------------
   // plantuml
   "plantuml.exportOutDir": ".",
   "plantuml.exportFormat": "svg",
@@ -487,11 +393,10 @@
   "codingcopilot.autoAcceptWebSearch": true,
   "codingcopilot.standaloneTerminal": true,
   "codingcopilot.enableCraftCodeBase": true,
+  "codingcopilot.sandboxEnabled": false,
   "codingcopilot.customBlacklistCommands": [],
   "gitlens.graph.changesColumn.enabled": true,
 
-  "claudeCode.claudeProcessWrapper": "/opt/homebrew/bin/tclaude",
-  "claudeCode.preferredLocation": "panel",
   "pixide.px.hiddenPlatEditions": {
     "v2-timi": {
       "key": "v2-timi",
