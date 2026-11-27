@@ -4,4 +4,3 @@ rex.bind("cmd+r", "client.tab.rename")        -- set_tab_title
 rex.bind("cmd+z", "pane.zoom")                -- toggle_layout stack
 rex.bind("cmd+h", "client.tab.previous")      -- previous_tab
 rex.bind("cmd+l", "client.tab.next")          --  next_tab
-rex.unbind("ctrl+t")                          -- 让 ctrl+t 透传给 nvim (toggleterm)
