@@ -31,11 +31,11 @@ return {
       mux = { enabled = false },
       tools = { ["TClaude"] = { cmd = { "tclaude" } } },
       prompts = {
-        -- refactor = "Please refactor {this} to be more maintainable",
-        -- security = "Review {file} for security vulnerabilities",
-        -- custom = function(ctx)
-        --   return "Current file: " .. ctx.buf .. " at line " .. ctx.row
-        -- end,
+        release_tag = "Update the changelog following the project's conventions, then create a release tag. Use the changelog-conventions skill for the changelog and the git-workflow-and-versioning skill for the version bump and tagging. Do not push the tag until I confirm.",
+        commit = "Commit the current changes. Use the git-commit skill for the message format (gitmoji + conventional commits) and the git-workflow-and-versioning skill to keep commits atomic.",
+        review = "Review the current uncommitted code changes (git diff, including staged). Use the code-review-and-quality skill and report findings by severity.",
+        docs = "Check whether the current changes require documentation updates, and update the existing docs accordingly. Use the agents-md skill for AGENTS.md / CLAUDE.md and the changelog-conventions skill for the changelog. Do not create new Markdown files.",
+        push_check = "Prepare to push the current branch. Review everything to be pushed (git log @{u}.. and git diff @{u}..) for unrelated changes, debug code and secrets, then give the deployment checklist (processes, database, Redis/cache, config, other dependencies, compatibility and rollback). Use the git-workflow-and-versioning and shipping-and-launch skills. Do not push until I confirm.",
       },
     },
   },
